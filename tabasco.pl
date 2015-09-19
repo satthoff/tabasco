@@ -1,6 +1,6 @@
 #
 #
-# This software is copyright (c) 2014 by Dipl. Inform. Uwe Satthoff.
+# This software is copyright (c) 2014 - 2015 by Dipl. Inform. Uwe Satthoff.
 #
 # This is free software; you can redistribute it and/or modify it under the same terms
 # as the Perl 5 programming language system itself.
@@ -8,6 +8,7 @@
 # Contact: jcp@comasy.de
 #
 # Hamburg, 08-11/2014 - Uwe Satthoff
+# Hartenholm, 19-09/2015 - Uwe Satthoff
 #-------------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------------
@@ -433,7 +434,7 @@ Uwe Satthoff -  L<mailto:jcp@comasy.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Diplom Informatiker Uwe Satthoff - L<https://comasy.de>
+This software is copyright (c) 2014 - 2015 by Diplom Informatiker Uwe Satthoff - L<https://comasy.de>
 
 This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
 
