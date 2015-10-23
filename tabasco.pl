@@ -158,7 +158,7 @@ sub tabasco_pre_commit
 	    push @errorMessage, "A new trunk can only be created with a svn-copy operation from a tag of the same task.";
 	    push @errorMessage, "Invalid source: >$source<";
 	  } else {
-	    $source =~ s/^(.*)tags\/[^\/\s]+\$/$1/;
+	    $source =~ s/^(.*)tags\/[^\/\s]+\/$/$1/;
 	    $source =~ s/\/$//;
 	    $target =~ s/^(.*)trunk\/$/$1/;
 	    $target =~ s/\/$//;
@@ -266,7 +266,7 @@ sub tabasco_pre_commit
     if( @errorMessage ) {
       grep s/$/\n/, @errorMessage;
       $errorMessage[0] = ' ' . $errorMessage[0];
-      print STDERR "@errorMessage\n";
+      print STDERR "\n@errorMessage\n\n";
       exit -1;
     }
   }
