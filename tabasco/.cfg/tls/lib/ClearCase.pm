@@ -34,7 +34,6 @@ B<ClearCase.pm> [options]
 
 =cut
 
-
 sub AUTOLOAD {
     use vars qw( $AUTOLOAD );
 
@@ -126,7 +125,7 @@ __END__
 
 =head1 AUTHOR INFORMATION
 
- Copyright (C) 2006 Uwe Satthoff
+ Copyright (C) 2006, 2017 Uwe Satthoff
 
 =head1 BUGS
 
