@@ -44,8 +44,9 @@ sub new
    # initialize
    $self->setFrom( $from );
    $self->setTo( $to );
-
    $self->setHlType( $hltype );
+
+
 
    return $self;
 } # new ()
