@@ -70,6 +70,12 @@ sub new()
    if( ClearCase::getRC() == 0 ) {
        my $objKind = ClearCase::getOutputLine();
        chomp $objKind;
+
+       if( $objKind eq '**null meta type**' ) {
+	   # we are not within a Vob
+	   return undef;
+       }
+
        $objKind =~ s/^\S+\s//;
        my $correctKind = $class;
        $correctKind =~ s/^.*:://;

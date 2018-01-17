@@ -120,6 +120,13 @@ sub lsprivate {
    return @result;
 } # lsprivate
 
+sub cwdInVob {
+    my $self = shift;
+
+    my $directoryVersion = ClearCase::InitVersion( -pathname => '.' );
+    return $directoryVersion;
+}
+
 
 1;
 
