@@ -1,0 +1,66 @@
+#
+# RM_EMPTY_BRANCH.tgr
+#
+# When uncheckouts or rmbranches are performed remove the parent branch
+# if the parent branch has no checkouts, sub-branches or labeld versions
+# associated with it IFF (IF AND ONLY IF) the uncheckout file is the 0th
+# element or removing the branch causes the parent branch to also be
+# "empty".
+#
+########################################################################
+
+use File::Spec::Functions;
+
+sub error {
+   my $error = shift;
+   print "
+$error
+
+";
+   exit 1;
+}
+
+my $vobPattern = quotemeta( $ENV{CLEARCASE_VOB_PN} );
+my @path = split /$vobPattern/, $ENV{CLEARCASE_PN};
+$path[$#path] =~ s/\\/\//g;
+my $toolPattern = quotemeta( '/.cfg/' );
+exit 0 if( $path[$#path] =~ m/^$toolPattern/ );
+
+$ENV{CLEARCASE_ID_STR} =~ s%\\%/%g;             # be compatible on Unix and Windows
+exit 0 if ( $ENV{CLEARCASE_OP_KIND} eq 'uncheckout' and $ENV{CLEARCASE_ID_STR} !~ m%/0$% );
+$BRANCH_DIR = $ENV{'CLEARCASE_XPN'};
+$ORIG_DIR = $BRANCH_DIR;
+$BRANCH_DIR =~ s%\\%/%g;                        # be compatible on Unix and Windows
+$BRANCH_DIR =~ s/^(.*)\/.*$/$1/;                # get the previous branch
+exit 0 if ($BRANCH_DIR =~ m/^.*\@\@\/main$/); # try not to delete the main branch
+$LOG = "/dev/null";
+if (defined $ENV{OS})
+  {
+    $LOG = "NUL";
+    $ORIG_DIR =~ s/^(.*)\\.*$/$1/;
+  }
+else
+  {
+    $ORIG_DIR =~ s/^(.*)\/.*$/$1/;
+  }
+  # Windows
+if (opendir (DD, "$BRANCH_DIR"))
+  {
+    # dynamic view
+    @list = grep (!/^\.$|^\.\.$/, readdir (DD));
+    grep (chomp, @list);
+    closedir(DD);
+    exit 0 unless (scalar (@list) == 2);      # has labels, branches or versions > 0 (don't care about hyperlinks)
+    system ("cleartool rmbranch -force -c \"Automatic removal of empty branch via trigger...\" \"$ORIG_DIR\"");
+  }
+else
+  {
+    # snapshot view
+    @vt = qx(cleartool lsvt -a -obs "$BRANCH_DIR");
+    exit 0 if @vt > 2;                        # same as CLEARCASE_ID_CHECK above
+    exit 0 if ( $vt[1] =~ m%\s\(.*\)% );      # meta data on /0 version
+    system ("cleartool rmbranch -force -c \"Automatic removal of empty branch via trigger...\" \"$ORIG_DIR\"");
+    system ("cleartool update -log $LOG \"$ENV{CLEARCASE_PN}\"");
+  }
+exit 0;
+
