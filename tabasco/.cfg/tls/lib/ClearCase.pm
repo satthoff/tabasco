@@ -40,7 +40,7 @@ sub AUTOLOAD {
 
     ( my $method = $AUTOLOAD ) =~ s/.*:://;
 
-    if( $method =~ m/^Init(\S+)$/ ) {
+    if( $method =~ m/^Init(\S+)$/ ) { # request to create object of class
 	my $package = 'ClearCase::' . $1;
 	eval "require $package";
 	Die( [ "require of package $package failed." ] ) if $@;
