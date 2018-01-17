@@ -10,7 +10,7 @@ sub BEGIN {
    require Exporter;
    require ClearCase::Element;
 
-   @ISA = qw(Exporter ClearCase::Element);
+   @ISA = qw(Exporter);
 
    @EXPORT = qw(
    );
@@ -21,28 +21,30 @@ sub BEGIN {
    );
 
    %DATA = (
-      Target   => undef,
-      HlType   => undef
+       From => undef,
+       To => undef,
+       HlType => undef
       );
 
    Data::init(
       PACKAGE  => __PACKAGE__,
-      SUPER    => "ClearCase::Element"
+      SUPER    => undef
       );
 
 
 } # sub BEGIN()
 
-sub new($$$)
+sub new
 {
-   my ( $proto, $hltype, $base, $target ) = @_;
+   my ( $proto, $hltype, $from, $to ) = @_;
    my $class = ref ($proto) || $proto;
-   my $self  = $class->SUPER::_new( $base );
+   my $self  = {};
    bless $self, $class;
 
    # initialize
-   $self->setTarget( $target );
+   $self->setFrom( $from );
    $self->setHlType( $hltype );
+   $self->setTo( $to );
 
    return $self;
 } # new ()
