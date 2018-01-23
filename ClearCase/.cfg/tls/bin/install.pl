@@ -46,7 +46,8 @@ my $vobTag = File::Basename::dirname( $base );
 my $vob = ClearCase::InitVob( -tag => $vobTag );
 
 # create the hyperlink type to link paths to the branches, what we need first
-my $pathLink = ClearCase::InitHlType( -name => $TaBasCo::Config::pathLink, -vob => $vob )->create();
+my $pathLinkType = ClearCase::InitHlType( -name => $TaBasCo::Config::pathLink, -vob => $vob );
+$pathLinkType->create();
 
 # create the configuration file
 ClearCase::checkout(
@@ -57,16 +58,16 @@ ClearCase::mkelem(
 		  -pathname => $configFile
 		 );
 
-# now create the hyperlink from the branch main of the configuration file
+# now create the hyperlink from the first Task (= branch main of the configuration file)
 # to the Vob root path element
-ClearCase::mkhlink(
-                   -hltype => $pathLink->getName(),
-                   -from   => $configFile . '@@' . $OS::Config::slash . 'main',
-                   -to     => $vobTag . $OS::Config::slash . '.@@'
-                  );
-
-# load the initial task
-my $task = TaBasCo::Task->new( -pathname => $configFile . '/main' );
+my $mainTask = TaBasCo::Task->new( -pathname => $configFile . '@@' . $OS::Config::slash . 'main' );
+my $vobRootElement = ClearCase::InitElement( -pathname => $vobTag . $OS::Config::slash . '.@@' );
+my $initialPathLink = ClearCase::InitHyperLink(
+    -hltype => $pathlinkType,
+    -from => $mainTask,
+    -to => $vobRootElement
+    );
+$initialPathLink->create();
 
 # create the label type MAIN_NEXT
 ClearCase::InitLbType( -name => uc( 'main' . $TaBasCo::Config::nextLabelExtension ), -vob => $vob
@@ -78,7 +79,7 @@ ClearCase::InitLbType( -name => $TaBasCo::Config::cspecLabel, -vob => $vob
 
 
 # now create the initial config spec for the initial task
-$task->createConfigSpec();
+$mainTask->createConfigSpec();
 
 # the initial config spec has been written.
 # and the CSPEC label has been attached.
@@ -91,10 +92,10 @@ ClearCase::checkout(
                    );
 
 # get the new release name
-my $relName = $task->nextReleaseName();
+my $relName = $mainTask->nextReleaseName();
 
 # create the release
-$task->createNewRelease( $relName );
+$mainTask->createNewRelease( $relName );
 
 # create the tools label type
 ClearCase::InitLbType( -name => $TaBasCo::Config::toolSelectLabel, -vob => $vob )->create();

@@ -4,7 +4,6 @@ use strict;
 use Carp;
 use File::Basename;
 use Log;
-require ClearCase::Version;
 
 
 BEGIN {
@@ -72,20 +71,23 @@ sub new()
        chomp $objKind;
 
        if( $objKind eq '**null meta type**' ) {
-	   # we are not within a Vob
+	   # we are not within a Vob or it is not a full qualified pathname
 	   return undef;
        }
 
-       $objKind =~ s/^\S+\s//;
-       my $correctKind = $class;
-       $correctKind =~ s/^.*:://;
-
-       Die( [ "Pathname argument  is not a $class: $pathname" ] ) if( lc( $objKind ) ne lc( $correctKind ) );
        $self->computeMyOid( $pathname );
    }
    
    $self->_init( $pathname );
    return $self;
+}
+
+sub _init {
+    my $self = shift;
+
+    # only to ensure that a subroutine _init exists in the class hierachy,
+    # because sibling classes might not declare a _init subroutine.
+
 }
 
 sub loadNormalizedPath {
