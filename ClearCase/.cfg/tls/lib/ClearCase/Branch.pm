@@ -44,23 +44,21 @@ sub BEGIN {
 
 sub _init {
     my $self = shift;
-    my $pathname = shift;
-
-    $self->setName( File::Basename::basename( $pathname )  );
+    $self->setName( File::Basename::basename( $self->getVXPN() ) );
 }
 
-sub create
-  {
+sub create {
+    # must be moved to ClearCase::Element and renamed to createBranch
     my $self = shift;
-   my ( $fve, @other ) = $self->rearrange(
-      [ 'FROMVERSION' ],
-      @_ );
+    my ( $fve, @other ) = $self->rearrange(
+	[ 'FROMVERSION' ],
+	@_ );
 
     my $branchType = ClearCase::InitBrType( -name => $self->getName(), -vob => $self->getVob()  );
     unless( $branchType->exist() )
-      {
+    {
         $branchType->create();
-      }
+    }
     ClearCase::mkbranch(
 	-pathname => $fve->getVXPN(),
 	-name     => $self->getName(),
@@ -75,17 +73,10 @@ sub create
     return $self;
   }
 
-
-sub getBranchPath
-  {
-    my $self = shift;
-    return $self->getVXPN();
-  }
-
 sub loadMyElement {
     my $self = shift;
 
-    my @tmp = split /\@\@/, $self->getBranchPath();
+    my @tmp = split /\@\@/, $self->getVXPN();
     pop @tmp;
     my $ePath = join '@@', @tmp;
     $ePath =~ s/$/\@\@/ unless( $ePath =~ m/\@\@$/ );
@@ -96,7 +87,7 @@ sub loadLatestVersion
   {
     my $self = shift;
 
-    my $latestVersion = ClearCase::InitVersion( -pathname => $self->getBranchPath() . $OS::Config::slash . 'LATEST' );
+    my $latestVersion = ClearCase::InitVersion( -pathname => $self->getVXPN() . $OS::Config::slash . 'LATEST' );
     return $self->setLatestVersion( $latestVersion );
   }
 
@@ -104,7 +95,7 @@ sub loadZeroVersion
   {
     my $self = shift;
 
-    my $zeroVersion = ClearCase::InitVersion( -pathname => $self->getBranchPath() . $OS::Config::slash . '0' );
+    my $zeroVersion = ClearCase::InitVersion( -pathname => $self->getVXPN() . $OS::Config::slash . '0' );
     return $self->setZeroVersion( $zeroVersion );
   }
 
@@ -113,7 +104,7 @@ sub getLabeledVersion
     my $self = shift;
     my $label = shift;
 
-    my $labeledVersion = ClearCase::InitVersion( -pathname => $self->getBranchPath() . $OS::Config::slash . $label );
+    my $labeledVersion = ClearCase::InitVersion( -pathname => $self->getVXPN() . $OS::Config::slash . $label );
     return $labeledVersion;
   }
 

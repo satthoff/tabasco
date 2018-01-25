@@ -23,7 +23,7 @@ BEGIN {
    );
 
    %DATA = (
-       CspecPath      => { CALCULATE => \&loadCspecPath }
+       CspecPath => { CALCULATE => \&loadCspecPath }
       );
 
    Data::init(

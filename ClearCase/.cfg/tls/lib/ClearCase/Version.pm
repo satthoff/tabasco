@@ -30,8 +30,8 @@ sub BEGIN {
        );
 
    Data::init(
-      PACKAGE     => __PACKAGE__,
-      SUPER       => 'ClearCase::Common::CCPath'
+       PACKAGE => __PACKAGE__,
+       SUPER => 'ClearCase::Common::CCPath'
       );
 
 } # sub BEGIN()
@@ -40,17 +40,8 @@ sub BEGIN {
 
 sub _init {
     my $self = shift;
-    my $pathname = shift;
-
-    # compute now the pure CC path, e.g. without labels
-    ClearCase::describe(
-       -pathname => $pathname,
-       -short => 1
-       );
-    my $purePath = ClearCase::getOutputLine();
-    chomp $purePath;
     
-    my @tmp = split /\@\@/, $purePath;
+    my @tmp = split /\@\@/, $self->getVXPN();
     $self->setVersionString( $tmp[ $#tmp ] );
 }
 

@@ -24,7 +24,7 @@ BEGIN {
 
    %DATA = (
        Oid => undef,
-       Vob    => { CALCULATE => \&loadVob },
+       Vob => undef,
        NormalizedPath => { CALCULATE => \&loadNormalizedPath }
       );
 
@@ -49,45 +49,41 @@ sub new()
 
    Die( [ "Missing argument pathname for initilization of object $class" ] ) unless( $pathname );
 
-   if( $self->isa( 'ClearCase::Branch' ) ) {
-       # the specified branch path might not exist yet,
-       # only initialization for the on disk object creation
-       ClearCase::disableErrorOut();
-       ClearCase::disableDieOnErrors();
-       ClearCase::describe(
-	   -pathname => $pathname,
-	   -fmt => '%m'
-	   );
-       ClearCase::enableErrorOut();
-       ClearCase::enableDieOnErrors();
-   } else {
-       ClearCase::describe(
-	   -pathname => $pathname,
-	   -fmt => '%m'
-	   );
-   }
-   if( ClearCase::getRC() == 0 ) {
-       my $objKind = ClearCase::getOutputLine();
-       chomp $objKind;
+   # determine my Vob
+   ClearCase::disableErrorOut();
+   ClearCase::disableDieOnErrors();
+   ClearCase::describe(
+       -pathname => 'vob:' . $pathname,
+       -short => 1
+       );
+   ClearCase::enableErrorOut();
+   ClearCase::enableDieOnErrors();
 
-       if( $objKind eq '**null meta type**' ) {
-	   # we are not within a Vob or it is not a full qualified pathname
-	   return undef;
-       }
-
-       $self->computeMyOid( $pathname );
+   if( ClearCase::getRC() != 0 ) {
+       # pathname is not a VXPN (path within a Vob)
+       return undef;
    }
+   my $vobTag = ClearCase::getOutputLine();
+   chomp $vobTag;
+   # get the Vob from my ClearCase host region
+   $self->setVob( $ClearCase::Common::Config::myHost->getRegion()->getVob( -tag => $vobTag ) );
+
+   # determine my OID
+   ClearCase::describe(
+       -pathname => $pathname,
+       -fmt => '%On'
+       );
+   $self->setOid( ClearCase::getOutputLine() );
    
-   $self->_init( $pathname );
+   $self->_init();
    return $self;
 }
 
 sub _init {
     my $self = shift;
 
-    # only to ensure that a subroutine _init exists in the class hierachy,
+    # exists here only to ensure that a subroutine _init exists in the class hierachy,
     # because sibling classes might not declare a _init subroutine.
-
 }
 
 sub loadNormalizedPath {
@@ -128,36 +124,19 @@ sub loadNormalizedPath {
         }
     }
     push @components, $first;
-    return $self->setNormalizedPath( join "/", reverse @components );
-}
-
-sub loadVob {
-    my $self  = shift;
-    return $self->setVob( $ClearCase::Common::Config::myHost->getRegion()->getVob( -tag => $self->getVXPN() ) );
+    return $self->setNormalizedPath( join "$OS::Config::slash", reverse @components );
 }
 
 sub getVXPN {
    my $self = shift;
 
    ClearCase::describe(
-       -pathname => 'oid: ' . $self->getOid(),
+       -pathname => 'oid: ' . $self->getOid() . '@' . $self->getVob()->getTag(),
        -short => 1
        );
    my $p = ClearCase::getOutputLine();
    chomp $p;
    return $p;
-}
-
-sub computeMyOid {
-    my $self = shift;
-    my $path = shift;
-
-       ClearCase::describe(
-       -pathname => $path,
-       -fmt => '%On'
-       );
-   my $oid = ClearCase::getOutputLine();
-   $self->setOid( $oid );
 }
 
 1;
