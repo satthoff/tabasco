@@ -127,7 +127,7 @@ __END__
 
 =head1 AUTHOR INFORMATION
 
- Copyright (C) 2009 2013 2016  Uwe Satthoff
+ Copyright (C) 2007  Uwe Satthoff
 
 =head1 CREDITS
 
