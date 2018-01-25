@@ -50,10 +50,6 @@ sub _init {
 	[ 'HLTYPE', 'FROM', 'TO' ],
 	@_ );
 
-    # TDB
-    # it must become a sibling of ClearCase::Common::MetaObject
-    # still missing the also valid input = hlink:xyz
-
     $self->setFrom( $from );
     $self->setTo( $to );
     $self->setHlType( $hltype );
