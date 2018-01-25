@@ -1,8 +1,6 @@
 
-1. combine ClearCase::Common::CCPath and ClearCase::Common::MetaObject into one class, e.g. ClearCase::Common::Object
+- adopt all other ClearCase classes to new ClearCase::Common::CCPath class
 
-2. adopt all other ClearCase classes to new ClearCase::Common::Object class
-
-3. adopt TaBasCo and OS interfaces to new ClearCase interface
+- adopt TaBasCo and OS interfaces to new ClearCase interface
 
 
