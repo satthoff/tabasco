@@ -48,11 +48,11 @@ sub load {
 	@_ );
 
     ClearCase::find(
-	-pathname => TaBasCo::Config::getConfigElement()->getElement(),
+	-pathname => TaBasCo::Common::Config::getConfigElement()->getElement(),
 	-version => 'lbtype(' . $name . ')',
 	-print => 1
 	);
-    my @versions = ClearCase::Common::Cleartool::getOutput();
+    my @versions = ClearCase::getOutput();
     return undef unless( @versions );
     my $latestVersion = $versions[$#versions];
 
@@ -104,7 +104,7 @@ sub createFloatingRelease
   {
     my $task = shift;
 
-    my $floatingLabel = uc( $task->getName() . $TaBasCo::Config::nextLabelExtension );
+    my $floatingLabel = uc( $task->getName() . $TaBasCo::Common::Config::nextLabelExtension );
     my $lbtype = ClearCase::InitLbType( -name => $floatingLabel, -vob => $task->getVob() );
     $lbtype->create();
     return $lbtype;
@@ -115,7 +115,7 @@ sub renameFloatingRelease
     my $task = shift;
     my $name = shift;
 
-    my $floatingLabel = uc( $task->getName() . $TaBasCo::Config::nextLabelExtension );
+    my $floatingLabel = uc( $task->getName() . $TaBasCo::Common::Config::nextLabelExtension );
     my $lbtype = ClearCase::InitLbType( name => $floatingLabel, -vob => $task->getVob() );
     $lbtype->rename( $name );
   }
@@ -125,7 +125,7 @@ sub loadName
     my $self = shift;
 
     my @labels = $self->getLabels();
-    my @names = grep !m/^${TaBasCo::Config::cspecLabel}$/, @labels;
+    my @names = grep !m/^${TaBasCo::COMMON::Config::cspecLabel}$/, @labels;
     return undef unless( @names );
     return undef unless( $#names == 0 );
     return $self->setName( $names[0] );
@@ -152,7 +152,7 @@ sub loadTask
     my $self = shift;
 
     Debug( [ '', 'BEGIN: ' . __PACKAGE__ . '::loadTask' ] );
-    return $self->setTask( TaBasCo::Task->new(  -pathname => $self->getMyBranch()->getVXPN() ) );
+    return $self->setTask( TaBasCo::InitTask(  -pathname => $self->getMyBranch()->getVXPN() ) );
   }
 
 1;

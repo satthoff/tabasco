@@ -70,7 +70,7 @@ sub createNewRelease
 
     # we have to attach the new release name to the currently
     # checked out version of the configuration element
-    my $newRelease = TaBasCo::Release->new( -pathname => $self->getElement() );
+    my $newRelease = TaBasCo::InitRelease( -pathname => $self->getElement() );
     $newRelease->applyName( $releaseName );
 
     # create the configuration specification
@@ -106,11 +106,11 @@ sub cspecHeader
     my $toolRoot = File::Basename::dirname( $self->getElement() );
     my $rootCspec = ClearCase::InitElement( -pathname => $toolRoot )->getCspecPath();
     $rootCspec =~ s/\/\.\.\.$//;
-    my $toolCspec = ClearCase::InitElement( -pathname => $toolRoot . $OS::Config::slash . $TaBasCo::Config::toolPath )->getCspecPath();
-    push @$config_spec, 'element -directory ' . $rootCspec . " $TaBasCo::Config::toolSelectLabel -nocheckout";
-    push @$config_spec, 'element -file ' . $rootCspec . "/$TaBasCo::Config::configFile CHECKEDOUT";
-    push @$config_spec, 'element -file ' . $rootCspec . "/$TaBasCo::Config::configFile /main/LATEST";
-    push @$config_spec, 'element ' . $toolCspec . " $TaBasCo::Config::toolSelectLabel -nocheckout";
+    my $toolCspec = ClearCase::InitElement( -pathname => $toolRoot . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolPath )->getCspecPath();
+    push @$config_spec, 'element -directory ' . $rootCspec . " $TaBasCo::Common::Config::toolSelectLabel -nocheckout";
+    push @$config_spec, 'element -file ' . $rootCspec . "/$TaBasCo::Common::Config::configFile CHECKEDOUT";
+    push @$config_spec, 'element -file ' . $rootCspec . "/$TaBasCo::Common::Config::configFile /main/LATEST";
+    push @$config_spec, 'element ' . $toolCspec . " $TaBasCo::Common::Config::toolSelectLabel -nocheckout";
 
   }
 
@@ -193,9 +193,9 @@ sub createConfigSpec
         print FD "$_\n";
       }
     close FD;
-    Debug( [ '', "attach label : $TaBasCo::Config::cspecLabel" ] );
-    my $cspecRelease =  TaBasCo::Release->new( -pathname => $self->getElement() );
-    $cspecRelease->applyName( $TaBasCo::Config::cspecLabel );
+    Debug( [ '', "attach label : $TaBasCo::Common::Config::cspecLabel" ] );
+    my $cspecRelease =  TaBasCo::InitRelease( -pathname => $self->getElement() );
+    $cspecRelease->applyName( $TaBasCo::Common::Config::cspecLabel );
   }
 
 sub createCspecBlock
@@ -247,7 +247,7 @@ sub create
 
    my $newTask = $self->new(
 			    -element => $baseline->get('_Element'),
-			    -branch  => File::Basename::dirname( $baseline->getVersionString() ) . $OS::Config::slash . $name
+			    -branch  => File::Basename::dirname( $baseline->getVersionString() ) . $OS::Common::Config::slash . $name
 			   );
    $newTask->SUPER::create( -fromVersion => $baseline );
    TaBasCo::Release::createFloatingRelease( $newTask );
@@ -259,7 +259,7 @@ sub mkPath
     my $self = shift;
     my $path = shift;
     ClearCase::mkhlink(
-		       -hltype => $TaBasCo::Config::pathLink,
+		       -hltype => $TaBasCo::Common::Config::pathLink,
 		       -from   => $self->getBranchPath(),
 		       -to     => $path . '/.@@'
 		      );
@@ -273,10 +273,10 @@ sub loadPath
 
     ClearCase::describe(
                         -short    => 1,
-                        -ahl      => $TaBasCo::Config::pathLink,
+                        -ahl      => $TaBasCo::Common::Config::pathLink,
                         -pathname => $self->getBranchPath()
                        );
-    my @paths = ClearCase::Common::Cleartool::getOutput();
+    my @paths = ClearCase::getOutput();
     grep chomp, @paths;
     my $parent = undef;
     while( not @paths )
@@ -309,7 +309,7 @@ sub loadBaseline
     return undef unless( $pv );
     # here we have to load explicitely the Release object, because
     # pv is only a ClearCase::Version, but not a TaBasCo::Release
-    my $baseline = TaBasCo::Release->new( -element => $pv->get('_Element'), -version => $pv->getVersionString() );
+    my $baseline = TaBasCo::InitRelease( -element => $pv->get('_Element'), -version => $pv->getVersionString() );
     return $self->setBaseline( $baseline );
   }
 
@@ -321,7 +321,7 @@ sub loadCspecPath
     my @cspecPaths = ();
     foreach my $p ( @paths )
       {
-	push @cspecPaths, ClearCase::Element->new( -pathname => $p )->getCspecPath();
+	push @cspecPaths, ClearCase::InitElement( -pathname => $p )->getCspecPath();
       }
     return $self->setCspecPath( \@cspecPaths );
   }

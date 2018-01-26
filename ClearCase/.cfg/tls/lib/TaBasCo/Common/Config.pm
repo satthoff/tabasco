@@ -1,4 +1,4 @@
-package TaBasCo::Config;
+package TaBasCo::Common::Config;
 
 use strict;
 use Carp;

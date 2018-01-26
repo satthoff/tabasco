@@ -3,36 +3,37 @@ package TaBasCo;
 use strict;
 use Carp;
 
+sub BEGIN {
+   require Transaction;
+   require ClearCase::Common::Config;
+   require ClearCase::Common::Cleartool;
+}
+
 use Log;
-use Transaction;
-use Data;
-use ClearCase;
-use OS;
 
-use TaBasCo::UI;
-use TaBasCo::Config;
-use TaBasCo::Task;
-use TaBasCo::Release;
+sub AUTOLOAD {
+    use vars qw( $AUTOLOAD );
 
+    ( my $method = $AUTOLOAD ) =~ s/.*:://;
 
-BEGIN {
-   use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+    if( $method =~ m/^Init(\S+)$/ ) { # request to create object of package method = InitPackage
+	my $package = 'TaBasCo::' . $1;
+	eval "require $package";
+	Die( [ "require of package $package failed." ] ) if $@;
 
-   require Exporter;
-   require AutoLoader;
-
-   @ISA = qw(Exporter AutoLoader);
-
-   @EXPORT = qw(
-   );
-   @EXPORT_OK = qw(
-   );
-   %EXPORT_TAGS = (
-   # TAG1 => [...],
-   );
-   $VERSION = '0.01';
-
-};
+	no strict 'refs';
+	no strict 'subs';
+	my $func = <<EOF
+	    sub TaBasCo::$method {
+		return $package->new( \@_ );
+	}
+EOF
+;
+	eval( "$func" );
+	Die( [$func, $@ ] ) if $@;
+	goto &$AUTOLOAD;
+    }
+} # AUTOLOAD
 
 1;
 

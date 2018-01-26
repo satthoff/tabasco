@@ -73,8 +73,6 @@ EOF
 	Die( [$func, $@ ] ) if $@;
 	goto &$AUTOLOAD;
     }
-    
-
 } # AUTOLOAD
 
 sub getErrors {
