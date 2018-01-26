@@ -108,7 +108,6 @@ RETURN VALUE
 sub _init {
    my $self = shift;
 
-
    $self->SUPER::_init( -type => 'eltype', @_ );
    return;
 } # _init
@@ -131,10 +130,6 @@ RETURN VALUE
 
 sub create {
    my $self = shift;
-   my @other = @_;
-#    my ( @other ) = $self->rearrange(
-#       ,
-#       @_ );
 
    ClearCase::mkeltype(
       -name    => $self->getName(),

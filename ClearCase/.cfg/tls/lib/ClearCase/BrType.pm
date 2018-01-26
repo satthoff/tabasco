@@ -131,10 +131,6 @@ RETURN VALUE
 
 sub create {
    my $self = shift;
-   my @other = @_;
-#    my ( @other ) = $self->rearrange(
-#       ,
-#       @_ );
 
    ClearCase::mkbrtype(
       -name    => $self->getName(),
