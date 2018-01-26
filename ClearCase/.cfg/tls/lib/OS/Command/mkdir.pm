@@ -54,22 +54,22 @@ sub do_execute {
    my $self = shift;
    my @options = ();
 
-   OS::OsTool::registerRemoteHost( \@options, $self->getHost()->getHostname() ) if( $self->getHost() );
-   OS::OsTool::disableErrorStop();
+   OS::Common::OsTool::registerRemoteHost( \@options, $self->getHost()->getHostname() ) if( $self->getHost() );
+   OS::Common::OsTool::disableErrorStop();
    OS::ls(
           -path      => $self->getPath(),
           -short     => 1,
           -directory => 1,
           -host      => $self->getHost()
          );
-   OS::OsTool::enableErrorStop();
-   if( OS::OsTool::getRC() == 0 )
+   OS::Common::OsTool::enableErrorStop();
+   if( OS::Common::OsTool::getRC() == 0 )
      {
        Die( [ 'Cannot create directory ' . $self->getPath(),
 	      'Path already exists.' ] );
      }
    push @options, "-p";
-   OS::OsTool::mkdir( @options, $self->getPath() );
+   OS::Common::OsTool::mkdir( @options, $self->getPath() );
 }
 
 sub do_commit {
@@ -80,9 +80,9 @@ sub do_rollback {
    my $self = shift;
    my @options = ();
 
-   OS::OsTool::registerRemoteHost( \@options, $self->getHost()->getHostname() ) if( $self->getHost() );
+   OS::Common::OsTool::registerRemoteHost( \@options, $self->getHost()->getHostname() ) if( $self->getHost() );
    push @options, '-rf';
-   OS::OsTool::rm( @options, $self->getPath() );
+   OS::Common::OsTool::rm( @options, $self->getPath() );
 }
 
 1;

@@ -57,22 +57,22 @@ sub do_execute {
    my $self = shift;
    my @options = ();
 
-   OS::OsTool::registerRemoteHost( \@options, $self->getHost()->getHostname() ) if( $self->getHost() );
-   OS::OsTool::disableErrorStop();
+   OS::Common::OsTool::registerRemoteHost( \@options, $self->getHost()->getHostname() ) if( $self->getHost() );
+   OS::Common::OsTool::disableErrorStop();
    OS::ls(
           -path      => $self->getFrom(),
           -short     => 1,
           -directory => 1,
           -host      => $self->getHost()
          );
-   OS::OsTool::enableErrorStop();
-   if( OS::OsTool::getRC() == 0 )
+   OS::Common::OsTool::enableErrorStop();
+   if( OS::Common::OsTool::getRC() == 0 )
      {
        Die( [ 'Cannot create softlink ' . $self->getFrom(),
 	      'Path already exists.' ] );
      }
    push @options, '-s';
-   OS::OsTool::ln( @options, $self->getTo(), $self->getFrom() );
+   OS::Common::OsTool::ln( @options, $self->getTo(), $self->getFrom() );
 
 }
 
@@ -84,9 +84,9 @@ sub do_rollback {
    my $self = shift;
    my @options = ();
 
-   OS::OsTool::registerRemoteHost( \@options, $self->getHost()->getHostname() ) if( $self->getHost() );
+   OS::Common::OsTool::registerRemoteHost( \@options, $self->getHost()->getHostname() ) if( $self->getHost() );
    push @options, '-f';
-   OS::OsTool::rm( @options, $self->getFrom() );
+   OS::Common::OsTool::rm( @options, $self->getFrom() );
 }
 
 1;

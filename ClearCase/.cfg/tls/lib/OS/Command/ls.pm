@@ -64,14 +64,14 @@ sub do_execute {
    my $self = shift;
    my @options = ();
 
-   OS::OsTool::registerRemoteHost( \@options, $self->getHost()->getHostname() ) if( $self->getHost() );
+   OS::Common::OsTool::registerRemoteHost( \@options, $self->getHost()->getHostname() ) if( $self->getHost() );
    push @options, '-1' if $self->getShort();
    push @options, '-l' if $self->getLong();
    push @options, '-d' if $self->getDirectory();
    push @options, '-a' if $self->getAll();
    push @options, '-p' if $self->getSlashdir();
 
-   OS::OsTool::ls( @options, $self->getPath() );
+   OS::Common::OsTool::ls( @options, $self->getPath() );
 }
 
 sub do_commit {

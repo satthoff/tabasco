@@ -61,14 +61,14 @@ sub do_execute {
    my $self = shift;
 
    my @options = ();
-   OS::OsTool::registerRemoteHost( \@options, $self->getHost()->getHostname() ) if( $self->getHost() );
-   OS::OsTool::registerBackground( \@options ) if( $self->getBackground() );
+   OS::Common::OsTool::registerRemoteHost( \@options, $self->getHost()->getHostname() ) if( $self->getHost() );
+   OS::Common::OsTool::registerBackground( \@options ) if( $self->getBackground() );
    push @options, '-czpB --ignore-command-error';
    push @options, '--directory=' . $self->getDirectory();
    my $source = ' .';
    $source = ' ' . $self->getSource() if $self->getSource();
    push @options, '-f ' . $self->getFile() . $source;
-   OS::OsTool::gtar( @options );
+   OS::Common::OsTool::gtar( @options );
 }
 
 sub do_commit {

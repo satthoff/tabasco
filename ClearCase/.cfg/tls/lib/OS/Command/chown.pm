@@ -57,7 +57,7 @@ sub do_execute {
    my $self = shift;
    my @options = ();
 
-   OS::OsTool::registerRemoteHost( \@options, $self->getHost()->getHostname() ) if( $self->getHost() );
+   OS::Common::OsTool::registerRemoteHost( \@options, $self->getHost()->getHostname() ) if( $self->getHost() );
    OS::ls(
           -path => $self->getPath(),
           -long => 1,
@@ -65,14 +65,14 @@ sub do_execute {
           -directory => 1,
           -host => $self->getHost()
          );
-   my @erg = OS::OsTool::getOutput();
+   my @erg = OS::Common::OsTool::getOutput();
    grep chomp, @erg;
    my @tmp = split /\s+/, $erg[0];
    $self->{USER} = $tmp[2];
    $self->{GROUP} = $tmp[3];
    push @options, $self->getOwner() . ':' . $self->getGroup();
 
-   OS::OsTool::chown( @options, $self->getPath() );
+   OS::Common::OsTool::chown( @options, $self->getPath() );
 }
 
 sub do_commit {
@@ -83,13 +83,13 @@ sub do_rollback {
    my $self = shift;
    my @options = ();
 
-   OS::OsTool::registerRemoteHost( \@options, $self->getHost()->getHostname() ) if( $self->getHost() );
+   OS::Common::OsTool::registerRemoteHost( \@options, $self->getHost()->getHostname() ) if( $self->getHost() );
 
    my $user = $self->{USER};
    my $group = $self->{GROUP};
    push @options, $user . ':' .$group;
 
-   OS::OsTool::chown( @options, $self->getPath() );
+   OS::Common::OsTool::chown( @options, $self->getPath() );
 }
 
 1;

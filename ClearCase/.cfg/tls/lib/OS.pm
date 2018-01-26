@@ -3,9 +3,12 @@ package OS;
 use strict;
 use Carp;
 use Log;
-use Transaction;
-use OS::Config;
 
+sub BEGIN {
+   require Transaction;
+   require OS::Common::Config;
+   require OS::Common::OsTool;
+}
 
 BEGIN {
    use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
@@ -30,10 +33,26 @@ sub AUTOLOAD {
 
     ( my $method = $AUTOLOAD ) =~ s/.*:://;
 
-    if( $method =~ m/^[a-z]/ ) {
+    if( $method =~ m/^Init(\S+)$/ ) { # request to create object of package method = InitPackage
+	my $package = 'OS::' . $1;
+	eval "require $package";
+	Die( [ "require of package $package failed." ] ) if $@;
+
+	no strict 'refs';
+	no strict 'subs';
+	my $func = <<EOF
+	    sub OS::$method {
+		return $package->new( \@_ );
+	}
+EOF
+;
+	eval( "$func" );
+	Die( [$func, $@ ] ) if $@;
+	goto &$AUTOLOAD;
+    } else {
 	my $package = "OS::Command::$method";
 	eval "require $package";
-	Die( [ "require of package OS::Command::$method failed." ] ) if $@;
+	Die( [ "require of package $package failed." ] ) if $@;
 
 	no strict 'refs';
 	no strict 'subs';
@@ -46,28 +65,51 @@ EOF
 ;
 	eval( "$func" );
 	Die( [$func, $@ ] ) if $@;
-
-    } elsif( $method =~ m/^[A-Z]/ ) { # method is a perl package (OS/<method>.pm) of the OS interface
-	my $package = "OS::$method";
-	eval "require $package";
-	Die( [ "require of package OS::$method failed." ] )  if $@;
-
-	no strict 'refs';
-	no strict 'subs';
-	my $func = <<EOF
-	    sub OS::$method { return OS::$method->new( \@_ ); }
-EOF
-;
-	eval( "$func" );
-	Die( [$func, $@ ] ) if $@;
-
-    } else { # Error: method must start with upper or lower case letter 
-	Die( [ "methods for AUTOLOAD in package OS must start with upper or lower case letter" ] );
+	goto &$AUTOLOAD;
     }
-
-    goto &$AUTOLOAD;
+    
 
 } # AUTOLOAD
+
+sub getErrors {
+    return OS::Common::OsTool::getErrors();
+}
+
+sub getWarnings {
+    return OS::Common::OsTool::getWarnings();
+}
+
+sub getOutput {
+    return OS::Common::OsTool::getOutput();
+}
+
+sub getOutputLine {
+    return OS::Common::OsTool::getOutputLine();
+}
+
+sub getRC {
+    return OS::Common::OsTool::getRC();
+}
+
+sub disableErrorOut {
+    ClearCase::Common::Cleartool::disableErrorOut();
+    return;
+}
+
+sub enableErrorOut {
+    OS::Common::OsTool::enableErrorOut();
+    return;
+}
+
+sub disableDieOnErrors {
+    OS::Common::OsTool::disableDieOnErrors();
+    return;
+}
+
+sub enableDieOnErrors {
+    OS::Common::OsTool::enableDieOnErrors();
+    return;
+}
 
 1;
 

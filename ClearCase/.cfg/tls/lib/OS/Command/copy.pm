@@ -58,15 +58,15 @@ sub do_execute {
    my $self = shift;
    my @options = ();
 
-   OS::OsTool::disableErrorStop();
+   OS::Common::OsTool::disableErrorStop();
    OS::ls(
           -path      => $self->getTo(),
           -short     => 1,
           -directory => 1,
           -host      => $self->getToHost()
          );
-   OS::OsTool::enableErrorStop();
-   if( OS::OsTool::getRC() == 0 )
+   OS::Common::OsTool::enableErrorStop();
+   if( OS::Common::OsTool::getRC() == 0 )
      {
        Die( [ 'Cannot copy path ' . $self->getFrom(),
 	      'to target path ' . $self->getTo(),
@@ -85,7 +85,7 @@ sub do_execute {
    push @options, '-o LogLevel=quiet';
    push @options, $from;
    push @options, $to;
-   OS::OsTool::scp( @options );
+   OS::Common::OsTool::scp( @options );
 }
 
 sub do_commit {
@@ -96,9 +96,9 @@ sub do_rollback {
    my $self = shift;
    my @options = ();
 
-   OS::OsTool::registerRemoteHost( \@options, $self->getToHost()->getHostname() ) if( $self->getToHost() );
+   OS::Common::OsTool::registerRemoteHost( \@options, $self->getToHost()->getHostname() ) if( $self->getToHost() );
    push @options, '-rf';
-   OS::OsTool::rm( @options, $self->getTo() );
+   OS::Common::OsTool::rm( @options, $self->getTo() );
 }
 
 1;

@@ -55,24 +55,24 @@ sub do_execute {
 
    # in fact, the removal of the entire subtree will be performed in the commit, means during
    # successfull finishing of the appropriate transaction
-   OS::OsTool::disableErrorStop();
+   OS::Common::OsTool::disableErrorStop();
    OS::ls(
           -path      => $self->getPath(),
           -short     => 1,
           -directory => 1,
           -host      => $self->getHost()
          );
-   OS::OsTool::enableErrorStop();
+   OS::Common::OsTool::enableErrorStop();
    $self->{ SAVEPATH } = undef;
-   if( OS::OsTool::getRC() == 0 )
+   if( OS::Common::OsTool::getRC() == 0 )
      {
        $self->{ SAVEPATH } = $self->getPath() . '.' . time;
        if( -f "$self->{SAVEPATH}" )
 	 {
 	   my @options = ();
-	   OS::OsTool::registerRemoteHost( \@options, $self->getHost()->getHostname() ) if( $self->getHost() );
+	   OS::Common::OsTool::registerRemoteHost( \@options, $self->getHost()->getHostname() ) if( $self->getHost() );
 	   push @options, '-rf';
-	   OS::OsTool::rm( @options, $self->{ SAVEPATH } );
+	   OS::Common::OsTool::rm( @options, $self->{ SAVEPATH } );
 	 }
        OS::mv(
 	      -from => $self->getPath(),
@@ -88,9 +88,9 @@ sub do_commit {
 
    if( $self->{ SAVEPATH } )
      {
-       OS::OsTool::registerRemoteHost( \@options, $self->getHost()->getHostname() ) if( $self->getHost() );
+       OS::Common::OsTool::registerRemoteHost( \@options, $self->getHost()->getHostname() ) if( $self->getHost() );
        push @options, '-rf';
-       OS::OsTool::rm( @options, $self->{ SAVEPATH } );
+       OS::Common::OsTool::rm( @options, $self->{ SAVEPATH } );
      }
 }
 

@@ -1,4 +1,4 @@
-package OS::OsTool;
+package OS::Common::OsTool;
 
 use strict;
 use Carp qw( confess );

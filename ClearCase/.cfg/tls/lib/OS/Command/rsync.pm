@@ -64,13 +64,13 @@ sub do_execute {
    my $self = shift;
 
    my @options = ();
-   OS::OsTool::registerBackground( \@options ) if( $self->getBackground() );
+   OS::Common::OsTool::registerBackground( \@options ) if( $self->getBackground() );
    push @options, '-avzH -e "ssh -o LogLevel=quiet" --no-motd --delete';
    my $fromPrefix = '';
    my $toPrefix   = '';
    $fromPrefix = $self->getFromHost()->getHostname() . ':' if( $self->getFromHost() );
    $toPrefix   = $self->getToHost()->getHostname() . ':' if( $self->getToHost );
-   OS::OsTool::rsync( @options, $fromPrefix . $self->getFrom(), $toPrefix . $self->getTo() );
+   OS::Common::OsTool::rsync( @options, $fromPrefix . $self->getFrom(), $toPrefix . $self->getTo() );
 }
 
 sub do_commit {

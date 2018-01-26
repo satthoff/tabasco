@@ -58,10 +58,10 @@ sub do_execute {
    my $self = shift;
    my @options = ();
 
-   OS::OsTool::registerRemoteHost( \@options, $self->getHost()->getHostname() ) if( $self->getHost() );
+   OS::Common::OsTool::registerRemoteHost( \@options, $self->getHost()->getHostname() ) if( $self->getHost() );
    push @options, $self->getOptions();
    push @options, $self->getPattern();
-   OS::OsTool::grep( @options, $self->getPath() );
+   OS::Common::OsTool::grep( @options, $self->getPath() );
 }
 
 sub do_commit {

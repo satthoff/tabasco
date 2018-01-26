@@ -55,7 +55,7 @@ sub do_execute {
    my $self = shift;
    my @options = ();
 
-   OS::OsTool::registerRemoteHost( \@options, $self->getHost()->getHostname() ) if( $self->getHost() );
+   OS::Common::OsTool::registerRemoteHost( \@options, $self->getHost()->getHostname() ) if( $self->getHost() );
    OS::ls(
           -path => $self->getPath(),
           -long => 1,
@@ -63,7 +63,7 @@ sub do_execute {
           -directory => 1,
           -host => $self->getHost()
          );
-   my @erg = OS::OsTool::getOutput();
+   my @erg = OS::Common::OsTool::getOutput();
    grep chomp, @erg;
    my $oldPerm = $erg[0]; 
    $oldPerm =~ s/^(\S+)\s+.*/$1/;
@@ -80,7 +80,7 @@ sub do_execute {
    $perm =~ s/\-//g;
    push @options, "u=$user,g=$group,o=$perm";
 
-   OS::OsTool::chmod( @options, $self->getPath() );
+   OS::Common::OsTool::chmod( @options, $self->getPath() );
 }
 
 sub do_commit {
@@ -91,7 +91,7 @@ sub do_rollback {
    my $self = shift;
    my @options = ();
 
-   OS::OsTool::registerRemoteHost( \@options, $self->getHost()->getHostname() ) if( $self->getHost() );
+   OS::Common::OsTool::registerRemoteHost( \@options, $self->getHost()->getHostname() ) if( $self->getHost() );
    my $perm = $self->{OLDPERM};
    my $user = substr $perm, 0, 3;
    $user =~ s/\-//g;
@@ -102,7 +102,7 @@ sub do_rollback {
    $perm =~ s/\-//g;
    push @options, "u=$user,g=$group,o=$perm";
 
-   OS::OsTool::chmod( @options, $self->getPath() );
+   OS::Common::OsTool::chmod( @options, $self->getPath() );
 }
 
 1;

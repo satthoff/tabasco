@@ -1,4 +1,4 @@
-package OS::Config;
+package OS::Common::Config;
 
 use strict;
 use Carp;
@@ -47,7 +47,7 @@ BEGIN {
     my $hostname = `hostname`;
     chomp $hostname;
     require OS::Host;
-    $myHost = OS::Host->new( -hostname => $hostname );
+    $myHost = OS::InitHost( -hostname => $hostname );
     
 }
 

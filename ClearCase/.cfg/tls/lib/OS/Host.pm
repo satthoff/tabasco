@@ -70,7 +70,7 @@ sub Path
   {
     my $self = shift;
 
-    return OS::Path->new( @_, -host => $self );
+    return OS::InitPath( @_, -host => $self );
   }
 
 sub gmtTimeString
@@ -83,8 +83,6 @@ sub gmtTimeString
     my $timeString = sprintf( "%s.%s.%s-GMT-%d.%d.%d", $gmt[3], $month[ $gmt[4] ], $year, $gmt[2], $gmt[1], $gmt[0]);
     return $timeString;
 }
-
-
 
 1;
 
