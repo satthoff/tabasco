@@ -10,24 +10,6 @@ sub BEGIN {
    require OS::Common::OsTool;
 }
 
-BEGIN {
-   use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-
-   require Exporter;
-
-   @ISA = qw(Exporter);
-
-   @EXPORT = qw(
-   );
-   @EXPORT_OK = qw(
-   );
-   %EXPORT_TAGS = (
-   # TAG1 => [...],
-   );
-   $VERSION = '0.01';
-
-};
-
 sub AUTOLOAD {
     use vars qw( $AUTOLOAD );
 
