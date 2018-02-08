@@ -1,16 +1,9 @@
 package CLI;
 
 use strict;
-use Carp;
-use File::Temp;
 
 use CLI::Config;
 use CLI::Command;
-use OS;
-use Transaction;
-use ClearCase;
-use TaBasCo;
-use Log;
 
 
 sub new()
