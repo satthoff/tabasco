@@ -60,8 +60,13 @@ ClearCase::mkelem(
 
 # now create the hyperlink from the first Task (= branch main of the configuration file)
 # to the Vob root path element
+<<<<<<< .merge_file_EG4lL8
 my $mainTask = TaBasCo::Task->new( -pathname => $configFile . '@@' . $OS::Common::Config::slash . 'main' );
 my $vobRootElement = ClearCase::InitElement( -pathname => $vobTag . $OS::Common::Config::slash . '.@@' );
+=======
+my $mainTask = TaBasCo::InitTask( -pathname => $configFile . '@@' . $OS::Config::slash . 'main' );
+my $vobRootElement = ClearCase::InitElement( -pathname => $vobTag . $OS::Config::slash . '.@@' );
+>>>>>>> .merge_file_6SedRp
 my $initialPathLink = ClearCase::InitHyperLink(
     -hltype => $pathlinkType,
     -from => $mainTask,

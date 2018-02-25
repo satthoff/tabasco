@@ -80,11 +80,11 @@ sub getConfigElement {
     require ClearCase::Common::Config;
     my $view = $ClearCase::Common::Config::myHost->currentView();
     unless( $view ) {
-	Die( [ "No view context set in TaBasCo::Config." ] );
+	Die( [ "No view context set in TaBasCo::Common::Config." ] );
     }
-    return undef unless( -e $main::installPath . $OS::Config::slash . $TaBasCo::Config::configFilePath );
+    return undef unless( -e $main::installPath . $OS::Common::Config::slash . $TaBasCo::Common::Config::configFilePath );
     $configElement = ClearCase::InitElement(
-	-pathname => $main::installPath . $OS::Config::slash . $TaBasCo::Config::configFilePath
+	-pathname => $main::installPath . $OS::Common::Config::slash . $TaBasCo::Common::Config::configFilePath
 	);
     return $configElement;
 }

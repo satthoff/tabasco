@@ -70,12 +70,12 @@ sub createNewRelease
 
     # we have to attach the new release name to the currently
     # checked out version of the configuration element
-    my $newRelease = TaBasCo::InitRelease( -pathname => $self->getElement() );
+    my $newRelease = TaBasCo::InitRelease( -pathname => $self->getVXPN() );
     $newRelease->applyName( $releaseName );
 
     # create the configuration specification
     my @cspec = $self->createCspecBlock( $newRelease, $view );
-    my $file = $self->getElement();
+    my $file = TaBasCo::Common::Config::getConfigElement()->getNormalizedPath();
     open FD, ">$file";
     foreach ( @cspec )
       {
@@ -103,13 +103,13 @@ sub cspecHeader
     push @$config_spec, '# Date : ' . $self->gmtTimeString();
     push @$config_spec, '#-------------------------------------------------------------------------------------';
 
-    my $toolRoot = File::Basename::dirname( $self->getElement() );
-    my $rootCspec = ClearCase::InitElement( -pathname => $toolRoot )->getCspecPath();
+    my $toolRoot = File::Basename::dirname( TaBasCo::Common::Config::getConfigElement()->getNormalizedPath() );
+    my $rootCspec = TaBasCo::Common::Config::getConfigElement()->getCspecPath();
     $rootCspec =~ s/\/\.\.\.$//;
     my $toolCspec = ClearCase::InitElement( -pathname => $toolRoot . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolPath )->getCspecPath();
-    push @$config_spec, 'element -directory ' . $rootCspec . " $TaBasCo::Common::Config::toolSelectLabel -nocheckout";
-    push @$config_spec, 'element -file ' . $rootCspec . "/$TaBasCo::Common::Config::configFile CHECKEDOUT";
-    push @$config_spec, 'element -file ' . $rootCspec . "/$TaBasCo::Common::Config::configFile /main/LATEST";
+    push @$config_spec, 'element -directory ' . File::Basename::dirname( $rootCspec ) . " $TaBasCo::Common::Config::toolSelectLabel -nocheckout";
+    push @$config_spec, 'element -file ' . $rootCspec . " CHECKEDOUT";
+    push @$config_spec, 'element -file ' . $rootCspec . " /main/LATEST";
     push @$config_spec, 'element ' . $toolCspec . " $TaBasCo::Common::Config::toolSelectLabel -nocheckout";
 
   }

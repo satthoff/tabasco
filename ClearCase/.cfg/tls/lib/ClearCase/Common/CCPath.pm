@@ -124,7 +124,7 @@ sub loadNormalizedPath {
         }
     }
     push @components, $first;
-    return $self->setNormalizedPath( join "$OS::Config::slash", reverse @components );
+    return $self->setNormalizedPath( join "$OS::Common::Config::slash", reverse @components );
 }
 
 sub getVXPN {

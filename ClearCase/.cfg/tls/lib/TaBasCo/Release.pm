@@ -48,7 +48,7 @@ sub load {
 	@_ );
 
     ClearCase::find(
-	-pathname => TaBasCo::Common::Config::getConfigElement()->getElement(),
+	-pathname => TaBasCo::Common::Config::getConfigElement()->getNormalizedPath(),
 	-version => 'lbtype(' . $name . ')',
 	-print => 1
 	);
