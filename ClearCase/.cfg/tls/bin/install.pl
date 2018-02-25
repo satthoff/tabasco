@@ -40,13 +40,13 @@ use Log;
 Log::setVerbosity( "debug" );
 Transaction::start( -comment => 'TaBasCo installation' );
 
-my $configFile = $base . $OS::Config::slash . $TaBasCo::Config::configFile;
+my $configFile = $base . $OS::Common::Config::slash . $TaBasCo::Common::Config::configFile;
 my $vobTag = File::Basename::dirname( $base );
 
 my $vob = ClearCase::InitVob( -tag => $vobTag );
 
 # create the hyperlink type to link paths to the branches, what we need first
-my $pathLinkType = ClearCase::InitHlType( -name => $TaBasCo::Config::pathLink, -vob => $vob );
+my $pathLinkType = ClearCase::InitHlType( -name => $TaBasCo::Common::Config::pathLink, -vob => $vob );
 $pathLinkType->create();
 
 # create the configuration file
@@ -60,8 +60,8 @@ ClearCase::mkelem(
 
 # now create the hyperlink from the first Task (= branch main of the configuration file)
 # to the Vob root path element
-my $mainTask = TaBasCo::Task->new( -pathname => $configFile . '@@' . $OS::Config::slash . 'main' );
-my $vobRootElement = ClearCase::InitElement( -pathname => $vobTag . $OS::Config::slash . '.@@' );
+my $mainTask = TaBasCo::Task->new( -pathname => $configFile . '@@' . $OS::Common::Config::slash . 'main' );
+my $vobRootElement = ClearCase::InitElement( -pathname => $vobTag . $OS::Common::Config::slash . '.@@' );
 my $initialPathLink = ClearCase::InitHyperLink(
     -hltype => $pathlinkType,
     -from => $mainTask,
@@ -70,11 +70,11 @@ my $initialPathLink = ClearCase::InitHyperLink(
 $initialPathLink->create();
 
 # create the label type MAIN_NEXT
-ClearCase::InitLbType( -name => uc( 'main' . $TaBasCo::Config::nextLabelExtension ), -vob => $vob
+ClearCase::InitLbType( -name => uc( 'main' . $TaBasCo::Common::Config::nextLabelExtension ), -vob => $vob
                             )->create();
 
 # create the label type CSPEC
-ClearCase::InitLbType( -name => $TaBasCo::Config::cspecLabel, -vob => $vob
+ClearCase::InitLbType( -name => $TaBasCo::Common::Config::cspecLabel, -vob => $vob
                             )->create( -pbranch => 1 );
 
 
@@ -95,43 +95,43 @@ ClearCase::checkout(
 my $relName = $mainTask->nextReleaseName();
 
 # create the release
-$mainTask->createNewRelease( $relName );
+$mainTask->createNewRelease( $relName, ClearCase::InitView( $ENV{ 'CLEARCASE_VIEW' } ) );
 
 # create the tools label type
-ClearCase::InitLbType( -name => $TaBasCo::Config::toolSelectLabel, -vob => $vob )->create();
+ClearCase::InitLbType( -name => $TaBasCo::Common::Config::toolSelectLabel, -vob => $vob )->create();
 
 # label the installation
 ClearCase::mklabel(
-		   -pathname => $base . $OS::Config::slash . $TaBasCo::Config::toolPath,
-		   -label    => $TaBasCo::Config::toolSelectLabel,
+		   -pathname => $base . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolPath,
+		   -label    => $TaBasCo::Common::Config::toolSelectLabel,
 		   -recurse  => 1
 		  );
 ClearCase::mklabel(
                    -pathname => $base,
-                   -label    => $TaBasCo::Config::toolSelectLabel
+                   -label    => $TaBasCo::Common::Config::toolSelectLabel
                   );
 
 Transaction::commit();
 
 # finaly create all trigger types
-foreach my $trg ( keys %TaBasCo::Config::allTrigger )
+foreach my $trg ( keys %TaBasCo::Common::Config::allTrigger )
   {
     my $trt = ClearCase::InitTrType( -name => $trg, -vob => $vob );
     $trt->create(
-                 -all     => $TaBasCo::Config::allTrigger{ $trg }->{ 'all' },
-                 -element => $TaBasCo::Config::allTrigger{ $trg }->{ 'element' },
-                 -execu   => '"' . $TaBasCo::Config::allTrigger{ $trg }->{ 'execu' } . '"',
-                 -execw   => '"' . $TaBasCo::Config::allTrigger{ $trg }->{ 'execw' } . '"',
-                 -command => $TaBasCo::Config::allTrigger{ $trg }->{ 'ops' }
+                 -all     => $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'all' },
+                 -element => $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'element' },
+                 -execu   => '"' . $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'execu' } . '"',
+                 -execw   => '"' . $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'execw' } . '"',
+                 -command => $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'ops' }
                 );
-    if( defined( $TaBasCo::Config::allTrigger{ $trg }->{ 'att' } ) )
+    if( defined( $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'att' } ) )
       {
         $trt->attach( $configFile . '@@' );
       }
   }
 
 # load the user interface
-my $ui = TaBasCo::UI->new();
+my $ui = TaBasCo::InitUI();
 
 $ui->okMessage( "Installation finished.
 The starting baseline is $relName.
@@ -140,4 +140,4 @@ from where you want to start from with
 $relName.
 At least the root directory of the Vob
 has to be labeled.
-And DO NOT label the imported $TaBasCo::Config::toolRoot subtree !!! " );
+And DO NOT label the imported $TaBasCo::Common::Config::toolRoot subtree !!! " );
