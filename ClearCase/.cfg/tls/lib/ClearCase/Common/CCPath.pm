@@ -25,6 +25,7 @@ BEGIN {
    %DATA = (
        Oid => undef,
        Vob => undef,
+       CspecPath => { CALCULATE => \&loadCspecPath },
        NormalizedPath => { CALCULATE => \&loadNormalizedPath }
       );
 
@@ -125,6 +126,35 @@ sub loadNormalizedPath {
     }
     push @components, $first;
     return $self->setNormalizedPath( join "$OS::Common::Config::slash", reverse @components );
+}
+
+sub loadCspecPath {
+    my $self  = shift;
+
+    my $vobHome = $self->getVob()->getTag();
+    $vobHome =~ s/\\/\//g; # always UNIX style
+    my $qvobHome = quotemeta( $vobHome );
+    my $normPath = $self->getNormalizedPath(); # it is in UNIX style
+    my $p = $normPath;
+    if( $normPath =~ m/^\/\/view\/[^\/]+$qvobHome\/|^\/\/view\/[^\/]+${qvobHome}$/ ) {
+	# UNIX or Windows version extended
+	$p =~ s/^\/\/view\/[^\/]+$qvobHome//;
+    } elsif( $normPath =~ m/^\S:\/[^\/]+$qvobHome\/|^\S:\/[^\/]+${qvobHome}$/ ) {
+	# Windows drive letter
+	$p =~ s/^\S:\/[^\/]+$qvobHome//;
+    } elsif( $normPath =~ m/^$qvobHome\/|^${qvobHome}$/ ) {
+	# no view information in path
+	$p =~ s/^$qvobHome//;
+    } else {
+	Die( [ '', __PACKAGE__ . "::loadCspecPath : wrong norm path >$normPath<", '' ] );
+    }
+    $p =~ s/\\/\//g;
+    $p =~ s/\/\.$//;
+    $p =~ s/\/+/\//g;
+    $p = '' if( $p eq '/' );
+    my $cspecPath = $self->getVob()->getCspecTag() . $p . '/...';
+    $cspecPath =~ s/\\/\//g; # always UNIX style
+    return $self->setCspecPath( $cspecPath );
 }
 
 sub getVXPN {
