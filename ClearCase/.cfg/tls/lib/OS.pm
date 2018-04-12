@@ -74,7 +74,7 @@ sub getRC {
 }
 
 sub disableErrorOut {
-    ClearCase::Common::Cleartool::disableErrorOut();
+    OS::Common::OsTool::disableErrorOut();
     return;
 }
 
