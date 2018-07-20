@@ -1,0 +1,6 @@
+
+- adopt all other ClearCase classes to new ClearCase::Common::CCPath class
+
+- adopt TaBasCo and OS interfaces to new ClearCase interface
+
+
