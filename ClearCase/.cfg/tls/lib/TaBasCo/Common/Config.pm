@@ -83,7 +83,7 @@ sub getConfigElement {
 	Die( [ "No view context set in TaBasCo::Common::Config." ] );
     }
     return undef unless( -e $main::installPath . $OS::Common::Config::slash . $TaBasCo::Common::Config::configFilePath );
-    $configElement = ClearCase::InitElement(
+    $configElement = ClearCase::Element->new(
 	-pathname => $main::installPath . $OS::Common::Config::slash . $TaBasCo::Common::Config::configFilePath
 	);
     return $configElement;

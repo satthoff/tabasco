@@ -309,7 +309,7 @@ sub loadBaseline
     return undef unless( $pv );
     # here we have to load explicitely the Release object, because
     # pv is only a ClearCase::Version, but not a TaBasCo::Release
-    my $baseline = TaBasCo::InitRelease( -pathname => $pv->getVXPN() );
+    my $baseline = TaBasCo::Release->new( -pathname => $pv->getVXPN() );
     return $self->setBaseline( $baseline );
   }
 
