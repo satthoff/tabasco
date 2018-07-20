@@ -105,7 +105,7 @@ sub createFloatingRelease
     my $task = shift;
 
     my $floatingLabel = uc( $task->getName() . $TaBasCo::Common::Config::nextLabelExtension );
-    my $lbtype = ClearCase::InitLbType( -name => $floatingLabel, -vob => $task->getVob() );
+    my $lbtype = ClearCase::LbType->new( -name => $floatingLabel, -vob => $task->getVob() );
     $lbtype->create();
     return $lbtype;
   }
@@ -116,7 +116,7 @@ sub renameFloatingRelease
     my $name = shift;
 
     my $floatingLabel = uc( $task->getName() . $TaBasCo::Common::Config::nextLabelExtension );
-    my $lbtype = ClearCase::InitLbType( name => $floatingLabel, -vob => $task->getVob() );
+    my $lbtype = ClearCase::LbType->new( name => $floatingLabel, -vob => $task->getVob() );
     $lbtype->rename( $name );
   }
 
@@ -152,7 +152,7 @@ sub loadTask
     my $self = shift;
 
     Debug( [ '', 'BEGIN: ' . __PACKAGE__ . '::loadTask' ] );
-    return $self->setTask( TaBasCo::InitTask(  -pathname => $self->getMyBranch()->getVXPN() ) );
+    return $self->setTask( TaBasCo::Task->new(  -pathname => $self->getMyBranch()->getVXPN() ) );
   }
 
 1;

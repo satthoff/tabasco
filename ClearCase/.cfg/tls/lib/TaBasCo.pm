@@ -5,37 +5,13 @@ use Carp;
 
 sub BEGIN {
    require Transaction;
+   require Log;
    require ClearCase::Common::Config;
    require ClearCase::Common::Cleartool;
+   require TaBasCo::Task;
+   require TaBasCo::Release;
 }
 
-use Log;
-
-sub AUTOLOAD {
-    use vars qw( $AUTOLOAD );
-
-    ( my $method = $AUTOLOAD ) =~ s/.*:://;
-
-    if( $method =~ m/^Init(\S+)$/ ) { # request to create object of package method = InitPackage
-        my $package = 'TaBasCo::' . $1;
-        eval "require $package";
-        Die( [ "require of package $package failed." ] ) if $@;
-
-        no strict 'refs';
-        no strict 'subs';
-        my $func = <<EOF
-            sub TaBasCo::$method {
-                return $package->new( \@_ );
-        }
-EOF
-;
-        eval( "$func" );
-        Die( [$func, $@ ] ) if $@;
-        goto &$AUTOLOAD;
-    } else {
-        Die( [ '', "Cannot autoload method $method in " . __PACKAGE__ , '' ] );
-    }
-} # AUTOLOAD
 
 1;
 

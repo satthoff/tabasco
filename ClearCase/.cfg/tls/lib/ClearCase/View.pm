@@ -123,7 +123,7 @@ sub lsprivate {
 sub cwdInVob {
     my $self = shift;
 
-    my $directoryVersion = ClearCase::InitVersion( -pathname => '.' );
+    my $directoryVersion = ClearCase::Version->new( -pathname => '.' );
     return $directoryVersion;
 }
 

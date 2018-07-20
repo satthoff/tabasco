@@ -47,7 +47,7 @@ BEGIN {
     my $hostname = `hostname`;
     chomp $hostname;
     require OS::Host;
-    $myHost = OS::InitHost( -hostname => $hostname );
+    $myHost = OS::Host->new( -hostname => $hostname );
     
 }
 

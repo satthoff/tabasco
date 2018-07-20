@@ -70,7 +70,7 @@ sub createNewRelease
 
     # we have to attach the new release name to the currently
     # checked out version of the configuration element
-    my $newRelease = TaBasCo::InitRelease( -pathname => $self->getVXPN() );
+    my $newRelease = TaBasCo::Release->new( -pathname => $self->getVXPN() );
     $newRelease->applyName( $releaseName );
 
     # create the configuration specification
@@ -106,7 +106,7 @@ sub cspecHeader
     my $toolRoot = File::Basename::dirname( TaBasCo::Common::Config::getConfigElement()->getNormalizedPath() );
     my $rootCspec = TaBasCo::Common::Config::getConfigElement()->getCspecPath();
     $rootCspec =~ s/\/\.\.\.$//;
-    my $toolCspec = ClearCase::InitElement( -pathname => $toolRoot . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolPath )->getCspecPath();
+    my $toolCspec = ClearCase::Element->new( -pathname => $toolRoot . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolPath )->getCspecPath();
     push @$config_spec, 'element -directory ' . File::Basename::dirname( $rootCspec ) . " $TaBasCo::Common::Config::toolSelectLabel -nocheckout";
     push @$config_spec, 'element -file ' . $rootCspec . " CHECKEDOUT";
     push @$config_spec, 'element -file ' . $rootCspec . " /main/LATEST";
@@ -194,7 +194,7 @@ sub createConfigSpec
       }
     close FD;
     Debug( [ '', "attach label : $TaBasCo::Common::Config::cspecLabel" ] );
-    my $cspecRelease =  TaBasCo::InitRelease( -pathname => $self->getElement() );
+    my $cspecRelease =  TaBasCo::Release->new( -pathname => $self->getElement() );
     $cspecRelease->applyName( $TaBasCo::Common::Config::cspecLabel );
   }
 
@@ -321,7 +321,7 @@ sub loadCspecPath
     my @cspecPaths = ();
     foreach my $p ( @paths )
       {
-	push @cspecPaths, ClearCase::InitElement( -pathname => $p )->getCspecPath();
+	push @cspecPaths, ClearCase::Element->new( -pathname => $p )->getCspecPath();
       }
     return $self->setCspecPath( \@cspecPaths );
   }

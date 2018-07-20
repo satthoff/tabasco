@@ -70,7 +70,7 @@ sub Path
   {
     my $self = shift;
 
-    return OS::InitPath( @_, -host => $self );
+    return OS::Path->new( @_, -host => $self );
   }
 
 sub gmtTimeString

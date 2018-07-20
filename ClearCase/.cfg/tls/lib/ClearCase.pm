@@ -13,6 +13,9 @@ sub BEGIN {
    require ClearCase::Region;
    require ClearCase::BrType;
    require ClearCase::Element;
+   require ClearCase::View;
+   require ClearCase::Vob;
+   require ClearCase::LbType;
 }
 
 use Log;

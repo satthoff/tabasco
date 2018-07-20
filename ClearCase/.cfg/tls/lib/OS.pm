@@ -15,41 +15,23 @@ sub AUTOLOAD {
 
     ( my $method = $AUTOLOAD ) =~ s/.*:://;
 
-    if( $method =~ m/^Init(\S+)$/ ) { # request to create object of package method = InitPackage
-	my $package = 'OS::' . $1;
-	eval "require $package";
-	Die( [ "require of package $package failed." ] ) if $@;
 
-	no strict 'refs';
-	no strict 'subs';
-	my $func = <<EOF
-	    sub OS::$method {
-		return $package->new( \@_ );
-	}
-EOF
-;
-	eval( "$func" );
-	Die( [$func, $@ ] ) if $@;
-	goto &$AUTOLOAD;
-    } else {
-	my $package = "OS::Command::$method";
-	eval "require $package";
-	Die( [ "require of package $package failed." ] ) if $@;
+    my $package = "OS::Command::$method";
+    eval "require $package";
+    Die( [ "require of package $package failed." ] ) if $@;
 
-	no strict 'refs';
-	no strict 'subs';
-	my $func = <<EOF
-	    sub OS::$method { # method is a command of the OS interface
-		my \$action = $package->new( -transaction => Transaction::getTransaction(), \@_  );
-		\$action->execute();
-	}
-EOF
-;
-	eval( "$func" );
-	Die( [$func, $@ ] ) if $@;
-	goto &$AUTOLOAD;
+    no strict 'refs';
+    no strict 'subs';
+    my $func = <<EOF
+	sub OS::$method { # method is a command of the OS interface
+	    my \$action = $package->new( -transaction => Transaction::getTransaction(), \@_  );
+	    \$action->execute();
     }
-    
+EOF
+;
+    eval( "$func" );
+    Die( [$func, $@ ] ) if $@;
+    goto &$AUTOLOAD;
 
 } # AUTOLOAD
 

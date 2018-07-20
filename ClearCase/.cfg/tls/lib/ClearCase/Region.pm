@@ -62,7 +62,7 @@ sub loadVobs {
 
    my %vobs = ();
    foreach ( @erg ) {
-       $vobs{ $_ } = ClearCase::InitVob( -tag => $_ );
+       $vobs{ $_ } = ClearCase::Vob->new( -tag => $_ );
    }
    return $self->setVobs( \%vobs );
 }
@@ -76,7 +76,7 @@ sub loadViews {
 
    my %views = ();
    foreach ( @erg ) {
-       $views{ $_ } = ClearCase::InitView( $_ );
+       $views{ $_ } = ClearCase::View->( $_ );
    }
    return $self->setViews( \%views );
 }
