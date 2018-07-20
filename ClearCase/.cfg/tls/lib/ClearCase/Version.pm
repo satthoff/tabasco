@@ -50,7 +50,7 @@ sub loadMyBranch {
     my $self = shift;
 
     my $branchPath = File::Basename::dirname( $self->getVXPN() );
-    my $branch = ClearCase::InitBranch( -pathname => $branchPath );
+    my $branch = ClearCase::Branch->new( -pathname => $branchPath );
     return $self->setMyBranch( $branch ) if( $branch );
     return undef;
 }

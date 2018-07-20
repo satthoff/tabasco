@@ -54,7 +54,7 @@ sub create {
 	[ 'FROMVERSION' ],
 	@_ );
 
-    my $branchType = ClearCase::InitBrType( -name => $self->getName(), -vob => $self->getVob()  );
+    my $branchType = ClearCase::BrType->new( -name => $self->getName(), -vob => $self->getVob()  );
     unless( $branchType->exist() )
     {
         $branchType->create();
@@ -80,14 +80,14 @@ sub loadMyElement {
     pop @tmp;
     my $ePath = join '@@', @tmp;
     $ePath =~ s/$/\@\@/ unless( $ePath =~ m/\@\@$/ );
-    return $self->setMyElement( ClearCase::InitElement( -pathname => $ePath ) );
+    return $self->setMyElement( ClearCase::Element->new( -pathname => $ePath ) );
 }
 
 sub loadLatestVersion
   {
     my $self = shift;
 
-    my $latestVersion = ClearCase::InitVersion( -pathname => $self->getVXPN() . $OS::Config::slash . 'LATEST' );
+    my $latestVersion = ClearCase::Version->new( -pathname => $self->getVXPN() . $OS::Config::slash . 'LATEST' );
     return $self->setLatestVersion( $latestVersion );
   }
 
@@ -95,7 +95,7 @@ sub loadZeroVersion
   {
     my $self = shift;
 
-    my $zeroVersion = ClearCase::InitVersion( -pathname => $self->getVXPN() . $OS::Config::slash . '0' );
+    my $zeroVersion = ClearCase::Version->new( -pathname => $self->getVXPN() . $OS::Config::slash . '0' );
     return $self->setZeroVersion( $zeroVersion );
   }
 
@@ -104,7 +104,7 @@ sub getLabeledVersion
     my $self = shift;
     my $label = shift;
 
-    my $labeledVersion = ClearCase::InitVersion( -pathname => $self->getVXPN() . $OS::Config::slash . $label );
+    my $labeledVersion = ClearCase::Version->new( -pathname => $self->getVXPN() . $OS::Config::slash . $label );
     return $labeledVersion;
   }
 1;

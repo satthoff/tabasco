@@ -48,7 +48,7 @@ sub loadRegions {
 
     my %regions = ();
     foreach ( @result ) {
-	$regions{ $_ } = ClearCase::InitRegion( -name => $_ );
+	$regions{ $_ } = ClearCase::Region->( -name => $_ );
     }
 
     return $self->setRegions( \%regions );

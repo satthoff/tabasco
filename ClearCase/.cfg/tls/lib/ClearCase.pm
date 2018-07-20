@@ -7,6 +7,12 @@ sub BEGIN {
    require Transaction;
    require ClearCase::Common::Config;
    require ClearCase::Common::Cleartool;
+   require ClearCase::Version;
+   require ClearCase::Branch;
+   require ClearCase::Registry;
+   require ClearCase::Region;
+   require ClearCase::BrType;
+   require ClearCase::Element;
 }
 
 use Log;
