@@ -66,17 +66,35 @@ sub new()
    }
    my $vobTag = ClearCase::getOutputLine();
    chomp $vobTag;
-   # get the Vob from my ClearCase host region
-   $self->setVob( $ClearCase::Common::Config::myHost->getRegion()->getVob( -tag => $vobTag ) );
+      
+   # Dependent on the type - ClearCase::Element, ClearCase::Branch, ClearCase::Version - we have to check
+   # and possibly to change the provided $pathname according to the currently active ClearCase view.
+   #
+   # e.g. $self->isa( 'ClearCase::Version' )
+   #
+   ClearCase::describe(
+       -fmt => '%m',
+       -pathname => $pathname );
+   my $pathType = ClearCase::getOutputLine();
 
+   if( ( $self->isa( 'ClearCase::Element' ) and $pathType ne 'element' ) or
+       ( $self->isa( 'ClearCase::Branch' ) and $pathType ne 'branch' ) or
+       ( $self->isa( 'ClearCase::Version' ) and $pathType ne 'version' ) ) {
+       # something to be done with pathname
+       
+   }
+   
    # determine my OID
    ClearCase::describe(
        -pathname => $pathname,
        -fmt => '%On'
        );
    $self->setOid( ClearCase::getOutputLine() );
+
+   # get the Vob from my ClearCase host region
+   $self->setVob( $ClearCase::Common::Config::myHost->getRegion()->getVob( -tag => $vobTag ) );
    
-   $self->_init();
+   $self->_init) ();
    return $self;
 }
 
@@ -160,6 +178,8 @@ sub loadCspecPath {
 sub getVXPN {
    my $self = shift;
 
+   # the composition of the version extended pathname depends on the
+   # config spec of the currently active view
    ClearCase::describe(
        -pathname => 'oid: ' . $self->getOid() . '@' . $self->getVob()->getTag(),
        -short => 1

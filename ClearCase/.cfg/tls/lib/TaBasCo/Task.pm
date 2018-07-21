@@ -245,10 +245,7 @@ sub create
       [ 'BASELINE', 'NAME' ],
       @_ );
 
-   my $newTask = $self->new(
-			    -element => $baseline->get('_Element'),
-			    -branch  => File::Basename::dirname( $baseline->getVersionString() ) . $OS::Common::Config::slash . $name
-			   );
+   my $newTask = $self->new( -pathname => File::Basename::dirname( $baseline->getVXPN() ) . $OS::Common::Config::slash . $name );
    $newTask->SUPER::create( -fromVersion => $baseline );
    TaBasCo::Release::createFloatingRelease( $newTask );
    return $newTask;
