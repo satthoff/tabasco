@@ -179,10 +179,11 @@ sub getVXPN {
    my $self = shift;
 
    # the composition of the version extended pathname depends on the
-   # config spec of the currently active view
+   # config spec of the currently active view.
+   # therefore we use the format option '%Xn'.
    ClearCase::describe(
        -pathname => 'oid: ' . $self->getOid() . '@' . $self->getVob()->getTag(),
-       -short => 1
+       -fmt => '%Xn'
        );
    my $p = ClearCase::getOutputLine();
    chomp $p;
