@@ -53,7 +53,7 @@ sub new()
 	  'ClearCase::Element, ClearCase::Branch or ClearCase::Version.' ] )
        if( ( not $self->isa( 'ClearCase::Element' ) and
 	     not $self->isa( 'ClearCase::Branch' ) and
-	     not $self->isa( 'ClearCase::Version' ) );
+	     not $self->isa( 'ClearCase::Version' ) ) );
 
    # determine my Vob
    ClearCase::disableErrorOut();
@@ -128,7 +128,7 @@ sub new()
    # get the Vob from my ClearCase host region
    $self->setVob( $ClearCase::Common::Config::myHost->getRegion()->getVob( -tag => $vobTag ) );
    
-   $self->_init) ();
+   $self->_init();
    return $self;
 }
 

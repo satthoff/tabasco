@@ -49,7 +49,7 @@ sub _init {
 sub loadMyBranch {
     my $self = shift;
 
-    return $self->setMyBranch( ClearCase::Branch->new( -pathname => $self->getVXPN() );
+    return $self->setMyBranch( ClearCase::Branch->new( -pathname => $self->getVXPN() ) );
 }
 
 sub loadPreviousVersion
