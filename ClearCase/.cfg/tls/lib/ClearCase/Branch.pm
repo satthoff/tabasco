@@ -76,11 +76,7 @@ sub create {
 sub loadMyElement {
     my $self = shift;
 
-    my @tmp = split /\@\@/, $self->getVXPN();
-    pop @tmp;
-    my $ePath = join '@@', @tmp;
-    $ePath =~ s/$/\@\@/ unless( $ePath =~ m/\@\@$/ );
-    return $self->setMyElement( ClearCase::Element->new( -pathname => $ePath ) );
+    return $self->setMyElement( ClearCase::Element->new( -pathname => $self->getVXPN() ) );
 }
 
 sub loadLatestVersion

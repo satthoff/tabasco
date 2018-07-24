@@ -49,10 +49,7 @@ sub _init {
 sub loadMyBranch {
     my $self = shift;
 
-    my $branchPath = File::Basename::dirname( $self->getVXPN() );
-    my $branch = ClearCase::Branch->new( -pathname => $branchPath );
-    return $self->setMyBranch( $branch ) if( $branch );
-    return undef;
+    return $self->setMyBranch( ClearCase::Branch->new( -pathname => $self->getVXPN() );
 }
 
 sub loadPreviousVersion

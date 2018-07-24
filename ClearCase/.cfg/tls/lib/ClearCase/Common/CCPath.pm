@@ -49,6 +49,11 @@ sub new()
    confess @other if @other;
 
    Die( [ "Missing argument pathname for initilization of object $class" ] ) unless( $pathname );
+   Die( [ 'Fatal Error. Package ' . __PACKAGE__ . ' can only be used as parent package of',
+	  'ClearCase::Element, ClearCase::Branch or ClearCase::Version.' ] )
+       if( ( not $self->isa( 'ClearCase::Element' ) and
+	     not $self->isa( 'ClearCase::Branch' ) and
+	     not $self->isa( 'ClearCase::Version' ) );
 
    # determine my Vob
    ClearCase::disableErrorOut();
@@ -62,26 +67,55 @@ sub new()
 
    if( ClearCase::getRC() != 0 ) {
        # pathname is not a VXPN (path within a Vob)
+       # or should we Die in this case?
        return undef;
    }
    my $vobTag = ClearCase::getOutputLine();
    chomp $vobTag;
       
-   # Dependent on the type - ClearCase::Element, ClearCase::Branch, ClearCase::Version - we have to check
+   # Dependent on the class - ClearCase::Element, ClearCase::Branch, ClearCase::Version - we have to check
    # and possibly to change the provided $pathname according to the currently active ClearCase view.
    #
    # e.g. $self->isa( 'ClearCase::Version' )
    #
+   # the pathType (see below) can be:
+   #     file element
+   #     directory element
+   #     directory version
+   #     version
+   #     branch
    ClearCase::describe(
        -fmt => '%m',
        -pathname => $pathname );
    my $pathType = ClearCase::getOutputLine();
+   $pathType =~ s/^\s*(.*)\s*$/$1/; # strip off leading and trailing white spaces
+   $pathType =~ s/^\S+\s//; # reduce to simple string value: element, branch or version.
 
    if( ( $self->isa( 'ClearCase::Element' ) and $pathType ne 'element' ) or
        ( $self->isa( 'ClearCase::Branch' ) and $pathType ne 'branch' ) or
        ( $self->isa( 'ClearCase::Version' ) and $pathType ne 'version' ) ) {
-       # something to be done with pathname
-       
+       # THEN: something to be done with pathname
+
+       # ensure to have in variable $pathname really the version extended pathname
+       ClearCase::describe(
+	   -pathname => $pathname,
+	   -fmt => '%Xn'
+	   );
+       $pathname = ClearCase::getOutputLine();
+
+       if( $pathType eq 'version' and $self->isa( 'ClearCase::Branch' ) ) {
+	   # strip off the trailing number
+	   $pathname = File::Basename::dirname( $pathname );
+       } elsif( ( $pathType eq 'version' and $self->isa( 'ClearCase::Element' ) ) or
+		( $pathType eq 'branch' and $self->isa( 'ClearCase::Element' ) ) ) {
+	   # strip off the trailing branch or version identifier
+	   $pathname =~ s/^(\S+\@\@).*/$1/;
+       } else {
+	   Die( [ '', 'Package: ' . __PACKAGE__ . ' ( check the inconsitency! )',
+		  'Pathname: ' . $pathname,
+		  'PathType: ' . $pathType,
+		  'Class: ' . $class, '' ] );
+       }
    }
    
    # determine my OID
