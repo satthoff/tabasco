@@ -16,6 +16,7 @@ sub BEGIN {
    require ClearCase::View;
    require ClearCase::Vob;
    require ClearCase::LbType;
+   require ClearCase::HlType;
 }
 
 use Log;

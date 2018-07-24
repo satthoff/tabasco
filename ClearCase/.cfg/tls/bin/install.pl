@@ -43,10 +43,10 @@ Transaction::start( -comment => 'TaBasCo installation' );
 my $configFile = $base . $OS::Common::Config::slash . $TaBasCo::Common::Config::configFile;
 my $vobTag = File::Basename::dirname( $base );
 
-my $vob = ClearCase::InitVob( -tag => $vobTag );
+my $vob = ClearCase::Vob->new( -tag => $vobTag );
 
 # create the hyperlink type to link paths to the branches, what we need first
-my $pathLinkType = ClearCase::InitHlType( -name => $TaBasCo::Common::Config::pathLink, -vob => $vob );
+my $pathLinkType = ClearCase::HlType->new( -name => $TaBasCo::Common::Config::pathLink, -vob => $vob );
 $pathLinkType->create();
 
 # create the configuration file
@@ -61,20 +61,19 @@ ClearCase::mkelem(
 # now create the hyperlink from the first Task (= branch main of the configuration file)
 # to the Vob root path element
 my $mainTask = TaBasCo::Task->new( -pathname => $configFile . '@@' . $OS::Common::Config::slash . 'main' );
-my $vobRootElement = ClearCase::InitElement( -pathname => $vobTag . $OS::Common::Config::slash . '.@@' );
-my $initialPathLink = ClearCase::InitHyperLink(
+my $initialPathLink = ClearCase::HyperLink->new(
     -hltype => $pathlinkType,
     -from => $mainTask,
-    -to => $vobRootElement
+    -to => $vob->getRootElement()
     );
 $initialPathLink->create();
 
 # create the label type MAIN_NEXT
-ClearCase::InitLbType( -name => uc( 'main' . $TaBasCo::Common::Config::nextLabelExtension ), -vob => $vob
+ClearCase::LbType->new( -name => uc( 'main' . $TaBasCo::Common::Config::nextLabelExtension ), -vob => $vob
                             )->create();
 
 # create the label type CSPEC
-ClearCase::InitLbType( -name => $TaBasCo::Common::Config::cspecLabel, -vob => $vob
+ClearCase::LbType->new( -name => $TaBasCo::Common::Config::cspecLabel, -vob => $vob
                             )->create( -pbranch => 1 );
 
 
@@ -95,10 +94,10 @@ ClearCase::checkout(
 my $relName = $mainTask->nextReleaseName();
 
 # create the release
-$mainTask->createNewRelease( $relName, ClearCase::InitView( $ENV{ 'CLEARCASE_VIEW' } ) );
+$mainTask->createNewRelease( $relName, ClearCase::View->new( $ENV{ 'CLEARCASE_VIEW' } ) );
 
 # create the tools label type
-ClearCase::InitLbType( -name => $TaBasCo::Common::Config::toolSelectLabel, -vob => $vob )->create();
+ClearCase::LbType->new( -name => $TaBasCo::Common::Config::toolSelectLabel, -vob => $vob )->create();
 
 # label the installation
 ClearCase::mklabel(
@@ -116,7 +115,7 @@ Transaction::commit();
 # finaly create all trigger types
 foreach my $trg ( keys %TaBasCo::Common::Config::allTrigger )
   {
-    my $trt = ClearCase::InitTrType( -name => $trg, -vob => $vob );
+    my $trt = ClearCase::TrType->new( -name => $trg, -vob => $vob );
     $trt->create(
                  -all     => $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'all' },
                  -element => $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'element' },

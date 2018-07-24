@@ -25,6 +25,7 @@ sub BEGIN {
        Tag            => undef,
        Password   => undef,
        Exists         => undef,
+       RootElement => { CALCULATE => \&loadRootElement },
        Name         => { CALCULATE => \&loadName },
        Hostname  => { CALCULATE => \&loadVob },
        Owner        => { CALCULATE => \&loadVob },
@@ -75,6 +76,12 @@ sub loadName {
    my $self = shift;
    require File::Basename;
    return $self->setName( File::Basename::basename( $self->getTag() ) );
+}
+
+sub loadRootElement {
+    my $self = shift;
+
+    return $self->setRootElement( ClearCase::Element->new( -pathname => $self->getTag() . $OS::Common::Config::slash . '.@@' ) );
 }
 
 sub loadAllReplica {
