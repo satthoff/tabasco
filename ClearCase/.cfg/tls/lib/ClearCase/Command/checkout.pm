@@ -44,7 +44,7 @@ sub new {
          @_ );
    confess join( ' ', @other ) if @other;
 
-   my $self  = $class->SUPER::new( $transaction, $pathname );
+   my $self  = $class->SUPER::new( $transaction );
    bless $self, $class;
 
    $self->setIdenticalCheckin( $ident );

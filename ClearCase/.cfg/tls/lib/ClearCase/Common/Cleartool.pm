@@ -68,7 +68,10 @@ sub AUTOLOAD {
 
    my $package = "ClearCase::Command::$method";
    eval "require $package";
-   confess $@ if $@;
+   if( $@ ) {
+      Error( [ "require of $package failed.", "$@" ] );
+      confess $@;
+   }
 
    no strict 'refs';
    no strict 'subs';
@@ -110,6 +113,67 @@ sub GetCwd {
 
    return getOutputLine();
 }
+
+sub execute {
+   @CMD  = @_;
+   @CMD_OUTPUT = ();
+
+   Exec( join( ' ', @CMD ) . "\n" );
+
+   ### pipe( PARENT_R, CHILD_W );
+   pipe( PARENT_R, CHILD_W );
+
+   my $rc;
+   if( my $pid = fork() )
+   {
+      # ======================================================================
+      # PARENT
+      #
+      close CHILD_W;
+
+      # ======================================================================
+      # We are the parent
+      my $line;
+      for(;;) {
+         $line = readline (*PARENT_R );
+         last if not $line;
+         push @CMD_OUTPUT, $line;
+      }
+      close PARENT_R;
+
+      waitpid( $pid, 0 );
+      $rc = $?;
+   }
+   else
+   {
+      # ======================================================================
+      # CHILD
+      #
+      close PARENT_R;
+
+      # set STDOUT to CHILD_W and AUTOFLUSH
+      open STDOUT, ">&=" . fileno( CHILD_W );
+      $| = 1;
+
+      if( not exec ( "@CMD" ) ) {
+         # the program couldn't be executed
+         my $msg = "ERROR: can't exec ( ";
+         $msg.=join( ' ', @CMD );
+         $msg.=") - ".$!;
+
+         close CHILD_W;
+
+         Die( $msg );
+      }
+      # NOT REACHED
+   }
+
+   $CMD_RC = $rc;
+
+   # return the output
+   return $CMD_RC == 0;
+
+} # execute
 
 
 use vars qw( @CT_ERRORS @CT_WARNINGS @CT_OUTPUT $CT_RC $CT );

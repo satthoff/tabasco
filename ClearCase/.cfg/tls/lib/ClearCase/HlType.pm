@@ -110,7 +110,7 @@ sub _init {
 
 
    $self->SUPER::_init( -type => 'hltype', @_ );
-   return;
+   return $self;
 } # _init
 
 

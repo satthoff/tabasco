@@ -52,7 +52,7 @@ sub AUTOLOAD {
 
     my $package = "ClearCase::Command::$method";
     eval "require $package";
-    Die( [ "require of package $package failed." ] ) if $@;
+    Die( [ "require of package $package failed.", "$@" ] ) if $@;
 
     no strict 'refs';
     no strict 'subs';

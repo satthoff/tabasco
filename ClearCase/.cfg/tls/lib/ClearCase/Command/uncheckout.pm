@@ -23,7 +23,8 @@ sub BEGIN {
    %DATA = (
       UndoList       => undef,
       Keep           => undef,
-      Rm             => undef
+      Rm             => undef,
+      Argv           => undef
    );
 
    Data::init(
