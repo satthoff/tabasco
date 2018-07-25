@@ -3,6 +3,8 @@ package ClearCase::Common::MetaObject;
 use strict;
 use Carp;
 
+use Log;
+
 sub BEGIN {
    use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS %DATA);
    $VERSION = '0.01';
@@ -34,7 +36,7 @@ sub BEGIN {
 
 } # sub BEGIN()
 
-my @knownTypes = qw/ 'brtype' 'lbtype' 'attype' 'hltype' 'trtype' 'eltype' /;
+my @knownTypes = qw/ brtype lbtype attype hltype trtype eltype /;
 
 sub new {
    my $proto = shift;

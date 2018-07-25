@@ -3,7 +3,7 @@ package TaBasCo::Common::Config;
 use strict;
 use Carp;
 
-use OS::Config;
+use OS::Common::Config;
 use Log;
 use ClearCase;
 
@@ -34,7 +34,7 @@ BEGIN
     $toolRoot = '.cfg';
     $toolPath = 'tls';
     $configFile = 'config.txt';
-    $configFilePath = $toolRoot . $OS::Config::slash . $configFile;
+    $configFilePath = $toolRoot . $OS::Common::Config::slash . $configFile;
     $toolSelectLabel = 'TABASCO';
 
 

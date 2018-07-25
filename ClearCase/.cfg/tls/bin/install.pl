@@ -33,6 +33,7 @@ BEGIN {
 
   require ClearCase;
   require TaBasCo;
+  require OS;
 }
 
 use Log;
@@ -40,6 +41,7 @@ use Log;
 Log::setVerbosity( "debug" );
 Transaction::start( -comment => 'TaBasCo installation' );
 
+$base = File::Basename::dirname( $base );
 my $configFile = $base . $OS::Common::Config::slash . $TaBasCo::Common::Config::configFile;
 my $vobTag = File::Basename::dirname( $base );
 

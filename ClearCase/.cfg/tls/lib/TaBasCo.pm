@@ -8,6 +8,7 @@ sub BEGIN {
    require Log;
    require ClearCase::Common::Config;
    require ClearCase::Common::Cleartool;
+   require TaBasCo::Common::Config;
    require TaBasCo::Task;
    require TaBasCo::Release;
 }

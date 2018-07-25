@@ -58,9 +58,9 @@ sub loadHostinfo {
 	if( $line =~ m/^\s+Operating system:\s+(\S+)\.*$/ ) {
 	    $self->setOS( $1 );
 	} elsif( $line =~ m/^\s+Registry host:\s+(\S+)\.*$/ ) {
-	    $self->setRegistry( ClearCase::Registry( -hostname => $1 ) );
+	    $self->setRegistry( ClearCase::Registry->new( -hostname => $1 ) );
 	} elsif( $line =~ m/^\s+License host:\s+(\S+)\.*$/ ) {
-	    $self->setLicenseHost( OS::Host( -hostname => $1 ) );
+	    $self->setLicenseHost( OS::Host->new( -hostname => $1 ) );
 	} elsif( $line =~ m/^\s+Registry region:\s+(\S+)\.*$/ ) {
 	    $self->setRegionName( $1 );
 	}
