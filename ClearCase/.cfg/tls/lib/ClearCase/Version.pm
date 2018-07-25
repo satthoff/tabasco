@@ -57,7 +57,7 @@ sub loadPreviousVersion
     my $self = shift;
 
     ClearCase::describe(
-	-pathname => $self->getVXPN(),
+	-argv => $self->getVXPN(),
 	-fmt => '%PVn'
 	);
     my $pv = ClearCase::getOutputLine();

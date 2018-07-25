@@ -25,7 +25,8 @@ sub BEGIN {
       Long     => undef,
       NxName   => undef,
       Visible  => undef,
-      Directory=> undef
+      Directory=> undef,
+       Argv => undef
    );
 
    Data::init(
@@ -41,13 +42,13 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $transaction, $pathname, $short, $long, $recurse, $visible, $nxname, $dir, @other ) =
+   my ( $transaction, $argv, $short, $long, $recurse, $visible, $nxname, $dir, @other ) =
       $class->rearrange(
-         [ qw( TRANSACTION PATHNAME SHORT LONG RECURSE VISIBLE NXNAME DIRECTORY ) ],
+         [ qw( TRANSACTION ARGV SHORT LONG RECURSE VISIBLE NXNAME DIRECTORY ) ],
          @_ );
    confess join( ' ', @other ) if @other;
 
-   my $self  = $class->SUPER::new( $transaction, $pathname );
+   my $self  = $class->SUPER::new( $transaction );
    bless $self, $class;
 
    $self->setDirectory($dir);
@@ -56,6 +57,7 @@ sub new {
    $self->setLong($long);
    $self->setVisible($visible);
    $self->setNxName($nxname);
+   $self->setArgv($argv);
 
    return $self;
 }
@@ -71,7 +73,7 @@ sub do_execute {
    push @options, '-nxn '  if $self->getNxName();
    push @options, '-vis '  if $self->getVisible();
 
-   ClearCase::Common::Cleartool::ls( @options, $self->getPathname());
+   ClearCase::Common::Cleartool::ls( @options, $self->getArgv());
 }
 
 sub do_commit {

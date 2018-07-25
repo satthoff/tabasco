@@ -38,17 +38,18 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $transaction, $pathname, $rm, $keep, @other ) =
+   my ( $transaction, $argv, $rm, $keep, @other ) =
       $class->rearrange(
-         [ 'TRANSACTION', [ 'PATHNAME', 'PATHNAMES' ], 'RM', 'KEEP' ],
+         [ 'TRANSACTION', 'ARGV', 'RM', 'KEEP' ],
          @_ );
    confess join( ' ', @other ) if @other;
 
-   my $self  = $class->SUPER::new( $transaction, $pathname );
+   my $self  = $class->SUPER::new( $transaction );
    bless $self, $class;
 
    $self->setKeep( $keep );
    $self->setRm( $rm );
+   $self->setArgv($argv);
 
    return $self;
 }
@@ -57,7 +58,7 @@ sub do_execute {
    my $self = shift;
    ClearCase::Common::Cleartool::uncheckout(
       '-keep',
-      $self->getPathname() );
+      $self->getArgv() );
 
    my @undoList;
    my $unco = $ClearCase::Common::Config::CC_UNCHECKOUT_OUTPUT{'UNCO'};

@@ -60,12 +60,12 @@ sub create {
         $branchType->create();
     }
     ClearCase::mkbranch(
-	-pathname => $fve->getVXPN(),
+	-argv => $fve->getVXPN(),
 	-name     => $self->getName(),
 	-checkout => 0
 	);
     ClearCase::describe(
-	-pathname => File::Basename::dirname( $fve->getVXPN() ),
+	-argv => File::Basename::dirname( $fve->getVXPN() ),
 	-fmt => '%On'
 	);
     my $oid = ClearCase::getOutputLine();

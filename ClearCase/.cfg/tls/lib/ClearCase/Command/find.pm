@@ -28,7 +28,8 @@ sub BEGIN {
       NRecurse => undef,
       Directory=> undef,
       All      => undef,
-      Branch   => undef
+      Branch   => undef,
+       Argv => undef
    );
 
    Data::init(
@@ -44,14 +45,14 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $element, $transaction, $name, $print, $pathname, $version, $nrecurse, $directory, $all, $branch, @other ) =
+   my ( $element, $transaction, $name, $print, $argv, $version, $nrecurse, $directory, $all, $branch, @other ) =
       $class->rearrange(
-         [ 'ELEMENT', 'TRANSACTION', 'NAME', 'PRINT', [ 'PATHNAME', 'PATHNAMES' ],
+         [ 'ELEMENT', 'TRANSACTION', 'NAME', 'PRINT', 'ARGV',
            'VERSION', 'NRECURSE', 'DIRECTORY', 'ALL', 'BRANCH' ],
          @_ );
    confess join( ' ', @other ) if @other;
 
-   my $self  = $class->SUPER::new( $transaction, $pathname );
+   my $self  = $class->SUPER::new( $transaction );
    bless $self, $class;
 
    $self->setName($name);
@@ -62,6 +63,7 @@ sub new {
    $self->setDirectory($directory);
    $self->setAll($all);
    $self->setBranch( $branch );
+   $self->setArgv($argv);
    return $self;
 }
 
@@ -69,7 +71,7 @@ sub do_execute {
    my $self = shift;
    my @options = ();
 
-   push @options, $self->getPathname()                      if $self->getPathname();
+   push @options, $self->getArgv()                      if $self->getArgv();
    push @options, '-all'                                    if $self->getAll();
    push @options, '-element \'' . $self->getElement() .'\'' if $self->getElement();
    push @options, '-branch \'' . $self->getBranch() .'\''   if $self->getBranch();

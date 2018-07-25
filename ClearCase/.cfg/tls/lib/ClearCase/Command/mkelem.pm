@@ -21,7 +21,8 @@ sub BEGIN {
 
    %DATA = (
       ElType      => undef,
-      Comment     => undef
+      Comment     => undef,
+      Argv => undef
    );
 
    Data::init(
@@ -37,17 +38,18 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $transaction, $element, $eltype, $comment, @other ) =
+   my ( $transaction, $argv, $eltype, $comment, @other ) =
       $class->rearrange(
-         [ qw( TRANSACTION PATHNAME ELTYPE COMMENT) ],
+         [ qw( TRANSACTION ARGV ELTYPE COMMENT) ],
          @_ );
    confess join( ' ', @other ) if @other;
 
-   my $self  = $class->SUPER::new( $transaction, $element );
+   my $self  = $class->SUPER::new( $transaction );
    bless $self, $class;
 
    $self->setElType( $eltype );
    $self->setComment( $comment );
+   $self->setArgv($argv);
 
    return $self;
 }
@@ -69,7 +71,7 @@ sub do_execute {
 
    ClearCase::Common::Cleartool::mkelem(
       @options,
-      $self->getPathname() );
+      $self->getArgv() );
 }
 
 sub do_commit {
@@ -77,7 +79,7 @@ sub do_commit {
    ClearCase::Common::Cleartool::checkin(
       '-nc',
       '-ident',
-      $self->getPathname() );
+      $self->getArgv() );
 }
 
 sub do_rollback {
@@ -85,11 +87,11 @@ sub do_rollback {
    ClearCase::Common::Cleartool::checkin(
       '-nc',
       '-ident',
-      $self->getPathname() );
+      $self->getArgv() );
 
    ClearCase::Common::Cleartool::rmelem(
       '-f',
-      $self->getPathname() );
+      $self->getArgv() );
 
 }
 

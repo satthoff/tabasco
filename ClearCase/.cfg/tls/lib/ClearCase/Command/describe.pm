@@ -20,11 +20,12 @@ sub BEGIN {
    );
 
    %DATA = (
-      Short    => undef,
-      Format   => undef,
+       Short    => undef,
+       Format   => undef,
       Long     => undef,
       Ahl      => undef,
-      Version  => undef
+      Version  => undef,
+      Argv => undef
    );
 
    Data::init(
@@ -40,13 +41,13 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $transaction, $pathname, $short, $fmt, $ahl, $long, $version, @other ) =
+   my ( $transaction, $argv, $short, $fmt, $ahl, $long, $version, @other ) =
       $class->rearrange(
-         [ qw( TRANSACTION PATHNAME SHORT FMT AHL LONG VERSION) ],
+         [ qw( TRANSACTION ARGV SHORT FMT AHL LONG VERSION) ],
          @_ );
    confess join( ' ', @other ) if @other;
 
-   my $self  = $class->SUPER::new( $transaction, $pathname );
+   my $self  = $class->SUPER::new( $transaction );
    bless $self, $class;
 
    $self->setVersion($version);
@@ -54,6 +55,7 @@ sub new {
    $self->setAhl($ahl);
    $self->setFormat($fmt);
    $self->setLong($long);
+   $self->setArgv( $argv );
 
    return $self;
 }
@@ -67,13 +69,9 @@ sub do_execute {
    push @options, '-ahl '. $self->getAhl() if $self->getAhl();
    push @options, '-fmt '. $self->getFormat() if $self->getFormat();
 
-   my $pathname = $self->getPathname();
+   my $pathname = $self->getArgv();
 
-   if( ref $pathname eq 'ARRAY' )
-     {
-      ClearCase::Common::Cleartool::describe( @options, "@$pathname" );
-     }
-   elsif( $self->getVersion() )
+   if( $self->getVersion() )
      {
       my $version = $self->getVersion();
       $pathname = $pathname . "\@\@" . $self->getVersion()

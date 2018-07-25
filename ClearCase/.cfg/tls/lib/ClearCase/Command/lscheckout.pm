@@ -28,7 +28,8 @@ sub BEGIN {
       All         => undef,
       BrType      => undef,
       Avobs       => undef,
-      Long        => undef
+      Long        => undef,
+       Argv => undef
    );
 
    Data::init(
@@ -44,14 +45,14 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $transaction, $pathname, $dir, $short, $me, $cview, $recursive, $all, $brtype, $avobs, $long, @other ) =
+   my ( $transaction, $argv, $dir, $short, $me, $cview, $recursive, $all, $brtype, $avobs, $long, @other ) =
       $class->rearrange(
-         [  'TRANSACTION', [ 'PATHNAME', 'PATHNAMES' ], 'DIRECTORY', 'SHORT',
+         [  'TRANSACTION', 'ARGV', 'DIRECTORY', 'SHORT',
             'ME', 'CVIEW', 'RECURSIVE', 'ALL', 'BRTYPE', 'AVOBS', 'LONG' ],
          @_ );
    confess join( ' ', @other ) if @other;
 
-   my $self  = $class->SUPER::new( $transaction, $pathname );
+   my $self  = $class->SUPER::new( $transaction );
    bless $self, $class;
 
    $self->setAll( $all );
@@ -63,6 +64,7 @@ sub new {
    $self->setRecursive( $recursive );
    $self->setBrType( $brtype );
    $self->setAvobs( $avobs );
+   $self->setArgv($argv);
 
    return $self;
 }
@@ -80,7 +82,7 @@ sub do_execute {
    push @options , '-all'     if $self->getAll();
    push @options , '-avobs'   if $self->getAvobs();
    push (@options , '-brtype ' . $self->getBrType()) if $self->getBrType();
-   push @options, $self->getPathname() if( $self->getPathname() and ($self->getPathname() ne '') );
+   push @options, $self->getArgv() if( $self->getArgv() and ($self->getArgv() ne '') );
 
    ClearCase::Common::Cleartool::lscheckout(@options);
 }

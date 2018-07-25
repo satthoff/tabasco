@@ -80,7 +80,7 @@ sub run {
 	# create the config spec in version zero of new task = branch
 	# because of the triggers it should be possible just to checkout the task branch zero version
 	ClearCase::checkout(
-	    -pathname => $newTask->getZeroVersion()->getVXPN()
+	    -argv => $newTask->getZeroVersion()->getVXPN()
 	);
 
 	Transaction::commit();

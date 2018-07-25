@@ -271,7 +271,7 @@ sub loadPath
     ClearCase::describe(
                         -short    => 1,
                         -ahl      => $TaBasCo::Common::Config::pathLink,
-                        -pathname => $self->getBranchPath()
+                        -argv => $self->getBranchPath()
                        );
     my @paths = ClearCase::getOutput();
     grep chomp, @paths;

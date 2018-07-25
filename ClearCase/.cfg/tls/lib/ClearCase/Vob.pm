@@ -101,7 +101,7 @@ sub loadMyReplica {
 
     ClearCase::describe(
 	-fmt => '"%[replica_name]p"',
-	-pathname => 'vob:' . $self->getTag()
+	-argv => 'vob:' . $self->getTag()
 	);
     my $rep = ClearCase::getOutputLine();
     chomp $rep;
@@ -113,7 +113,7 @@ sub loadVob {
 
     ClearCase::describe(
 	-long => 1,
-	-pathname => 'vob:' . $self->getTag()
+	-argv => 'vob:' . $self->getTag()
 	);
     my @erg = ClearCase::getOutput();
     grep chomp, @erg;
@@ -146,7 +146,7 @@ sub exists
 	  ClearCase::disableErrorOut();
 	  ClearCase::disableDieOnErrors();
 	  ClearCase::describe(
-	      -pathname => 'vob:' . $self->getTag(),
+	      -argv => 'vob:' . $self->getTag(),
 	      -short    => 1
 	      );
 	  my $ex = ( ClearCase::getRC() == 0 );
@@ -291,7 +291,7 @@ sub load
      {
 	 ClearCase::describe(
 			     -short => 1,
-			     -pathname => 'vob:' . $path
+			     -argv => 'vob:' . $path
 			    );
 	 $check = 1 if( ClearCase::getRC() == 0 );
 	 $tag = ClearCase::getOutputLine();

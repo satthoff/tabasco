@@ -53,11 +53,11 @@ $pathLinkType->create();
 
 # create the configuration file
 ClearCase::checkout(
-		    -pathname => $base
+		    -argv => $base
 		   );
 ClearCase::mkelem(
 		  -eltype   => 'text_file',
-		  -pathname => $configFile
+		  -argv => $configFile
 		 );
 
 # now create the hyperlink from the first Task (= branch main of the configuration file)
@@ -89,7 +89,7 @@ $mainTask->createConfigSpec();
 Transaction::commit();
 Transaction::start( -comment => "create initial release" );
 ClearCase::checkout(
-                    -pathname => $configFile
+                    -argv => $configFile
                    );
 
 # get the new release name

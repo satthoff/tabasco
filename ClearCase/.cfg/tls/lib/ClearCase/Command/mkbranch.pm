@@ -36,19 +36,20 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $transaction, $pathname, $version, $name, $co, @other ) =
+   my ( $transaction, $argv, $version, $name, $co, @other ) =
       $class->rearrange(
-         [ qw( TRANSACTION PATHNAME VERSION NAME CHECKOUT ) ],
+         [ qw( TRANSACTION ARGV VERSION NAME CHECKOUT ) ],
          @_ );
    confess join( ' ', @other ) if @other;
 
-   my $self  = $class->SUPER::new( $transaction, $pathname );
+   my $self  = $class->SUPER::new( $transaction );
    bless $self, $class;
 
    $self->setName( $name );
    $self->setVersion( $version ) if( $version );
    $self->setCheckout( 1 );
    $self->setCheckout( $co ) if( defined $co );
+   $self->setArgv($argv);
 
    return $self;
 }
@@ -62,7 +63,7 @@ sub do_execute {
    push @options, '-nco' unless( $self->getCheckout() );
    push @options, $self->getName();
    ClearCase::Common::Cleartool::mkbranch(
-				  @options, $self->getPathname()
+				  @options, $self->getArgv()
 				 );
 }
 
@@ -75,7 +76,7 @@ sub do_rollback {
    my $v = $self->getVersion();
    $v =~ s/\\/\//g if( defined $ENV{ OS } ); # always UNIX style
    $v =~ s/^(.*\/)\d+$/$1/;
-   my $p = $self->getPathname();
+   my $p = $self->getArgv();
    $p =~ s/\"//g;
    $p =~ s/\'//g;
    my $branch =  '"' . $p . '@@' . $v . $self->getName() . '"';

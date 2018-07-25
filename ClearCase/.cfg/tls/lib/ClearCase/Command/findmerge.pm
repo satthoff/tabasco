@@ -34,7 +34,8 @@ sub BEGIN {
       FVe      => undef,
       Log      => undef,
       UndoList => undef,
-      Type     => undef
+      Type     => undef,
+       Argv => undef
    );
 
    Data::init(
@@ -50,16 +51,16 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $transaction, $log, $all, $fve, $print, $short, $merge, $abort, $pathname, $element, $gmerge, $silent,
+   my ( $transaction, $log, $all, $fve, $print, $short, $merge, $abort, $argv, $element, $gmerge, $silent,
         $directory, $type, @other ) =
       $class->rearrange(
          [ 'TRANSACTION','LOG', 'ALL', 'FVE', 'PRINT', 'SHORT', 'MERGE', 'ABORT',
-           [ 'PATHNAME', 'PATHNAMES' ], 'ELEMENT', 'GMERGE', 'SILENT', 'DIRECTORY', 'TYPE'
+          'ARGV', 'ELEMENT', 'GMERGE', 'SILENT', 'DIRECTORY', 'TYPE'
          ],
          @_ );
    confess join( ' ', @other ) if @other;
 
-   my $self  = $class->SUPER::new( $transaction, $pathname );
+   my $self  = $class->SUPER::new( $transaction );
    bless $self, $class;
 
    $self->setAll($all);
@@ -75,6 +76,7 @@ sub new {
    $self->setLog($log);
    $self->setFVe($fve);
    $self->setType( $type );
+   $self->setArgv( $argv );
 
    return $self;
 }
@@ -83,7 +85,7 @@ sub do_execute {
    my $self = shift;
    my @options = ();
 
-   push @options, $self->getPathname()               if $self->getPathname();
+   push @options, $self->getArgv()               if $self->getArgv();
    push @options, '-all '                            if $self->getAll();
    push @options, '-name ' . $self->getName()        if $self->getName();
    push @options, '-type ' . $self->getType()        if $self->getType();

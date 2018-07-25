@@ -95,7 +95,7 @@ sub exists {
 	ClearCase::disableErrorOut();
 	ClearCase::disableDieOnErrors();
 	ClearCase::describe(
-	    -pathname => $self->getFullName(),
+	    -argv => $self->getFullName(),
 	    -short    => 1
 	    );
 	my $ex = ( ClearCase::getRC() == 0 );

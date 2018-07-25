@@ -21,9 +21,10 @@ sub BEGIN {
    );
 
    %DATA = (
-      UndoList       => undef,
-      Identical      => 0
-   );
+       Argv => undef,
+       UndoList       => undef,
+       Identical      => 0
+       );
 
    Data::init(
       PACKAGE  => __PACKAGE__,
@@ -37,16 +38,16 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $transaction, $identical, $pathname, @other ) =
+   my ( $transaction, $identical, $argv, @other ) =
       $class->rearrange(
-         [ 'TRANSACTION', 'IDENTICAL', [ 'PATHNAME', 'PATHNAMES' ] ],
+         [ 'TRANSACTION', 'IDENTICAL', 'ARGV' ],
          @_ );
    confess join( ' ', @other ) if @other;
 
-   my $self  = $class->SUPER::new( $transaction, $pathname );
+   my $self  = $class->SUPER::new( $transaction );
    bless $self, $class;
    $self->setIdentical( $identical ) if defined $identical;
-
+   $self->setArgv( $argv );
    return $self;
 }
 
@@ -58,7 +59,7 @@ sub do_execute {
    push @options, '-identical' if ($self->getIdentical());
    ClearCase::Common::Cleartool::checkin(
       @options,
-      $self->getPathname() );
+      $self->getArgv() );
 
    my @undoList;
    my $co = $ClearCase::Common::Config::CC_CHECKIN_OUTPUT;

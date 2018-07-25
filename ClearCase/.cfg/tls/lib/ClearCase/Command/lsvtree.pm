@@ -24,7 +24,8 @@ sub BEGIN {
       Long     => undef,
       All      => undef,
       Merge    => undef,
-      Branch   => undef
+      Branch   => undef,
+       Argv => undef
    );
 
    Data::init(
@@ -39,13 +40,13 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $transaction, $pathname, $short, $long, $all, $merge, $branch, @other ) =
+   my ( $transaction, $argv, $short, $long, $all, $merge, $branch, @other ) =
       $class->rearrange(
-         [ qw( TRANSACTION PATHNAME SHORT LONG ALL MERGE BRANCH ) ],
+         [ qw( TRANSACTION ARGV SHORT LONG ALL MERGE BRANCH ) ],
          @_ );
    confess join( ' ', @other ) if @other;
 
-   my $self  = $class->SUPER::new( $transaction, $pathname );
+   my $self  = $class->SUPER::new( $transaction );
    bless $self, $class;
 
    $self->setShort($short);
@@ -53,6 +54,7 @@ sub new {
    $self->setAll($all);
    $self->setMerge($merge);
    $self->setBranch($branch);
+   $self->setArgv($argv);
 
    return $self;
 }
@@ -67,7 +69,7 @@ sub do_execute {
    push @options, '-all'     if $self->getAll();
    push @options, '-branch ' . $self->getBranch()    if $self->getBranch();
 
-   ClearCase::Common::Cleartool::lsvtree( @options, $self->getPathname());
+   ClearCase::Common::Cleartool::lsvtree( @options, $self->getArgv());
 }
 
 sub do_commit {

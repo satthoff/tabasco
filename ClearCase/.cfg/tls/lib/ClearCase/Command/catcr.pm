@@ -20,16 +20,17 @@ sub BEGIN {
    );
 
    %DATA = (
-      Short    => undef,
-      Flat     => undef,
-      Long     => undef,
-      Union    => undef
-   );
+       Short    => undef,
+       Flat     => undef,
+       Long     => undef,
+       Union    => undef,
+       Argv     => undef
+       );
 
    Data::init(
-      PACKAGE  => __PACKAGE__,
-      SUPER    => 'Transaction::Command'
-      );
+       PACKAGE  => __PACKAGE__,
+       SUPER    => 'Transaction::Command'
+       );
 
 
 } # sub BEGIN()
@@ -38,19 +39,20 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $transaction, $pathname, $short, $long, $flat, $union, @other ) =
+   my ( $transaction, $argv, $short, $long, $flat, $union, @other ) =
       $class->rearrange(
-         [ qw( TRANSACTION PATHNAME SHORT LONG FLAT UNION ) ],
+         [ qw( TRANSACTION ARGV SHORT LONG FLAT UNION ) ],
          @_ );
    confess join( ' ', @other ) if @other;
 
-   my $self  = $class->SUPER::new( $transaction, $pathname );
+   my $self  = $class->SUPER::new( $transaction );
    bless $self, $class;
 
    $self->setShort($short);
    $self->setLong($long);
    $self->setFlat($flat);
    $self->setUnion($union);
+   $self->setArgv( $argv );
 
    return $self;
 }
@@ -65,7 +67,7 @@ sub do_execute {
    push @options, '-union' if $self->getUnion();
 
 
-   ClearCase::Common::Cleartool::catcr( @options, $self->getPathname());
+   ClearCase::Common::Cleartool::catcr( @options, $self->getArgv());
 }
 
 sub do_commit {

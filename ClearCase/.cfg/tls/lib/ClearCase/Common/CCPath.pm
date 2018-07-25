@@ -59,7 +59,7 @@ sub new()
    ClearCase::disableErrorOut();
    ClearCase::disableDieOnErrors();
    ClearCase::describe(
-       -pathname => 'vob:' . $pathname,
+       -argv => 'vob:' . $pathname,
        -short => 1
        );
    ClearCase::enableErrorOut();
@@ -86,7 +86,7 @@ sub new()
    #     branch
    ClearCase::describe(
        -fmt => '%m',
-       -pathname => $pathname );
+       -argv => $pathname );
    my $pathType = ClearCase::getOutputLine();
    $pathType =~ s/^\s*(.*)\s*$/$1/; # strip off leading and trailing white spaces
    $pathType =~ s/^\S+\s//; # reduce to simple string value: element, branch or version.
@@ -98,7 +98,7 @@ sub new()
 
        # ensure to have in variable $pathname really the version extended pathname
        ClearCase::describe(
-	   -pathname => $pathname,
+	   -argv => $pathname,
 	   -fmt => '%Xn'
 	   );
        $pathname = ClearCase::getOutputLine();
@@ -120,7 +120,7 @@ sub new()
    
    # determine my OID
    ClearCase::describe(
-       -pathname => $pathname,
+       -argv => $pathname,
        -fmt => '%On'
        );
    $self->setOid( ClearCase::getOutputLine() );
@@ -216,7 +216,7 @@ sub getVXPN {
    # config spec of the currently active view.
    # therefore we use the format option '%Xn'.
    ClearCase::describe(
-       -pathname => 'oid: ' . $self->getOid() . '@' . $self->getVob()->getTag(),
+       -argv => 'oid: ' . $self->getOid() . '@' . $self->getVob()->getTag(),
        -fmt => '%Xn'
        );
    my $p = ClearCase::getOutputLine();
