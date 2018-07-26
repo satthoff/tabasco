@@ -22,7 +22,8 @@ sub BEGIN {
 
    %DATA = (
       Label     => undef,
-      UndoList  => undef
+      UndoList  => undef,
+      Argv      => undef
    );
 
    Data::init(
@@ -38,17 +39,17 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $transaction, $label, $element, @other ) =
+   my ( $transaction, $label, $argv, @other ) =
       $class->rearrange(
-         [ qw( TRANSACTION LABEL PATHNAME ) ],
+         [ qw( TRANSACTION LABEL ARGV ) ],
          @_ );
    confess join( ' ', @other ) if @other;
 
-   my $self  = $class->SUPER::new( $transaction, $element );
+   my $self  = $class->SUPER::new( $transaction );
    bless $self, $class;
 
    $self->setLabel( $label );
-
+   $self->setArgv( $argv );
    return $self;
 }
 
@@ -58,7 +59,7 @@ sub do_execute {
    ClearCase::Common::Cleartool::rmlabel(
       $self->getComment(),
       $self->getLabel(),
-      $self->getPathname() );
+      $self->getArgv() );
 
    my @undoList;
    my $regex = $ClearCase::Common::Config::CC_LBTYPE_OUTPUT{'REMOVE'};

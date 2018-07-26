@@ -25,6 +25,7 @@ sub BEGIN {
    %DATA = (
       UndoList  => undef,
       Force     => undef,
+      Argv      => undef
    );
 
    Data::init(
@@ -39,16 +40,17 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $transaction, $force, $element, @other ) =
+   my ( $transaction, $force, $argv, @other ) =
       $class->rearrange(
-         [ 'TRANSACTION', 'FORCE', [ 'PATHNAME', 'PATHNAMES' ] ],
+         [ 'TRANSACTION', 'FORCE', 'ARGV' ],
          @_ );
    confess join( ' ', @other ) if @other;
 
-   my $self  = $class->SUPER::new( $transaction, $element );
+   my $self  = $class->SUPER::new( $transaction );
    bless $self, $class;
 
    $self->setForce( $force );
+   $self->setArgv( $argv );
    return $self;
 }
 
@@ -63,7 +65,7 @@ sub do_execute {
    ClearCase::Common::Cleartool::rmname(
       $self->getComment(),
       @options,
-      $self->getPathname() );
+      $self->getArgv() );
 
    my @undoList;
    my $regex_remove  = $ClearCase::Common::Config::CC_RMNAME_OUTPUT{'RMNAME'};

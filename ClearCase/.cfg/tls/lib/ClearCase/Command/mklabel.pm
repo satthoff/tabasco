@@ -26,7 +26,8 @@ sub BEGIN {
       Recurse   => undef,
       Replace   => undef,
       Version   => undef,
-      Comment   => undef
+      Comment   => undef,
+      Argv      => undef
    );
 
    Data::init(
@@ -40,13 +41,13 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $transaction, $label, $element, $version, $recurse, $replace, $comment, @other ) =
+   my ( $transaction, $label, $argv, $version, $recurse, $replace, $comment, @other ) =
       $class->rearrange(
-         [ qw( TRANSACTION LABEL PATHNAME VERSION RECURSE REPLACE COMMENT) ],
+         [ qw( TRANSACTION LABEL ARGV VERSION RECURSE REPLACE COMMENT) ],
          @_ );
    confess join( '-', @other ) if @other;
 
-   my $self  = $class->SUPER::new( $transaction, $element );
+   my $self  = $class->SUPER::new( $transaction );
    bless $self, $class;
 
    $self->setLabel( $label );
@@ -54,6 +55,7 @@ sub new {
    $self->setReplace( $replace );
    $self->getComment( $comment );
    $self->setVersion( $version );
+   $self->setArgv( $argv );
    return $self;
 }
 
@@ -77,7 +79,7 @@ sub do_execute {
    ClearCase::Common::Cleartool::mklabel(
       @options,
       $self->getLabel(),
-      $self->getPathname() );
+      $self->getArgv() );
 
    my @undoList;
    my $create = $ClearCase::Common::Config::CC_LBTYPE_OUTPUT{'CREATE'};
