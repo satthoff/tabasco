@@ -2,8 +2,8 @@ package ClearCase::Command::ln;
 
 use strict;
 use Carp;
-
 use File::Basename;
+use Log;
 
 sub BEGIN {
    use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS %DATA );

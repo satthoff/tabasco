@@ -4,6 +4,7 @@ use strict;
 use Carp;
 use Cwd;
 use File::Basename;
+use Log;
 
 sub BEGIN {
    use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS %DATA);

@@ -5,6 +5,8 @@ package ClearCase::Command::mkhltype;
 use strict;                   # restrict unsafe constructs
 use Carp;
 
+use Log;
+
 sub BEGIN {
    # =========================================================================
    # global definitions
