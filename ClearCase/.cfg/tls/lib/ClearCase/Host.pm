@@ -36,14 +36,6 @@ sub BEGIN {
 } # sub BEGIN()
 
 
-sub _init {
-   my $self = shift;
-
-   $self->SUPER::_init( @_ );
-
-   return;
-} # _init
-
 sub loadHostinfo {
     my $self = shift;
 

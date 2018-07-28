@@ -51,7 +51,7 @@ sub _init {
        @_ );
    
    $self->setHostname( $hostname );
-   return;
+   return $self;
 } # _init
 
 sub _getExecHost
