@@ -23,12 +23,13 @@ sub BEGIN {
 
    require Data;
 
-   %DATA = ( 
-	    Parent    => { CALCULATE => \&loadParent },
-	    Path      => { CALCULATE => \&loadPath },
-	    CspecPath => { CALCULATE => \&loadCspecPath },
-	    Baseline  => { CALCULATE => \&loadBaseline }
-           );
+   %DATA = (
+       MainTask  => { CALCULATE => \&loadMainTask },
+       Parent    => { CALCULATE => \&loadParent },
+       Path      => { CALCULATE => \&loadPath },
+       CspecPath => { CALCULATE => \&loadCspecPath },
+       Baseline  => { CALCULATE => \&loadBaseline }
+       );
 
    Data::init(
       PACKAGE  => __PACKAGE__,
@@ -37,6 +38,17 @@ sub BEGIN {
 
 
 } # sub BEGIN()
+
+sub loadMainTask {
+    my $proto = shift;
+    my $class = ref ($proto) || $proto;
+    my $self = {};
+    bless $self, $class;
+
+    my $mainTask = $self->new( -pathname => $configFile . '@@' . $OS::Common::Config::slash . 'main' );
+    Die( [ '', 'Cannot load the main task.', '' ] ) unless( $self );
+    return $self->setMainTask( $mainTask );
+}
 
 sub gmtTimeString
   {

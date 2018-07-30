@@ -62,7 +62,7 @@ ClearCase::mkelem(
 
 # now create the hyperlink from the first Task (= branch main of the configuration file)
 # to the Vob root path element
-my $mainTask = TaBasCo::Task->new( -pathname => $configFile . '@@' . $OS::Common::Config::slash . 'main' );
+my $mainTask = TaBasCo::Task->getMainTask();
 my $initialPathLink = ClearCase::HyperLink->new(
     -hltype => $pathlinkType,
     -from => $mainTask,
