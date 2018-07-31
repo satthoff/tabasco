@@ -53,80 +53,12 @@ sub BEGIN {
 } # sub BEGIN()
 
 
-# ============================================================================
-# non exported package globals
-
-# ============================================================================
-# initialize package globals ( exported )
-
-# ============================================================================
-# initialize package globals ( not exported )
-
-# ============================================================================
-# file private lexicals
-
-
-# ============================================================================
-# Description
-
-=head1 NAME
-
-BrType - <short description>
-
-=head1 SYNOPSIS
-
-B<BrType.pm> [options]
-
-=head1 DESCRIPTION
-
-<long description>
-
-=head1 USAGE
-
-=head1 METHODS
-
-=cut
-
-# ============================================================================
-# Preloaded methods go here.
-
-
-# ===========================================================================
-
-=head2 FUNCTION _init
-
-DESCRIPTION
-
-ARGUMENTS
-
- $self         the object
-
-RETURN VALUE
-
-=cut
-
 sub _init {
    my $self = shift;
 
    $self->SUPER::_init( -type => 'lbtype', @_ );
    return;
 } # _init
-
-
-
-# ===========================================================================
-
-=head2 FUNCTION create
-
-DESCRIPTION
-
-ARGUMENTS
-
- $self         the object
-
-RETURN VALUE
-
-=cut
 
 sub create {
    my $self = shift;

@@ -45,7 +45,7 @@ sub loadMainTask {
     my $self = {};
     bless $self, $class;
 
-    my $mainTask = $self->new( -pathname => $configFile . '@@' . $OS::Common::Config::slash . 'main' );
+    my $mainTask = $self->new( -pathname => TaBasCo::Common::Config::getConfigElement()->getNormalizedPath() . '@@' . $OS::Common::Config::slash . 'main' );
     Die( [ '', 'Cannot load the main task.', '' ] ) unless( $self );
     return $self->setMainTask( $mainTask );
 }
