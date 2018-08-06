@@ -49,6 +49,7 @@ sub AUTOLOAD {
 
     ( my $method = $AUTOLOAD ) =~ s/.*:://;
 
+    Debug( [ 'enter AUTOLOAD in package ClearCase with AUTOLOAD = ' . $AUTOLOAD ] );
 
     my $package = "ClearCase::Command::$method";
     eval "require $package";

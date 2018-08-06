@@ -61,17 +61,7 @@ B<Cleartool.pm> [options]
 sub AUTOLOAD {
    use vars qw( $AUTOLOAD );
 
-   Debug( [ 'enter AUTOLOAD in ClearCase::Common::Cleartool with AUTOLOAD = ' . $AUTOLOAD ] );
-
-   
    ( my $method = $AUTOLOAD ) =~ s/.*:://;
-
-   my $package = "ClearCase::Command::$method";
-   eval "require $package";
-   if( $@ ) {
-      Error( [ "require of $package failed.", "$@" ] );
-      confess $@;
-   }
 
    no strict 'refs';
    no strict 'subs';
