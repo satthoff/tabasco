@@ -9,7 +9,7 @@ sub BEGIN {
    $VERSION = '0.01';
    require Exporter;
 
-   @ISA = qw(Exporter);
+   @ISA = qw(Exporter Data);
 
    @EXPORT = qw(
    );
@@ -25,6 +25,7 @@ sub BEGIN {
        HlType => undef
       );
 
+   require Data;
    Data::init(
       PACKAGE  => __PACKAGE__,
       SUPER    => undef
@@ -61,7 +62,7 @@ sub create {
 
     my $fromId = undef;
     my $toId = undef;
-    my $hltypeName = $self->getHLType()->getName();
+    my $hltypeName = $self->getHlType()->getName();
 
     if( $self->getFrom()->isa( 'ClearCase::Common::CCPath' ) ) {
 	$fromId = $self->getFrom()->getVXPN();

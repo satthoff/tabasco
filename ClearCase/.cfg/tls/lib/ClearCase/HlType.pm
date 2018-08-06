@@ -137,7 +137,7 @@ sub create {
       -vob     => $self->getVob()->getTag()
       );
 
-   return;
+   return $self;
 } # create
 
 

@@ -88,6 +88,7 @@ sub new()
        -fmt => '%m',
        -argv => $pathname );
    my $pathType = ClearCase::getOutputLine();
+   chomp $pathType;
    $pathType =~ s/^\s*(.*)\s*$/$1/; # strip off leading and trailing white spaces
    $pathType =~ s/^\S+\s//; # reduce to simple string value: element, branch or version.
 
@@ -102,6 +103,7 @@ sub new()
 	   -fmt => '%Xn'
 	   );
        $pathname = ClearCase::getOutputLine();
+       chomp $pathname;
 
        if( $pathType eq 'version' and $self->isa( 'ClearCase::Branch' ) ) {
 	   # strip off the trailing number
@@ -123,10 +125,12 @@ sub new()
        -argv => $pathname,
        -fmt => '%On'
        );
-   $self->setOid( ClearCase::getOutputLine() );
+   my $oid = ClearCase::getOutputLine();
+   chomp $oid;
+   $self->setOid( $oid );
 
    # get the Vob from my ClearCase host region
-   $self->setVob( $ClearCase::Common::Config::myHost->getRegion()->getVob( -tag => $vobTag ) );
+   $self->setVob( $ClearCase::Common::Config::myHost->getRegion()->getVob( $vobTag ) );
    
    $self->_init();
    return $self;
@@ -217,7 +221,7 @@ sub getVXPN {
    # config spec of the currently active view.
    # therefore we use the format option '%Xn'.
    ClearCase::describe(
-       -argv => 'oid: ' . $self->getOid() . '@' . $self->getVob()->getTag(),
+       -argv => 'oid:' . $self->getOid() . '@' . $self->getVob()->getTag(),
        -fmt => '%Xn'
        );
    my $p = ClearCase::getOutputLine();

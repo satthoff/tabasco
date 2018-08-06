@@ -2,6 +2,8 @@ package TaBasCo::Common::Config;
 
 use strict;
 use Carp;
+use File::Basename;
+use Cwd;
 
 use OS::Common::Config;
 use Log;
@@ -22,7 +24,7 @@ sub BEGIN {
    );
 } # sub BEGIN()
 
-use vars qw/ $pathLink $cspecLabel $nextLabelExtension
+use vars qw/ $pathLink $cspecLabel $nextLabelExtension $base
 	     $toolPath $configFile $toolRoot $configFilePath %allTrigger $toolSelectLabel $configElement /;
 
 
@@ -34,8 +36,9 @@ BEGIN
     $toolRoot = '.cfg';
     $toolPath = 'tls';
     $configFile = 'config.txt';
-    $configFilePath = $toolRoot . $OS::Common::Config::slash . $configFile;
     $toolSelectLabel = 'TABASCO';
+    $base = File::Basename::dirname (File::Basename::dirname ( Cwd::abs_path( File::Basename::dirname $0 ) ) );
+    $configFilePath = $base . $OS::Common::Config::slash . $configFile;
 
 
     %allTrigger = (
@@ -82,9 +85,10 @@ sub getConfigElement {
     unless( $view ) {
 	Die( [ "No view context set in TaBasCo::Common::Config." ] );
     }
-    return undef unless( -e $main::installPath . $OS::Common::Config::slash . $TaBasCo::Common::Config::configFilePath );
+    Die( [ 'Config files does not exist.' ] )
+               unless( -e $TaBasCo::Common::Config::configFilePath );
     $configElement = ClearCase::Element->new(
-	-pathname => $main::installPath . $OS::Common::Config::slash . $TaBasCo::Common::Config::configFilePath
+	-pathname => $TaBasCo::Common::Config::configFilePath
 	);
     return $configElement;
 }
