@@ -76,7 +76,7 @@ sub loadViews {
 
    my %views = ();
    foreach ( @erg ) {
-       $views{ $_ } = ClearCase::View->( $_ );
+       $views{ $_ } = ClearCase::View->new( $_ );
    }
    return $self->setViews( \%views );
 }

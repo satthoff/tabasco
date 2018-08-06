@@ -76,13 +76,13 @@ sub _init {
    }
 
    Die( [ '', 'Wrong object initialization in ' .  __PACKAGE__ . ". Unknown object type = $typeName.", '' ] ) unless( grep m/^${typeName}$/, @knownTypes );
-   unless( $ClearCase::Common::Config::myHost->getRegion()->getVob( -tag => $vobTag ) and $ClearCase::Common::Config::myHost->getRegion()->getVob( -tag => $vobTag )->exists() ) {
+   unless( $ClearCase::Common::Config::myHost->getRegion()->getVob( $vobTag ) and $ClearCase::Common::Config::myHost->getRegion()->getVob( $vobTag )->exists() ) {
        Die( [ '', 'Wrong object initialization in ' .  __PACKAGE__ . ". Specified Vob does not exist. Vob tag = $vobTag.", '' ] );
    }
 
    $self->setType( $typeName );
    $self->setName( $name );
-   $self->setVob( $ClearCase::Common::Config::myHost->getRegion()->getVob( -tag => $vobTag ) );
+   $self->setVob( $ClearCase::Common::Config::myHost->getRegion()->getVob( $vobTag ) );
    $self->setFullName( $typeName . ':' . $name . "\@$vobTag" );
    return $self;
 }
