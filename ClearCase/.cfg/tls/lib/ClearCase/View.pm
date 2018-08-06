@@ -56,7 +56,7 @@ sub new {
 
    $self->setTag( $tag_name );
    $self->setType( 'dynamic' );
-   return undef;
+   return $self;
 } # new
 
 sub loadViewData {
