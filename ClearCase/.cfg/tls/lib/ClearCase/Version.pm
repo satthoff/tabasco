@@ -45,6 +45,29 @@ sub _init {
     $self->setVersionString( $tmp[ $#tmp ] );
 }
 
+sub attachLabel {
+    my $self = shift;
+
+    my ( $name, $replace, @other ) = $self->rearrange(
+	[ 'NAME', 'REPLACE' ],
+	@_ );
+    confess @other if @other;
+
+    if( $replace ) {
+	$replace = 1;
+    } else {
+	$replace = 0;
+    }
+
+    ClearCase::mklabel(
+	-argv    => $self->getVXPN(),
+	-label   => $name,
+	-replace => $replace
+	);
+    return undef if( ClearCase::getRC() != 0 );
+    return $self;
+}
+
 
 sub loadMyBranch {
     my $self = shift;

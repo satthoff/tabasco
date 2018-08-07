@@ -65,7 +65,7 @@ sub applyName
     my $self = shift;
     my $name = shift;
 
-    $self->SUPER::mklabel( -name => $name, -replace => 1 );
+    $self->attachLabel( -name => $name, -replace => 1 );
     $self->setName( $name );
     return $self;
   }

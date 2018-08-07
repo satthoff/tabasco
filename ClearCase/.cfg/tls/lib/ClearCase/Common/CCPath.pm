@@ -25,6 +25,7 @@ BEGIN {
    %DATA = (
        Oid => undef,
        Vob => undef,
+       PathType => undef,
        CspecPath => { CALCULATE => \&loadCspecPath },
        NormalizedPath => { CALCULATE => \&loadNormalizedPath }
       );
@@ -119,8 +120,17 @@ sub new()
 		  'Class: ' . $class, '' ] );
        }
    }
-   
+
+   # save the path type - version,branch,element
+   # we need it in subroutine loadNormalizedPath later
+   $self->setPathType( $pathType );
+
    # determine my OID
+   # PROBLEM - still to be solved:
+   #    if the $pathname is a CHECKEDOUT version,
+   #    then we cannot use the OID as a unique identification,
+   #    because after checkin the OID of the checkedin version is different.
+   #    The OID of a CHECKEDOUT version is only valid as long the CHECKOUT exists.
    ClearCase::describe(
        -argv => $pathname,
        -fmt => '%On'
@@ -155,9 +165,16 @@ sub loadNormalizedPath {
 
     my @components = ();
 
-    $xpn =~ s/\@\@$//;
+    if( $self->getPathType() eq 'element' ) {
+	# we expect an element path to end with @@
+	$xpn =~ s/\@\@$//;
+    } elsif( $self->getPathType() eq 'branch' ) {
+	# we expect a branch path to end with @@/<some branches>
+	$xpn =~ s/\@\@\/.*//;
+    }
+
     unless( $xpn =~ m/\@\@.*\@\@/ ) {
-	$xpn = $xpn . '@@/main/1';
+	$xpn = $xpn . '@@/main/1'; # append dummy version string to let the following algorithm work
     }
 
     $xpn =~ s/\/\.\@\@\//\@\@\//g;

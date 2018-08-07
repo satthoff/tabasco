@@ -83,7 +83,7 @@ sub loadLatestVersion
   {
     my $self = shift;
 
-    my $latestVersion = ClearCase::Version->new( -pathname => $self->getVXPN() . $OS::Config::slash . 'LATEST' );
+    my $latestVersion = ClearCase::Version->new( -pathname => $self->getVXPN() . $OS::Common::Config::slash . 'LATEST' );
     return $self->setLatestVersion( $latestVersion );
   }
 
@@ -91,7 +91,7 @@ sub loadZeroVersion
   {
     my $self = shift;
 
-    my $zeroVersion = ClearCase::Version->new( -pathname => $self->getVXPN() . $OS::Config::slash . '0' );
+    my $zeroVersion = ClearCase::Version->new( -pathname => $self->getVXPN() . $OS::Common::Config::slash . '0' );
     return $self->setZeroVersion( $zeroVersion );
   }
 
@@ -100,7 +100,7 @@ sub getLabeledVersion
     my $self = shift;
     my $label = shift;
 
-    my $labeledVersion = ClearCase::Version->new( -pathname => $self->getVXPN() . $OS::Config::slash . $label );
+    my $labeledVersion = ClearCase::Version->new( -pathname => $self->getVXPN() . $OS::Common::Config::slash . $label );
     return $labeledVersion;
   }
 1;

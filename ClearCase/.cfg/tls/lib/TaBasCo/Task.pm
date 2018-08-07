@@ -198,15 +198,14 @@ sub createConfigSpec
     push @config_spec, 'element * /main/0 -nocheckout';
     grep chomp, @config_spec;
 
-    my $file = $self->getElement();
+    my $file = $self->getNormalizedPath();
     open FD, ">$file";
     foreach ( @config_spec )
       {
         print FD "$_\n";
       }
     close FD;
-    Debug( [ '', "attach label : $TaBasCo::Common::Config::cspecLabel" ] );
-    my $cspecRelease =  TaBasCo::Release->new( -pathname => $self->getElement() );
+    my $cspecRelease =  TaBasCo::Release->new( -pathname => $self->getNormalizedPath() );
     $cspecRelease->applyName( $TaBasCo::Common::Config::cspecLabel );
   }
 
@@ -269,7 +268,7 @@ sub mkPath
     my $path = shift;
     ClearCase::mkhlink(
 		       -hltype => $TaBasCo::Common::Config::pathLink,
-		       -from   => $self->getBranchPath(),
+		       -from   => $self->getVXPN(),
 		       -to     => $path . '/.@@'
 		      );
     $self->setPath( $path );
@@ -283,7 +282,7 @@ sub loadPath
     ClearCase::describe(
                         -short    => 1,
                         -ahl      => $TaBasCo::Common::Config::pathLink,
-                        -argv => $self->getBranchPath()
+                        -argv => $self->getVXPN()
                        );
     my @paths = ClearCase::getOutput();
     grep chomp, @paths;
