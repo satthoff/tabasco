@@ -48,7 +48,6 @@ sub new {
    bless( $self, $class );
 
    my $tag_name = shift;
-   Debug( [ "tag_name = >$tag_name<" ] );
    unless ( defined $tag_name )
    {
       Die( [ "Usage ".__PACKAGE__."->new( \$tagname )" ] );
