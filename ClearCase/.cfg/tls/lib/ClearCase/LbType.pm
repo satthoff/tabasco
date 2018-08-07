@@ -43,7 +43,7 @@ sub BEGIN {
 
    %DATA = (
 	   );
-
+   require Data;
    Data::init(
       PACKAGE     => __PACKAGE__,
       SUPER       => 'ClearCase::Common::MetaObject'
@@ -57,18 +57,31 @@ sub _init {
    my $self = shift;
 
    $self->SUPER::_init( -type => 'lbtype', @_ );
-   return;
+   return $self;
 } # _init
 
 sub create {
    my $self = shift;
 
+   my ( $pbranch, @other ) =
+      $self->rearrange(
+         [ qw( PBRANCH ) ],
+         @_ );
+   confess join( ' ', @other ) if @other;
+
+   if( $pbranch ) {
+       $pbranch = 1;
+   } else {
+       $pbranch = 0;
+   }
+
    ClearCase::mklbtype(
-      -name    => $self->getName(),
-      -vob     => $self->getVob()->getTag()
+       -name    => $self->getName(),
+       -pbranch => $pbranch,
+       -vob     => $self->getVob()->getTag()
       );
 
-   return;
+   return $self;
 } # create
 
 

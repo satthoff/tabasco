@@ -64,7 +64,7 @@ ClearCase::mkelem(
 # to the Vob root path element
 my $mainTask = TaBasCo::Task->getMainTask();
 my $initialPathLink = ClearCase::HyperLink->new(
-    -hltype => $pathlinkType,
+    -hltype => $pathLinkType,
     -from => $mainTask,
     -to => $vob->getRootElement()
     );

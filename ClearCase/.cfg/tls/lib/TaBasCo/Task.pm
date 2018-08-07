@@ -46,7 +46,7 @@ sub loadMainTask {
     bless $self, $class;
 
     my $mainTask = $self->new( -pathname => TaBasCo::Common::Config::getConfigElement()->getNormalizedPath() . '@@' . $OS::Common::Config::slash . 'main' );
-    Die( [ '', 'Cannot load the main task.', '' ] ) unless( $self );
+    Die( [ '', 'Cannot load the main task.', '' ] ) unless( $mainTask );
     return $self->setMainTask( $mainTask );
 }
 
