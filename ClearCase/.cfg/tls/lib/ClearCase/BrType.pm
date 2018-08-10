@@ -132,9 +132,22 @@ RETURN VALUE
 sub create {
    my $self = shift;
 
+   my ( $pbranch, @other ) =
+      $self->rearrange(
+         [ qw( PBRANCH ) ],
+         @_ );
+   confess join( ' ', @other ) if @other;
+
+   if( $pbranch ) {
+       $pbranch = 1;
+   } else {
+       $pbranch = 0;
+   }
+
    ClearCase::mkbrtype(
-      -name    => $self->getName(),
-      -vob     => $self->getVob()->getTag()
+       -name    => $self->getName(),
+       -pbranch => $pbranch,
+       -vob     => $self->getVob()->getTag()
       );
 
    return;
