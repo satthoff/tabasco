@@ -35,7 +35,8 @@ sub BEGIN {
 
 } # sub BEGIN()
 
-my @knownTypes = qw/ brtype lbtype attype hltype trtype eltype /;
+# still to be done for UCM types, stream, activity, baseline, .....
+my @knownTypes = qw/ brtype lbtype attype hltype trtype eltype replica vob /;
 
 sub new {
    my $proto = shift;
