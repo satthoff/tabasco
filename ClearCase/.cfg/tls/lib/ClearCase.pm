@@ -18,6 +18,7 @@ sub BEGIN {
    require ClearCase::LbType;
    require ClearCase::HlType;
    require ClearCase::HyperLink;
+   require ClearCase::Replica;
 }
 
 use Log;

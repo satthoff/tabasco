@@ -1,4 +1,4 @@
-package ClearCase::LbType;
+package ClearCase::Replica;
 
 # ============================================================================
 # standard modules
@@ -17,7 +17,6 @@ sub BEGIN {
    # required Moduls
    require Exporter;          # implements default import method for modules
    require ClearCase::Common::MetaObject;
-   require Data;
 
    # =========================================================================
    #
@@ -57,30 +56,19 @@ sub BEGIN {
 sub _init {
    my $self = shift;
 
-   $self->SUPER::_init( -type => 'lbtype', @_ );
+   $self->SUPER::_init( -type => 'replica', @_ );
    return $self;
 } # _init
 
 sub create {
    my $self = shift;
 
-   my ( $pbranch, @other ) =
-      $self->rearrange(
-         [ qw( PBRANCH ) ],
-         @_ );
-   confess join( ' ', @other ) if @other;
-
-   if( $pbranch ) {
-       $pbranch = 1;
-   } else {
-       $pbranch = 0;
-   }
-
-   ClearCase::mklbtype(
-       -name    => $self->getName(),
-       -pbranch => $pbranch,
-       -vob     => $self->getVob()->getTag()
-      );
+   Die( [ 'subroutine create of ' . __PACKAGE__ . ' is not yet implemented.' ] );
+#   ClearCase::mklbtype(
+#       -name    => $self->getName(),
+#       -pbranch => $pbranch,
+#       -vob     => $self->getVob()->getTag()
+#      );
 
    return $self;
 } # create

@@ -17,6 +17,7 @@ sub BEGIN {
    # required Moduls
    require Exporter;          # implements default import method for modules
    require ClearCase::Common::MetaObject;
+   require Data;
 
    # =========================================================================
    #

@@ -110,7 +110,11 @@ sub loadAllReplica {
 	);
     my @reps = ClearCase::getOutput();
     grep chomp, @reps;
-    return $self->setAllReplica( \@reps );
+    my %replicas = ();
+    foreach ( @reps ) {
+	$replicas{ $_ } = ClearCase::Replica->new( -name => $_, -vob => $self );
+    }
+    return $self->setAllReplica( \%replicas );
 }
 
 sub loadMyReplica {
@@ -122,7 +126,12 @@ sub loadMyReplica {
 	);
     my $rep = ClearCase::getOutputLine();
     chomp $rep;
-    return $self->setMyReplica( $rep );
+    my %reps = %{ $self->getAllReplicas() };
+    unless( defined $reps{ $rep } ) {
+	$reps{ $rep } = ClearCase::Replica->new( -name => $rep, -vob => $self );
+	$self->setAllReplicas( \%reps );
+    }
+    return $self->setMyReplica( $reps{ $rep } );
 }
 
 sub loadVob {
