@@ -129,7 +129,7 @@ foreach my $trg ( keys %TaBasCo::Common::Config::allTrigger )
   }
 
 # load the user interface
-my $ui = TaBasCo::InitUI();
+my $ui = TaBasCo::UI->new();
 
 $ui->okMessage( "Installation finished.
 The starting baseline is $relName.
