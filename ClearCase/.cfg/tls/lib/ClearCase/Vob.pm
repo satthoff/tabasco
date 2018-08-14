@@ -261,7 +261,7 @@ sub loadHyperlinkTypes {
 
    my %hltypes = ();
    foreach ( @hyperlinks ) {
-       $hltypes{ $_ } = ClearCase::HlType( -name => "$_", -vob => $self );
+       $hltypes{ $_ } = ClearCase::HlType->new( -name => "$_", -vob => $self );
    }
    return $self->setHyperlinkTypes( \%hltypes );
 }
@@ -324,7 +324,7 @@ sub loadElementTypes {
 
    my %types = ();
    foreach ( @typenames ) {
-       $types{ $_ } = ClearCase::ElType( -name => "$_", -vob => $self );
+       $types{ $_ } = ClearCase::ElType->new( -name => "$_", -vob => $self );
    }
    return $self->setElementTypes( \%types );
 }
@@ -347,7 +347,7 @@ sub loadTriggerTypes {
 
    my %types = ();
    foreach ( @typenames ) {
-       $types{ $_ } = ClearCase::TrType( -name => "$_", -vob => $self );
+       $types{ $_ } = ClearCase::TrType->new( -name => "$_", -vob => $self );
    }
    return $self->setTriggerTypes( \%types );
 }
