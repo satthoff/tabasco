@@ -64,9 +64,9 @@ sub _init {
 sub create {
    my $self = shift;
 
-   my ( $pbranch, @other ) =
+   my ( $pbranch, $global, $acquire, @other ) =
       $self->rearrange(
-         [ qw( PBRANCH ) ],
+         [ qw( PBRANCH GLOBAL ACQUIRE ) ],
          @_ );
    confess join( ' ', @other ) if @other;
 
@@ -79,6 +79,8 @@ sub create {
    ClearCase::mklbtype(
        -name    => $self->getName(),
        -pbranch => $pbranch,
+       -global  => $global,
+       -acquire => $acquire,
        -vob     => $self->getVob()->getTag()
       );
 

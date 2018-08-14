@@ -133,9 +133,9 @@ RETURN VALUE
 sub create {
    my $self = shift;
 
-   my ( $pbranch, @other ) =
+   my ( $pbranch, $global, $acquire, @other ) =
       $self->rearrange(
-         [ qw( PBRANCH ) ],
+         [ qw( PBRANCH GLOBAL ACQUIRE ) ],
          @_ );
    confess join( ' ', @other ) if @other;
 

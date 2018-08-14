@@ -21,10 +21,12 @@ sub BEGIN {
    );
 
    %DATA = (
-      Name     => undef,
-      Vob      => undef,
-      PBranch  => undef,
-      Comment  => undef
+       Name     => undef,
+       Vob      => undef,
+       PBranch  => undef,
+       Global   => undef,
+       Acquire  => undef,
+       Comment  => undef
    );
 
    Data::init(
@@ -39,9 +41,9 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $transaction, $name, $vob, $pbranch, $comment, @other ) =
+   my ( $transaction, $name, $vob, $pbranch, $global, $acquire, $comment, @other ) =
       $class->rearrange(
-         [ qw( TRANSACTION NAME VOB PBRANCH COMMENT) ],
+         [ qw( TRANSACTION NAME VOB PBRANCH GLOBAL ACQUIRE COMMENT) ],
          @_ );
    confess join( ' ', @other ) if @other;
 
@@ -52,6 +54,8 @@ sub new {
    $self->setVob( $vob );
    $self->setName( $name );
    $self->setPBranch( $pbranch );
+   $self->setGlobal( $global );
+   $self->setAcquire( $acquire );
    $self->setComment( $comment );
 
    return $self;
@@ -71,7 +75,9 @@ sub do_execute {
       push @options, ' -nc';
    }
 
-   push @options, '-pbranch'     if $self->getPBranch();
+   push @options, '-pbranch' if $self->getPBranch();
+   push @options, '-global' if $self->getGlobal();
+   push @options, '-acquire' if $self->getAcquire();
 
    ClearCase::Common::Cleartool::mkbrtype(
       @options,

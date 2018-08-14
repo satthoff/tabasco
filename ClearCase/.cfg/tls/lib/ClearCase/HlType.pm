@@ -133,9 +133,17 @@ RETURN VALUE
 sub create {
    my $self = shift;
 
+   my ( $global, $acquire, @other ) =
+      $self->rearrange(
+         [ qw( GLOBAL ACQUIRE ) ],
+         @_ );
+   confess join( ' ', @other ) if @other;
+
    ClearCase::mkhltype(
-      -name    => $self->getName(),
-      -vob     => $self->getVob()->getTag()
+       -name    => $self->getName(),
+       -global  => $global,
+       -acquire => $acquire,
+       -vob     => $self->getVob()->getTag()
       );
 
    return $self;

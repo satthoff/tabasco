@@ -44,9 +44,11 @@ sub BEGIN {
    );
 
    %DATA = (
-      Name     => undef,
-      Vob      => undef,
-      Comment  => undef
+       Name     => undef,
+       Vob      => undef,
+       Comment  => undef,
+       Global   => undef,
+       Acquire  => undef
    );
 
    Data::init(
@@ -98,9 +100,9 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $transaction, $name, $vob, $comment, @other ) =
+   my ( $transaction, $name, $vob, $comment, $global, $acquire, @other ) =
       $class->rearrange(
-         [ qw( TRANSACTION NAME VOB COMMENT) ],
+         [ qw( TRANSACTION NAME VOB COMMENT GLOBAL ACQUIRE ) ],
          @_ );
    confess join( ' ', @other ) if @other;
 
@@ -109,6 +111,8 @@ sub new {
 
    $self->setName( $name );
    $self->setVob( $vob );
+   $self->setGlobal( $global );
+   $self->setAcquire( $acquire );
    $self->setComment( $comment );
 
    return $self;
@@ -127,7 +131,9 @@ sub do_execute {
       push @options, ' -nc';
    }
 
-   push @options, '-shared'; #hyperlink types are alwasy shared
+   push @options, '-shared'; #hyperlink types are always shared
+   push @options, '-global' if $self->getGlobal();
+   push @options, '-acquire' if $self->getAcquire();
 
    ClearCase::Common::Cleartool::mkhltype(
       @options,
