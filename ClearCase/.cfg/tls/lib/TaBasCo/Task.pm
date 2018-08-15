@@ -79,15 +79,15 @@ sub createNewRelease
     TaBasCo::Release::renameFloatingRelease( $self, $releaseName );
     TaBasCo::Release::createFloatingRelease( $self );
     
+    my $file = TaBasCo::Common::Config::getConfigElement()->getNormalizedPath();
 
     # we have to attach the new release name to the currently
     # checked out version of the configuration element
-    my $newRelease = TaBasCo::Release->new( -pathname => $self->getVXPN() );
+    my $newRelease = TaBasCo::Release->new( -pathname => $file );
     $newRelease->applyName( $releaseName );
 
     # create the configuration specification
     my @cspec = $self->createCspecBlock( $newRelease, $view );
-    my $file = TaBasCo::Common::Config::getConfigElement()->getNormalizedPath();
     open FD, ">$file";
     foreach ( @cspec )
       {
