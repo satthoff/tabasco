@@ -105,8 +105,7 @@ sub createFloatingRelease
     my $task = shift;
 
     my $floatingLabel = uc( $task->getName() . $TaBasCo::Common::Config::nextLabelExtension );
-    my $lbtype = ClearCase::LbType->new( -name => $floatingLabel, -vob => $task->getVob() );
-    $lbtype->create();
+    my $lbtype = $task->getVob()->ensureLabelType( -name => $floatingLabel );
     return $lbtype;
   }
 
@@ -116,7 +115,7 @@ sub renameFloatingRelease
     my $name = shift;
 
     my $floatingLabel = uc( $task->getName() . $TaBasCo::Common::Config::nextLabelExtension );
-    my $lbtype = ClearCase::LbType->new( name => $floatingLabel, -vob => $task->getVob() );
+    my $lbtype = $task->getVob()->ensureLabelType( -name => $floatingLabel );
     $lbtype->rename( $name );
   }
 
