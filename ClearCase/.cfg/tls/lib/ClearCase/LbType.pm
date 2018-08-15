@@ -64,7 +64,7 @@ sub _init {
 sub create {
    my $self = shift;
 
-   my ( $pbranch, $global, $acquire, @other ) =
+   my ( $pbranch, @other ) =
       $self->rearrange(
          [ qw( PBRANCH GLOBAL ACQUIRE ) ],
          @_ );
@@ -76,13 +76,8 @@ sub create {
        $pbranch = 0;
    }
 
-   ClearCase::mklbtype(
-       -name    => $self->getName(),
-       -pbranch => $pbranch,
-       -global  => $global,
-       -acquire => $acquire,
-       -vob     => $self->getVob()->getTag()
-      );
+   # ensure the label type to exist in my Vob
+   $self->getVob()->ensureBranchType( -name => $self->getName(), -pbranch => $pbranch );
 
    return $self;
 } # create

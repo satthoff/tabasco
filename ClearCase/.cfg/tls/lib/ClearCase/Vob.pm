@@ -281,7 +281,7 @@ sub getHlType {
     return undef;
 }
 
-sub createHyperlinkType {
+sub ensureHyperlinkType {
     my $self = shift;
 
     my ( $name, @other ) = $self->rearrange(
@@ -297,9 +297,11 @@ sub createHyperlinkType {
 
     $hltype = ClearCase::HlType->new( -name => $name, -vob  => $config[1] );
     unless( $hltype->exists() ) {
-	$hltype->create(
-	    -global => $config[0],
-	    -acquire => $config[0]
+	ClearCase::mkhltype(
+	    -name    => $name,
+	    -global  => $config[0],
+	    -acquire => $config[0],
+	    -vob     => $self->getTag()
 	    );
     }
     $tmp{ $name } = $hltype;
@@ -377,7 +379,7 @@ sub getLbType {
     return undef;
 }
 
-sub createLabelType {
+sub ensureLabelType {
     my $self = shift;
 
     my ( $name, $pbranch, @other ) = $self->rearrange(
@@ -398,10 +400,12 @@ sub createLabelType {
 
     $lbtype = ClearCase::LbType->new( -name => $name, -vob => $config[1] );
     unless( $lbtype->exists() ) {
-	$lbtype->create(
+	ClearCase::mklbtype(
+	    -name    => $name,
 	    -pbranch => $pbranch,
 	    -global  => $config[0],
-	    -acquire => $config[0]
+	    -acquire => $config[0],
+	    -vob     => $self->getTag()
 	    );
     }
     $tmp{ $name } = $lbtype;
@@ -434,7 +438,7 @@ sub getBrType {
     return undef;
 }
 
-sub createBranchType {
+sub ensureBranchType {
     my $self = shift;
 
     my ( $name, $pbranch, @other ) = $self->rearrange(
@@ -455,10 +459,12 @@ sub createBranchType {
 
     $brtype = ClearCase::BrType->new( -name => $name, -vob => $config[1] );
     unless( $brtype->exists() ) {
-	$brtype->create(
+	ClearCase::mkbrtype(
+	    -name    => $name,
 	    -pbranch => $pbranch,
 	    -global  => $config[0],
-	    -acquire => $config[0]
+	    -acquire => $config[0],
+	    -vob     => $self->getTag()
 	    );
     }
     $tmp{ $name } = $brtype;

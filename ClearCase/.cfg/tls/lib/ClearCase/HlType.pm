@@ -133,18 +133,8 @@ RETURN VALUE
 sub create {
    my $self = shift;
 
-   my ( $global, $acquire, @other ) =
-      $self->rearrange(
-         [ qw( GLOBAL ACQUIRE ) ],
-         @_ );
-   confess join( ' ', @other ) if @other;
-
-   ClearCase::mkhltype(
-       -name    => $self->getName(),
-       -global  => $global,
-       -acquire => $acquire,
-       -vob     => $self->getVob()->getTag()
-      );
+   # ensure the hyperlink type exists in my Vob
+   $self->getVob()->ensureHyperlinkType( -name => $self->getName() );
 
    return $self;
 } # create

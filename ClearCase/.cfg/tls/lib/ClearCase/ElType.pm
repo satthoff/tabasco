@@ -132,6 +132,7 @@ RETURN VALUE
 sub create {
    my $self = shift;
 
+   # still needs to be changed to use $self->getVob()->ensureElementType( -name => $self->getName() )
    ClearCase::mkeltype(
       -name    => $self->getName(),
       -vob     => $self->getVob()->getTag()

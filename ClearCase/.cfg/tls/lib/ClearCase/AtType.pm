@@ -132,6 +132,7 @@ RETURN VALUE
 sub create {
    my $self = shift;
 
+   # needs to be changed to use $self->getVob()->ensureAttributeType( -name => $self->getName() )
    ClearCase::mkattype(
       -name    => $self->getName(),
       -vob     => $self->getVob()->getTag()

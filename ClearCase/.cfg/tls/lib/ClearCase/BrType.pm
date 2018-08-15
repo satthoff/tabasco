@@ -145,13 +145,10 @@ sub create {
        $pbranch = 0;
    }
 
-   ClearCase::mkbrtype(
-       -name    => $self->getName(),
-       -pbranch => $pbranch,
-       -vob     => $self->getVob()->getTag()
-      );
+   # ensure the branch type to exist in my Vob
+   $self->getVob()->ensureBranchType( -name => $self->getName(), -pbranch => $pbranch );
 
-   return;
+   return $self;
 } # create
 
 

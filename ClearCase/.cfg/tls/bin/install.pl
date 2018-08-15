@@ -48,16 +48,16 @@ my $vobTag = File::Basename::dirname( $base );
 my $vob = $ClearCase::Common::Config::myHost->getRegion()->getVob( $vobTag );
 
 # create the label type MAIN_NEXT in my Vob
-$vob->createLabelType( -name => uc( 'main' . $TaBasCo::Common::Config::nextLabelExtension ) );
+$vob->ensureLabelType( -name => uc( 'main' . $TaBasCo::Common::Config::nextLabelExtension ) );
 
 # create the label type CSPEC in my Vob
-$vob->createLabelType( -name => $TaBasCo::Common::Config::cspecLabel, -pbranch => 1 );
+$vob->ensureLabelType( -name => $TaBasCo::Common::Config::cspecLabel, -pbranch => 1 );
 
 # create the hyperlink type in my Vob to link paths to the branches (tasks)
-my $pathLinkType = $vob->createHyperlinkType( -name => $TaBasCo::Common::Config::pathLink );
+my $pathLinkType = $vob->ensureHyperlinkType( -name => $TaBasCo::Common::Config::pathLink );
 
 # create the tools label type
-$vob->createLabelType( -name => $TaBasCo::Common::Config::toolSelectLabel );
+$vob->ensureLabelType( -name => $TaBasCo::Common::Config::toolSelectLabel );
 
 # create the configuration file
 ClearCase::checkout(
