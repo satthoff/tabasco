@@ -413,6 +413,21 @@ sub ensureLabelType {
     return $lbtype;
 }
 
+sub renameLabelType {
+    my $self = shift;
+
+    my ( $oldName, $newName, @other ) = $self->rearrange(
+	[ qw( OLDNAME NEWNAME ) ],
+	@_ );
+
+    my $oldLabelType = $self->getLbType( $oldName );
+    my %tmp = %{ $self->getLabelTypes() };
+    $tmp{ $oldName } = undef;
+    $self->setLabelTypes( \%tmp );
+    $oldLabelType->rename( $newName );
+    return $self->getLbType( $newName );
+}
+
 sub loadBranchTypes {
     my $self = shift;
 

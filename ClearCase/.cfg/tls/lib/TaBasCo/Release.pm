@@ -115,8 +115,7 @@ sub renameFloatingRelease
     my $name = shift;
 
     my $floatingLabel = uc( $task->getName() . $TaBasCo::Common::Config::nextLabelExtension );
-    my $lbtype = $task->getVob()->ensureLabelType( -name => $floatingLabel );
-    $lbtype->rename( $name );
+    return $task->getVob()->renameLabelType( -oldname => $floatingLabel, -newname => $name );
   }
 
 sub loadName
