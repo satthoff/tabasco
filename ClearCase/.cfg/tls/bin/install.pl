@@ -96,7 +96,7 @@ ClearCase::checkout(
 my $relName = $mainTask->nextReleaseName();
 
 # create the release
-$mainTask->createNewRelease( $relName, ClearCase::View->new( $ENV{ 'CLEARCASE_VIEW' } ) );
+$mainTask->createNewRelease( $relName, $ClearCase::Common::Config::myHost->getRegion()->getView( $ENV{ 'CLEARCASE_VIEW' } ) );
 
 # label the installation
 ClearCase::mklabel(
