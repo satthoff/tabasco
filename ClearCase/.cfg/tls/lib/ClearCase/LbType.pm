@@ -87,6 +87,17 @@ sub create {
    return $self;
 } # create
 
+sub rename {
+    my $self = shift;
+    my $newName = shift;
+
+    my $newLbType = $self->new( -name => $newName, -vob => $self->getVob() );
+    ClearCase::rename(
+	-oldname => $self->getFullName(),
+	-newname => $newLbType->getFullName()
+	);
+    return $self;
+}
 
 
 # ============================================================================
