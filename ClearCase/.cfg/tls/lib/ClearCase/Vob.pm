@@ -408,6 +408,7 @@ sub ensureLabelType {
 	    -vob     => $self->getTag()
 	    );
     }
+    $lbtype->setPerBranch( $pbranch );
     $tmp{ $name } = $lbtype;
     $self->setLabelTypes( \%tmp );
     return $lbtype;
@@ -423,9 +424,9 @@ sub renameLabelType {
     my $oldLabelType = $self->getLbType( $oldName );
     my %tmp = %{ $self->getLabelTypes() };
     $tmp{ $oldName } = undef;
+    $tmp{ $newName } = $oldLabelType->rename( $newName );
     $self->setLabelTypes( \%tmp );
-    $oldLabelType->rename( $newName );
-    return $self->getLbType( $newName );
+    return $tmp{ $newName };
 }
 
 sub loadBranchTypes {

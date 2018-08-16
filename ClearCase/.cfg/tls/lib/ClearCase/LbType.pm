@@ -43,8 +43,9 @@ sub BEGIN {
    );
 
    %DATA = (
+       PerBranch => undef
 	   );
-   require Data;
+
    Data::init(
       PACKAGE     => __PACKAGE__,
       SUPER       => 'ClearCase::Common::MetaObject'
@@ -78,7 +79,7 @@ sub create {
 
    # ensure the label type to exist in my Vob
    $self->getVob()->ensureBranchType( -name => $self->getName(), -pbranch => $pbranch );
-
+   $self->setPerBranch( $pbranch );
    return $self;
 } # create
 
@@ -91,7 +92,8 @@ sub rename {
 	-oldname => $self->getFullName(),
 	-newname => $newLbType->getFullName()
 	);
-    return $self;
+    $newLbType->setPerBranch( $self->getPerBranch() );
+    return $newLbType;
 }
 
 
