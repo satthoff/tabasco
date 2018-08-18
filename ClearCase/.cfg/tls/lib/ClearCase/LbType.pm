@@ -78,7 +78,7 @@ sub create {
    }
 
    # ensure the label type to exist in my Vob
-   $self->getVob()->ensureBranchType( -name => $self->getName(), -pbranch => $pbranch );
+   $self->getVob()->ensureLabelType( -name => $self->getName(), -pbranch => $pbranch );
    $self->setPerBranch( $pbranch );
    return $self;
 } # create
