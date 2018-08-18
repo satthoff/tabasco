@@ -45,8 +45,45 @@ sub loadMainTask {
     my $self = {};
     bless $self, $class;
 
+    Transaction::start( -comment => "load main task" );
+    # subroutine TaBasCo::Common::Config::getConfigElement called in next code line will create the config file if it does not exist
     my $mainTask = $self->new( -pathname => TaBasCo::Common::Config::getConfigElement()->getNormalizedPath() . '@@' . $OS::Common::Config::slash . 'main' );
     Die( [ '', 'Cannot load the main task.', '' ] ) unless( $mainTask );
+
+    # loading the main task means probably to install TABASCO in my vob.
+    # in this case  we have to ensure that all initializations will be done.
+    unless( $TaBasCo::Common::Config::myVob->getLbType( $TaBasCo::Common::Config::toolSelectLabel ) ) {
+	Transaction::start( -comment => "perform Vob initialization for TABASCO installation" );
+	$TaBasCo::Common::Config::myVob->ensureLabelType( -name => uc( 'main' . $TaBasCo::Common::Config::nextLabelExtension ) );
+	$TaBasCo::Common::Config::myVob->ensureLabelType( -name => $TaBasCo::Common::Config::cspecLabel, -pbranch => 1 );
+	$TaBasCo::Common::Config::myVob->ensureHyperlinkType( -name => $TaBasCo::Common::Config::pathLink );
+	$TaBasCo::Common::Config::myVob->ensureLabelType( -name => $TaBasCo::Common::Config::toolSelectLabel );
+
+	# now create the hyperlink from the first Task (= branch main of the configuration file)
+	# to the Vob root path element
+	my $initialPathLink = ClearCase::HyperLink->new(
+	    -hltype => $TaBasCo::Common::Config::myVob->getHlType( $TaBasCo::Common::Config::pathLink ),
+	    -from   => $mainTask,
+	    -to     => $TaBasCo::Common::Config::myVob->getRootElement()
+	    );
+	$initialPathLink->create();
+	
+	$mainTask->createConfigSpec();
+	
+	# the initial config spec has been written.
+	# and the CSPEC label has been attached.
+	# now we have to checkin and checkout again
+	# to create the initial release
+	ClearCase::checkin(
+	    -argv => TaBasCo::Common::Config::getConfigElement()->getNormalizedPath()
+	    );
+	ClearCase::checkout(
+	    -argv => TaBasCo::Common::Config::getConfigElement()->getNormalizedPath()
+	    );
+	$mainTask->createNewRelease( $mainTask->nextReleaseName(), $ClearCase::Common::Config::myHost->currentView() );
+	Transaction::commit(); # perform Vob initialization for TABASCO installation
+    }
+    Transaction::commit(); # load main task
     return $self->setMainTask( $mainTask );
 }
 

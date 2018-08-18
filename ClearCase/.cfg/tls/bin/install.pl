@@ -41,71 +41,19 @@ use Log;
 Log::setVerbosity( "debug" );
 Transaction::start( -comment => 'TaBasCo installation' );
 
-$base = File::Basename::dirname( $base );
-my $configFile = $base . $OS::Common::Config::slash . $TaBasCo::Common::Config::configFile;
-my $vobTag = File::Basename::dirname( $base );
-
-my $vob = $ClearCase::Common::Config::myHost->getRegion()->getVob( $vobTag );
-
-# create the label type MAIN_NEXT in my Vob
-$vob->ensureLabelType( -name => uc( 'main' . $TaBasCo::Common::Config::nextLabelExtension ) );
-
-# create the label type CSPEC in my Vob
-$vob->ensureLabelType( -name => $TaBasCo::Common::Config::cspecLabel, -pbranch => 1 );
-
-# create the hyperlink type in my Vob to link paths to the branches (tasks)
-my $pathLinkType = $vob->ensureHyperlinkType( -name => $TaBasCo::Common::Config::pathLink );
-
-# create the tools label type
-$vob->ensureLabelType( -name => $TaBasCo::Common::Config::toolSelectLabel );
-
-# create the configuration file
-ClearCase::checkout(
-		    -argv => $base
-		   );
-ClearCase::mkelem(
-		  -eltype   => 'text_file',
-		  -argv => $configFile
-		 );
-
-# now create the hyperlink from the first Task (= branch main of the configuration file)
-# to the Vob root path element
+# loading the main task the very first time means also
+# that all initialization in the vob will be performed
 my $mainTask = TaBasCo::Task->getMainTask();
-my $initialPathLink = ClearCase::HyperLink->new(
-    -hltype => $pathLinkType,
-    -from => $mainTask,
-    -to => $vob->getRootElement()
-    );
-$initialPathLink->create();
 
-
-# now create the initial config spec for the initial task
-$mainTask->createConfigSpec();
-
-# the initial config spec has been written.
-# and the CSPEC label has been attached.
-# now we have to checkin and check out again
-# to create the initial release
-Transaction::commit();
-Transaction::start( -comment => "create initial release" );
-ClearCase::checkout(
-                    -argv => $configFile
-                   );
-
-# get the new release name
-my $relName = $mainTask->nextReleaseName();
-
-# create the release
-$mainTask->createNewRelease( $relName, $ClearCase::Common::Config::myHost->getRegion()->getView( $ENV{ 'CLEARCASE_VIEW' } ) );
 
 # label the installation
 ClearCase::mklabel(
-		   -pathname => $base . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolPath,
+		   -pathname => $TaBasCo::Common::Config::myVob->getTag() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolPath,
 		   -label    => $TaBasCo::Common::Config::toolSelectLabel,
 		   -recurse  => 1
 		  );
 ClearCase::mklabel(
-                   -pathname => $base,
+                   -pathname => $TaBasCo::Common::Config::myVob->getTag() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot,
                    -label    => $TaBasCo::Common::Config::toolSelectLabel
                   );
 
@@ -124,18 +72,19 @@ foreach my $trg ( keys %TaBasCo::Common::Config::allTrigger )
                 );
     if( defined( $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'att' } ) )
       {
-        $trt->attach( $configFile . '@@' );
+        $trt->attach( TaBasCo::Common::Config::getConfigElement()->getVXPN() );
       }
   }
+
+Transaction::commit(); # TaBasCo installation
 
 # load the user interface
 my $ui = TaBasCo::UI->new();
 
 $ui->okMessage( "Installation finished.
-The starting baseline is $relName.
 You should now label your configuration
 from where you want to start from with
-$relName.
+the initial baseline.
 At least the root directory of the Vob
 has to be labeled.
 And DO NOT label the imported $TaBasCo::Common::Config::toolRoot subtree !!! " );

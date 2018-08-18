@@ -24,7 +24,7 @@ sub BEGIN {
    );
 } # sub BEGIN()
 
-use vars qw/ $pathLink $cspecLabel $nextLabelExtension $base
+use vars qw/ $pathLink $cspecLabel $nextLabelExtension $base $myVob
 	     $toolPath $configFile $toolRoot $configFilePath %allTrigger $toolSelectLabel $configElement /;
 
 
@@ -39,6 +39,8 @@ BEGIN
     $toolSelectLabel = 'TABASCO';
     $base = File::Basename::dirname (File::Basename::dirname ( Cwd::abs_path( File::Basename::dirname $0 ) ) );
     $configFilePath = $base . $OS::Common::Config::slash . $configFile;
+
+    $myVob = $ClearCase::Common::Config::myHost->getRegion()->getVob( File::Basename::dirname ( File::Basename::dirname ( $base ) ) );
 
 
     %allTrigger = (
@@ -78,6 +80,7 @@ BEGIN
 my $configElement = undef;
 
 sub getConfigElement {
+    
     return $configElement if( $configElement );
 
     require ClearCase::Common::Config;
@@ -85,8 +88,16 @@ sub getConfigElement {
     unless( $view ) {
 	Die( [ "No view context set in TaBasCo::Common::Config." ] );
     }
-    Die( [ 'Config files does not exist.' ] )
-               unless( -e $TaBasCo::Common::Config::configFilePath );
+    unless( -e $TaBasCo::Common::Config::configFilePath ) {
+	ClearCase::checkout(
+	    -argv => $TaBasCo::Common::Config::base
+	    );
+	ClearCase::mkelem(
+	    -eltype   => 'text_file',
+	    -argv => $TaBasCo::Common::Config::configFilePath
+	    );
+	# the file is checkedout after creation
+    }
     $configElement = ClearCase::Element->new(
 	-pathname => $TaBasCo::Common::Config::configFilePath
 	);
