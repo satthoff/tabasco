@@ -81,10 +81,14 @@ Transaction::commit(); # TaBasCo installation
 # load the user interface
 my $ui = TaBasCo::UI->new();
 
+my $cf = TaBasCo::Common::Config::getConfigElement()->getNormalizedPath();
 $ui->okMessage( "Installation finished.
 You should now label your configuration
 from where you want to start from with
 the initial baseline.
+Open the version tree browser for file
+$cf
+to see the name of the initial baseline.
 At least the root directory of the Vob
 has to be labeled.
 And DO NOT label the imported $TaBasCo::Common::Config::toolRoot subtree !!! " );
