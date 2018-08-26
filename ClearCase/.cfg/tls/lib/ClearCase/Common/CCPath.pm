@@ -228,6 +228,11 @@ sub loadCspecPath {
     $p = '' if( $p eq '/' );
     my $cspecPath = $self->getVob()->getCspecTag() . $p . '/...';
     $cspecPath =~ s/\\/\//g; # always UNIX style
+
+    # above we do not care about double slashes in the pathname.
+    # but we want to return a clean path
+    $cspecPath =~ s/\\+/\//g;
+    
     return $self->setCspecPath( $cspecPath );
 }
 
