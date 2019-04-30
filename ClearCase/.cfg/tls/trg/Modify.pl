@@ -74,7 +74,7 @@ sub createNewTask
 	# here we have to guarantee that the config spec of the task's baseline  is set,
 	# otherwise the selection of a sub directory won't work.
 	Transaction::start( -comment => "set correct config spec for directory selection" );
-	my $currentView = ClearCase::InitView( "$ENV{CLEARCASE_VIEW_TAG}" );
+	my $currentView = ClearCase::View( "$ENV{CLEARCASE_VIEW_TAG}" );
 	my $cspecFile = $baseline->getVXPN();
 	open FD, "$cspecFile";
 	my @cspec = <FD>;
@@ -158,7 +158,7 @@ sub setConfigSpec
 	$ui->okMessage( "No view found." );
 	return;
       }
-    my $view = ClearCase::InitView( "$targetView" );
+    my $view = ClearCase::View( "$targetView" );
     if( $view->setConfigSpec( \@cspec ) )
       {
 	$ui->okMessage( "Successfully set config spec in view $targetView." );
@@ -294,7 +294,7 @@ elsif( $ENV{ CLEARCASE_OP_KIND } eq 'checkin' )
 	#
 	# we have to use the config spec of the parent task
 	Transaction::start( -comment => "set correct config spec for config spec creation" );
-	my $currentView = ClearCase::InitView( "$ENV{CLEARCASE_VIEW_TAG}" );
+	my $currentView = ClearCase::View( "$ENV{CLEARCASE_VIEW_TAG}" );
 	my $cspecFile = $relFocus->getTask()->getParent()->getLabeledVersion( $TaBasCo::Config::cspecLabel )->getVXPN();
 	open FD, "$cspecFile";
 	my @cspec = <FD>;
