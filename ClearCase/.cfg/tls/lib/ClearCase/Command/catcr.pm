@@ -98,7 +98,7 @@ __END__
 
 =head1 BUGS
 
-Address bug reports and comments to: uwe@satthoff.eu
+Address bug reports and comments to: satthoff@icloud.com
 
 
 

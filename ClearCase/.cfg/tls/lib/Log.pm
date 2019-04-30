@@ -230,14 +230,14 @@ __END__
 
 =head1 AUTHOR INFORMATION
 
- Copyright (C) 2004 Uwe Satthoff (uwe@satthoff.eu)
+ Copyright (C) 2004 Uwe Satthoff (satthoff@icloud.com)
 
 =head1 CREDITS
 
 =head1 BUGS
 
  Address bug reports and comments to:
-   uwe@satthoff.eu
+   satthoff@icloud.com
 
 =head1 SEE ALSO
 

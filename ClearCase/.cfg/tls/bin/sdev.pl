@@ -100,7 +100,7 @@ __END__
 
 =head1 AUTHOR INFORMATION
 
- Copyright (C) 2001 Uwe Satthoff; uwe@satthoff.eu 
+ Copyright (C) 2001 Uwe Satthoff; satthoff@icloud.com 
 
 =cut
 

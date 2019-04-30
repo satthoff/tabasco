@@ -264,7 +264,7 @@ __END__
 =head1 BUGS
 
  Address bug reports and comments to:
-   uwe@satthoff.eu
+   satthoff@icloud.com
 
 =head1 SEE ALSO
 
