@@ -74,7 +74,7 @@ sub do_execute {
    # 'cleartool setcs' need the new config spec in a file.
    if( defined $self->getCSpec() )
    {
-      $file = File::Temp::mktemp($OS::Config::tempDir . $OS::Config::slash . "newcspecXXXXX");
+      $file = File::Temp::mktemp($OS::Common::Config::tempDir . $OS::Common::Config::slash . "newcspecXXXXX");
       open FILE, ">$file";
       print FILE $self->getCSpec();
       close FILE;
@@ -102,7 +102,7 @@ sub do_rollback {
    # 'cleartool setcs' need the new config spec in a file.
    if( defined $self->getOldCSpec() )
    {
-      my $file = File::Temp::mktemp($OS::Config::tempDir . $OS::Config::slash ."oldcspecXXXXX");
+      my $file = File::Temp::mktemp($OS::Common::Config::tempDir . $OS::Common::Config::slash ."oldcspecXXXXX");
       open FILE, ">$file";
       print FILE $self->getOldCSpec();
       close FILE;

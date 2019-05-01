@@ -206,7 +206,7 @@ if( $ENV{ CLEARCASE_OP_KIND } eq 'checkout' )
     if( $actVersion  ne $lastVersion and $actBranch eq $lastBranch )
       {
 	# the version to be checked out is not the latest version on current branch
-	my $cspecVersion = $relFocus->getTask()->getLabeledVersion( $TaBasCo::Config::cspecLabel )->getVersionString();
+	my $cspecVersion = $relFocus->getTask()->getLabeledVersion( $TaBasCo::Common::Config::cspecLabel )->getVersionString();
 	my @actions = ();
 	push @actions, 'create_new_task' if( $actVersion ne $cspecVersion );
 	push @actions, 'set_config_spec';
@@ -241,7 +241,7 @@ if( $ENV{ CLEARCASE_OP_KIND } eq 'checkout' )
 	# prepare the creation of a new release on checkin, means let checkout proceed
 	# create a new task based on the version in focus, do not let checkout proceed
 	# set config spec of a view, if the version in focus is the CSPEC version, do not let checkout proceed
-	my $cspecVersion = $relFocus->getTask()->getLabeledVersion( $TaBasCo::Config::cspecLabel )->getVersionString();
+	my $cspecVersion = $relFocus->getTask()->getLabeledVersion( $TaBasCo::Common::Config::cspecLabel )->getVersionString();
 	my @actions = ();
 	push @actions, 'start_release_creation';
 	push @actions, 'create_new_task' if( $actVersion ne $cspecVersion );
@@ -295,7 +295,7 @@ elsif( $ENV{ CLEARCASE_OP_KIND } eq 'checkin' )
 	# we have to use the config spec of the parent task
 	Transaction::start( -comment => "set correct config spec for config spec creation" );
 	my $currentView = ClearCase::View( "$ENV{CLEARCASE_VIEW_TAG}" );
-	my $cspecFile = $relFocus->getTask()->getParent()->getLabeledVersion( $TaBasCo::Config::cspecLabel )->getVXPN();
+	my $cspecFile = $relFocus->getTask()->getParent()->getLabeledVersion( $TaBasCo::Common::Config::cspecLabel )->getVXPN();
 	open FD, "$cspecFile";
 	my @cspec = <FD>;
 	close FD;
