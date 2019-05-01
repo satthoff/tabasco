@@ -301,7 +301,7 @@ sub ensureHyperlinkType {
 	    -name    => $name,
 	    -global  => $config[0],
 	    -acquire => $config[0],
-	    -vob     => $self->getTag()
+	    -vob     => $config[1]->getTag()
 	    );
     }
     $tmp{ $name } = $hltype;
@@ -405,7 +405,7 @@ sub ensureLabelType {
 	    -pbranch => $pbranch,
 	    -global  => $config[0],
 	    -acquire => $config[0],
-	    -vob     => $self->getTag()
+	    -vob     => $config[1]->getTag()
 	    );
     }
     $lbtype->setPerBranch( $pbranch );
@@ -480,7 +480,7 @@ sub ensureBranchType {
 	    -pbranch => $pbranch,
 	    -global  => $config[0],
 	    -acquire => $config[0],
-	    -vob     => $self->getTag()
+	    -vob     => $config[1]->getTag()
 	    );
     }
     $tmp{ $name } = $brtype;
@@ -511,7 +511,7 @@ sub loadCspecTag
   {
       my $self = shift;
 
-      $self->loadFamilyID();
+      $self->loadFamilyID();  # the function $self->setCSpecTag() will be called in subroutine loadFamilyID()
       return $self->getCspecTag();
   }
 
@@ -519,7 +519,7 @@ sub loadUUID
   {
       my $self = shift;
 
-      $self->loadFamilyID();
+      $self->loadFamilyID(); # the function $self->setUUID() will be called in subroutine loadFamilyID()
       return $self->getUUID();
   }
 
