@@ -78,10 +78,6 @@ sub _init {
 
    Die( [ '', 'Wrong object initialization in ' .  __PACKAGE__ . ". Unknown object type = $typeName.", '' ] ) unless( grep m/^${typeName}$/, @knownTypes );
 
-   unless( $vob ) {
-       $vob = $ClearCase::Common::Config::myHost->getRegion()->getVob( $vobTag );
-   }
-
    $self->setType( $typeName );
    $self->setName( $name );
    $self->setVob( $ClearCase::Common::Config::myHost->getRegion()->getVob( $vobTag ) );

@@ -28,7 +28,6 @@ sub BEGIN {
        BranchString => undef,
        Name => undef,
        MyElement => { CALCULATE => \&loadMyElement },
-       LatestVersion => { CALCULATE => \&loadLatestVersion },
        ZeroVersion   => { CALCULATE => \&loadZeroVersion }
        );
 
@@ -79,12 +78,12 @@ sub loadMyElement {
     return $self->setMyElement( ClearCase::Element->new( -pathname => $self->getVXPN() ) );
 }
 
-sub loadLatestVersion
+sub getLatestVersion
   {
     my $self = shift;
 
     my $latestVersion = ClearCase::Version->new( -pathname => $self->getVXPN() . $OS::Common::Config::slash . 'LATEST' );
-    return $self->setLatestVersion( $latestVersion );
+    return $latestVersion;
   }
 
 sub loadZeroVersion

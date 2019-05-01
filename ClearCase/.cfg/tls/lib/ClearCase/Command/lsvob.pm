@@ -21,10 +21,11 @@ sub BEGIN {
    );
 
    %DATA = (
-      Short       => undef,
-      Long        => undef,
-      Tag         => undef,
-      Family      => undef
+       Short       => undef,
+       Long        => undef,
+       Tag         => undef,
+       Family      => undef,
+       Region      => undef
       );
 
    Data::init(
@@ -39,9 +40,9 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $transaction, $short, $long, $tag, $family, @other ) =
+   my ( $transaction, $short, $long, $tag, $family, $region, @other ) =
       $class->rearrange(
-         [ qw( TRANSACTION SHORT LONG TAG FAMILY ) ],
+         [ qw( TRANSACTION SHORT LONG TAG FAMILY REGION ) ],
          @_ );
    confess join( ' ', @other ) if @other;
 
@@ -52,6 +53,7 @@ sub new {
    $self->setLong(1) if $long;
    $self->setTag( $tag ) if $tag;
    $self->setFamily( $family ) if $family;
+   $self->setRegion( $region ) if $region;
 
    return $self;
 }
@@ -62,14 +64,9 @@ sub do_execute {
 
    push @options , '-s' if $self->getShort();
    push @options , '-l' if $self->getLong();
-   if( $self->getTag() )
-     {
-	 push @options , $self->getTag();
-     }
-   elsif( $self->getFamily() )
-     {
-	 push @options , '-family ' . $self->getFamily();
-     }
+   push @options , '-reg ' . $self->getRegion() if $self->getRegion();
+   push @options , '-family ' . $self->getFamily() if $self->getFamily();
+   push @options , $self->getTag() if $self->getTag();
 
    ClearCase::Common::Cleartool::lsvob(
       @options );

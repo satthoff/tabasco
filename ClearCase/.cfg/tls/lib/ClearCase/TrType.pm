@@ -132,10 +132,11 @@ RETURN VALUE
 sub create {
    my $self = shift;
 
-   ClearCase::mktrtype(
-      -name    => $self->getName(),
-      -vob     => $self->getVob()->getTag()
-      );
+   Die( [ 'subroutine create of ' . __PACKAGE__ . ' is not yet implemented.' ] );
+#   ClearCase::mktrtype(
+#      -name    => $self->getName(),
+#      -vob     => $self->getVob()->getTag()
+#      );
 
    return;
 } # create
