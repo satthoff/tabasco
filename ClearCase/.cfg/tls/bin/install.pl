@@ -62,7 +62,7 @@ Transaction::commit();
 # finaly create all trigger types
 foreach my $trg ( keys %TaBasCo::Common::Config::allTrigger )
   {
-    my $trt = ClearCase::TrType->new( -name => $trg, -vob => $vob );
+    my $trt = ClearCase::TrType->new( -name => $trg, -vob => $TaBasCo::Common::Config::myVob );
     $trt->create(
                  -all     => $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'all' },
                  -element => $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'element' },
