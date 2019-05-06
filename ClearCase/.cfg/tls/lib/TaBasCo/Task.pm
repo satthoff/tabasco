@@ -68,7 +68,7 @@ sub loadMainTask {
 	    );
 	$initialPathLink->create();
 	
-	$mainTask->createConfigSpec();
+	$mainTask->createConfigSpec( $ClearCase::Common::Config::myHost->currentView() );
 	
 	# the initial config spec has been written.
 	# and the CSPEC label has been attached.
