@@ -42,7 +42,7 @@ sub new {
 
    my ( $transaction, $viewtag, $long, $short, $region, @other ) =
       $class->rearrange(
-         [ qw( TRANSACTION VIEWTAG LONG SHORT) ],
+         [ qw( TRANSACTION VIEWTAG LONG SHORT REGION ) ],
          @_ );
    confess join( ' ', @other ) if @other;
 
@@ -52,6 +52,7 @@ sub new {
    $self->setLong( $long );
    $self->setShort( $short );
    $self->setViewTag( $viewtag );
+   $self->setRegion( $region );
 
    return $self;
 }
