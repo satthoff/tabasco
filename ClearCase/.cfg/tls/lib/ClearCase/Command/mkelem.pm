@@ -83,7 +83,7 @@ sub do_commit {
    ClearCase::Common::Cleartool::checkin(
       '-nc',
       '-ident',
-      $self->getArgv() )i unless( $self->getNoCheckout() );
+      $self->getArgv() ) unless( $self->getNoCheckout() );
 }
 
 sub do_rollback {
