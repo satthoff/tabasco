@@ -67,20 +67,24 @@ sub loadMainTask {
 	    -to     => $TaBasCo::Common::Config::myVob->getRootElement()
 	    );
 	$initialPathLink->create();
-	
-	$mainTask->createConfigSpec( $ClearCase::Common::Config::myHost->currentView() );
-	
-	# the initial config spec has been written.
-	# and the CSPEC label has been attached.
-	# now we have to checkin and checkout again
-	# to create the initial release
-	ClearCase::checkin(
+
+	Transaction::start( -comment => "create config spec of main task" );
+	# checkout the config element for writing the task config spec
+	ClearCase::checkout(
 	    -argv => TaBasCo::Common::Config::getConfigElement()->getNormalizedPath()
 	    );
+	$mainTask->createConfigSpec( $ClearCase::Common::Config::myHost->currentView() );	
+	# the initial config spec has been written.
+	# and the CSPEC label has been attached.
+	Transaction::commit();
+
+	Transaction::start( -comment => "create config spec of main task initial release" );
+	# checkout the config element for writing the release config spec
 	ClearCase::checkout(
 	    -argv => TaBasCo::Common::Config::getConfigElement()->getNormalizedPath()
 	    );
 	$mainTask->createNewRelease( $mainTask->nextReleaseName(), $ClearCase::Common::Config::myHost->currentView() );
+	Transaction::commit();
 	Transaction::commit(); # perform Vob initialization for TABASCO installation
     }
     Transaction::commit(); # load main task
