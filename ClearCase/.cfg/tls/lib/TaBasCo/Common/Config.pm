@@ -94,9 +94,9 @@ sub getConfigElement {
 	    );
 	ClearCase::mkelem(
 	    -eltype   => 'text_file',
+	    -nocheckout => 1,
 	    -argv => $TaBasCo::Common::Config::configFilePath
 	    );
-	# the file is checkedout after creation
     }
     $configElement = ClearCase::Element->new(
 	-pathname => $TaBasCo::Common::Config::configFilePath
