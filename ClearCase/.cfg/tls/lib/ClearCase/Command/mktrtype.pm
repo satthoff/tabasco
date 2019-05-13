@@ -22,7 +22,6 @@ sub BEGIN {
 
    %DATA = (
       Name     => undef,
-      Vob      => undef,
       Comment  => undef,
       All      => undef,
       ExecU    => undef,
@@ -47,15 +46,16 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $transaction, $name, $vob, $comment, $all, $execu, $execw, $cmd, $nusers, $element, $restrict, $type, $typelist, @other ) =
+   my ( $transaction, $name, $comment, $all, $execu, $execw, $cmd, $nusers, $element, $restrict, $type, $typelist, @other ) =
       $class->rearrange(
-         [ qw( TRANSACTION NAME VOB COMMENT ALL EXECU EXECW COMMAND NUSERS ELEMENT RESTRICT TYPE TYPELIST) ],
+         [ qw( TRANSACTION NAME COMMENT ALL EXECU EXECW COMMAND NUSERS ELEMENT RESTRICT TYPE TYPELIST) ],
          @_ );
    confess join( ' ', @other ) if @other;
 
    my $self  = $class->SUPER::new( $transaction );
    bless $self, $class;
 
+   # we expect the full name trtype:<trigger>@vob in variable name
    $self->setElement( $element );
    $self->setName( $name );
    $self->setExecU( $execu );
@@ -63,7 +63,6 @@ sub new {
    $self->setExecW( $execw );
    $self->setCmd( $cmd );
    $self->setAll( $all );
-   $self->setVob( $vob );
    $self->setComment( $comment );
    $self->setRestrict( $restrict );
    $self->setType( $type );
@@ -95,10 +94,7 @@ sub do_execute {
    push @options, '-nusers '. $self->getNUsers() if $self->getNUsers();
    push @options, $self->getRestrict()           if $self->getRestrict();
    push @options, $self->getCmd();
-
-   defined $self->getVob()
-      ? push @options, $self->getName() . '@' . $self->getVob(),
-      : push @options, $self->getName();
+   push @options, $self->getName();
 
    ClearCase::Common::Cleartool::mktrtype( @options );
 }
@@ -109,12 +105,8 @@ sub do_commit {
 
 sub do_rollback {
    my $self = shift;
-   my @options;
 
-   defined $self->getName()
-      ? push @options, 'trtype:' . $self->getName() . '@' . $self->getVob(),
-      : push @options, 'trtype:' . $self->getName();
-   ClearCase::Common::Cleartool::rmtype( '-f', '-rmall', @options );
+   ClearCase::Common::Cleartool::rmtype( '-f', '-rmall', $self->getName() );
 }
 
 
