@@ -48,12 +48,12 @@ my $mainTask = TaBasCo::Task->getMainTask();
 
 # label the installation
 ClearCase::mklabel(
-		   -pathname => $TaBasCo::Common::Config::myVob->getTag() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolPath,
+		   -argv => $TaBasCo::Common::Config::myVob->getTag() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolPath,
 		   -label    => $TaBasCo::Common::Config::toolSelectLabel,
 		   -recurse  => 1
 		  );
 ClearCase::mklabel(
-                   -pathname => $TaBasCo::Common::Config::myVob->getTag() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot,
+                   -argv => $TaBasCo::Common::Config::myVob->getTag() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot,
                    -label    => $TaBasCo::Common::Config::toolSelectLabel
                   );
 
