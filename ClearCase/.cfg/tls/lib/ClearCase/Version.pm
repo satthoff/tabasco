@@ -68,6 +68,19 @@ sub attachLabel {
     return $self;
 }
 
+sub getLabels {
+    my $self = shift;
+
+    ClearCase::describe(
+	-argv => $self->getVXPN(),
+	-fmt => '%Nl'
+	);
+    my $l = ClearCase::getOutputLine();
+    chomp $l;
+    my @labels = split /\s+/, $l;
+    return @labels;
+}
+
 
 sub loadMyBranch {
     my $self = shift;

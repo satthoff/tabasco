@@ -124,7 +124,6 @@ sub loadName
 
     my @labels = $self->getLabels();
     my @names = grep !m/^${TaBasCo::COMMON::Config::cspecLabel}$/, @labels;
-    return undef unless( @names );
     return undef unless( $#names == 0 );
     return $self->setName( $names[0] );
   }
