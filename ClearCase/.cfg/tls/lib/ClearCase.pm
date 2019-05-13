@@ -17,6 +17,7 @@ sub BEGIN {
    require ClearCase::Vob;
    require ClearCase::LbType;
    require ClearCase::HlType;
+   require ClearCase::TrType;
    require ClearCase::HyperLink;
    require ClearCase::Replica;
 }

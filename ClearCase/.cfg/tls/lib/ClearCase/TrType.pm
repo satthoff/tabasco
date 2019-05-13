@@ -115,31 +115,23 @@ sub _init {
 
 
 
-# ===========================================================================
-
-=head2 FUNCTION create
-
-DESCRIPTION
-
-ARGUMENTS
-
- $self         the object
-
-RETURN VALUE
-
-=cut
-
 sub create {
    my $self = shift;
 
-   Die( [ 'subroutine create of ' . __PACKAGE__ . ' is not yet implemented.' ] );
-#   ClearCase::mktrtype(
-#      -name    => $self->getName(),
-#      -vob     => $self->getVob()->getTag()
-#      );
-
+   ClearCase::mktrtype( @_ );
    return;
 } # create
+
+sub attach {
+    my $self = shift;
+    my $element = shift;
+
+    ClearCase(
+	trigger => $self->getFullName(),
+	element => $element
+	);
+    return;
+}
 
 
 
