@@ -287,8 +287,10 @@ sub create
       [ 'BASELINE', 'NAME' ],
       @_ );
 
-   my $newTask = $self->new( -pathname => File::Basename::dirname( $baseline->getVXPN() ) . $OS::Common::Config::slash . $name );
-   $newTask->SUPER::create( -fromVersion => $baseline );
+   my $newTask = $self->SUPER::create(
+       -fromVersion => $baseline,
+       -name => $name
+       );
    TaBasCo::Release::createFloatingRelease( $newTask );
    return $newTask;
   }

@@ -115,7 +115,7 @@ while( $ui->askYesNo( -question => 'Do you want to draw a merge arrow from anoth
 
 # we have to use the config spec of the release's  task
 Transaction::start( -comment => "set correct config spec for release creation" );
-my $currentView = ClearCase::View( "$ENV{CLEARCASE_VIEW_TAG}" );
+my $currentView = $ClearCase::Common::Config::myHost->getRegistry()->getRegion( $ClearCase::Common::Config::myHost->getRegionName() )->getView( "$ENV{CLEARCASE_VIEW_TAG}" );
 my $cspecFile = $relFocus->getTask()->getLabeledVersion( $TaBasCo::Common::Config::cspecLabel )->getVXPN();
 open FD, "$cspecFile";
 my @cspec = <FD>;

@@ -57,6 +57,8 @@ ClearCase::mklabel(
                    -label    => $TaBasCo::Common::Config::toolSelectLabel
                   );
 
+Transaction::commit();
+
 # finaly create all trigger types
 foreach my $trg ( keys %TaBasCo::Common::Config::allTrigger )
   {
