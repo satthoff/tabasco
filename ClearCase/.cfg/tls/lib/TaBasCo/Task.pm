@@ -45,15 +45,12 @@ sub loadMainTask {
     my $self = {};
     bless $self, $class;
 
-    Transaction::start( -comment => "load main task" );
-    # subroutine TaBasCo::Common::Config::getConfigElement called in next code line will create the config file if it does not exist
     my $mainTask = $self->new( -pathname => TaBasCo::Common::Config::getConfigElement()->getNormalizedPath() . '@@' . $OS::Common::Config::slash . 'main' );
     Die( [ '', 'Cannot load the main task.', '' ] ) unless( $mainTask );
 
     # loading the main task means probably to install TABASCO in my vob.
     # in this case  we have to ensure that all initializations will be done.
     unless( $TaBasCo::Common::Config::myVob->getLbType( $TaBasCo::Common::Config::toolSelectLabel ) ) {
-	Transaction::start( -comment => "perform Vob initialization for TABASCO installation" );
 	$TaBasCo::Common::Config::myVob->ensureLabelType( -name => uc( 'main' . $TaBasCo::Common::Config::nextLabelExtension ) );
 	$TaBasCo::Common::Config::myVob->ensureLabelType( -name => $TaBasCo::Common::Config::cspecLabel, -pbranch => 1 );
 	$TaBasCo::Common::Config::myVob->ensureHyperlinkType( -name => $TaBasCo::Common::Config::pathLink );
@@ -67,27 +64,9 @@ sub loadMainTask {
 	    -to     => $TaBasCo::Common::Config::myVob->getRootElement()
 	    );
 	$initialPathLink->create();
-
-	Transaction::start( -comment => "create config spec of main task" );
-	# checkout the config element for writing the task config spec
-	ClearCase::checkout(
-	    -argv => TaBasCo::Common::Config::getConfigElement()->getNormalizedPath()
-	    );
-	$mainTask->createConfigSpec( $ClearCase::Common::Config::myHost->currentView() );	
-	# the initial config spec has been written.
-	# and the CSPEC label has been attached.
-	Transaction::commit();
-
-	Transaction::start( -comment => "create config spec of main task initial release" );
-	# checkout the config element for writing the release config spec
-	ClearCase::checkout(
-	    -argv => TaBasCo::Common::Config::getConfigElement()->getNormalizedPath()
-	    );
+	$mainTask->createConfigSpec( $ClearCase::Common::Config::myHost->currentView() );
 	$mainTask->createNewRelease( $mainTask->nextReleaseName(), $ClearCase::Common::Config::myHost->currentView() );
-	Transaction::commit();
-	Transaction::commit(); # perform Vob initialization for TABASCO installation
     }
-    Transaction::commit(); # load main task
     return $self->setMainTask( $mainTask );
 }
 
@@ -129,12 +108,18 @@ sub createNewRelease
 
     # create the configuration specification
     my @cspec = $self->createCspecBlock( $newRelease, $view );
+
+    Transaction::start( -comment => 'checkout config element for new release config spec' );
+    ClearCase::checkout(
+	-argv => $file
+	);
     open FD, ">$file";
     foreach ( @cspec )
       {
         print FD "$_\n";
       }
     close FD;
+    Transaction::commit();
 
     return $newRelease;
   }
@@ -240,12 +225,19 @@ sub createConfigSpec
     grep chomp, @config_spec;
 
     my $file = $self->getNormalizedPath();
+
+    Transaction::start( -comment => 'checkout config element for new task config spec' );
+    ClearCase::checkout(
+	-argv => $file
+	);
     open FD, ">$file";
     foreach ( @config_spec )
       {
         print FD "$_\n";
       }
     close FD;
+    Transaction::commit();
+
     my $cspecRelease =  TaBasCo::Release->new( -pathname => $self->getNormalizedPath() );
     $cspecRelease->applyName( $TaBasCo::Common::Config::cspecLabel );
   }
