@@ -100,11 +100,7 @@ sub createNewRelease
     TaBasCo::Release::createFloatingRelease( $self );
     
     my $file = TaBasCo::Common::Config::getConfigElement()->getNormalizedPath();
-
-    # we have to attach the new release name to the currently
-    # checked out version of the configuration element
     my $newRelease = TaBasCo::Release->new( -pathname => $file );
-    $newRelease->applyName( $releaseName );
 
     # create the configuration specification
     my @cspec = $self->createCspecBlock( $newRelease, $view );
@@ -120,6 +116,8 @@ sub createNewRelease
       }
     close FD;
     Transaction::commit();
+
+    $newRelease->applyName( $releaseName );
 
     return $newRelease;
   }
