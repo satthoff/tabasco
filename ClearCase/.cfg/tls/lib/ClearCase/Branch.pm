@@ -63,7 +63,7 @@ sub create {
 	-checkout => 0
 	);
     my $newBranch = $self->new( -pathname => File::Basename::dirname( $fve->getVXPN() ) . $OS::Common::Config::slash . $name );
-    return $newBranch;
+    return $newBranch; # it should be a TaBasCo::Task as well, because $self is a Task
   }
 
 sub loadMyElement {
