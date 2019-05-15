@@ -105,17 +105,27 @@ sub createNewRelease
     # create the configuration specification
     my @cspec = $self->createCspecBlock( $newRelease, $view );
 
-    Transaction::start( -comment => 'checkout config element for new release config spec' );
-    ClearCase::checkout(
-	-argv => $file
+    ClearCase::lscheckout(
+	-argv => $file,
+	-short => 1
 	);
+    my @erg = ClearCase::getOutput();
+    grep chomp, @erg;
+    unless( @erg ) {
+	Transaction::start( -comment => 'checkout config element for new release config spec' );
+	ClearCase::checkout(
+	    -argv => $file
+	    );
+    }
     open FD, ">$file";
     foreach ( @cspec )
       {
         print FD "$_\n";
       }
     close FD;
-    Transaction::commit();
+    unless( @erg ) {
+	Transaction::commit();
+    }
 
     $newRelease->applyName( $releaseName );
 
@@ -224,17 +234,27 @@ sub createConfigSpec
 
     my $file = $self->getNormalizedPath();
 
-    Transaction::start( -comment => 'checkout config element for new task config spec' );
-    ClearCase::checkout(
-	-argv => $file
+    ClearCase::lscheckout(
+	-argv => $file,
+	-short => 1
 	);
+    my @erg = ClearCase::getOutput();
+    grep chomp, @erg;
+    unless( @erg ) {
+	Transaction::start( -comment => 'checkout config element for new task config spec' );
+	ClearCase::checkout(
+	    -argv => $file
+	    );
+    }
     open FD, ">$file";
     foreach ( @config_spec )
       {
         print FD "$_\n";
       }
     close FD;
-    Transaction::commit();
+    unless( @erg ) {
+	Transaction::commit();
+    }
 
     my $cspecRelease =  TaBasCo::Release->new( -pathname => $self->getNormalizedPath() );
     $cspecRelease->applyName( $TaBasCo::Common::Config::cspecLabel );
