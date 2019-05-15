@@ -111,7 +111,7 @@ sub _init {
 
 
    $self->SUPER::_init( -type => 'brtype', @_ );
-   return;
+   return $self;
 } # _init
 
 

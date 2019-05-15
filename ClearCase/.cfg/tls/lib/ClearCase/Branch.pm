@@ -59,7 +59,7 @@ sub create {
     }
     ClearCase::mkbranch(
 	-argv => $fve->getVXPN(),
-	-name     => $name,
+	-branchtype => $branchType,
 	-checkout => 0
 	);
     my $newBranch = $self->new( -pathname => File::Basename::dirname( $fve->getVXPN() ) . $OS::Common::Config::slash . $name );
