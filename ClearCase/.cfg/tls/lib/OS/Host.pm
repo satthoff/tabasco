@@ -59,7 +59,7 @@ sub _getExecHost
     my $self = shift;
 
     my $execHost = undef;
-    if( $OS::Config::myHost->getHostname() ne $self->getHostname() )
+    if( $OS::Common::Config::myHost->getHostname() ne $self->getHostname() )
       {
 	$execHost = $self;
       }
@@ -104,7 +104,7 @@ __END__
 
 =head1 BUGS
 
-Address bug reports and comments to: uwe@satthoff.eu
+Address bug reports and comments to: satthoff@icloud.com
 
 =head1 SEE ALSO
 

@@ -38,15 +38,15 @@ BEGIN {
 }
 
 use lib '/sdev/user/lib/site_perl';
-use OS::Config;
-use TaBasCo::Config;
+use OS::Common::Config;
+use TaBasCo::Common::Config;
 
 my $vobPattern = quotemeta( $ENV{CLEARCASE_VOB_PN} );
 my @path = split /$vobPattern/, $ENV{CLEARCASE_PN};
-my $toolPattern = quotemeta( $OS::Config::slash . $TaBasCo::Config::toolRoot . $OS::Config::slash );
+my $toolPattern = quotemeta( $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot . $OS::Common::Config::slash );
 exit 0 if( $path[$#path] =~ m/^$toolPattern/ );
 
-my $label = uc( $ENV{ CLEARCASE_BRTYPE } ) . $TaBasCo::Config::nextLabelExtension;
-my $rc = system( "cleartool mklabel -repl $label $ENV{ CLEARCASE_PN } $OS::Config::silent $OS::Config::trash" );
+my $label = uc( $ENV{ CLEARCASE_BRTYPE } ) . $TaBasCo::Common::Config::nextLabelExtension;
+my $rc = system( "cleartool mklabel -repl $label $ENV{ CLEARCASE_PN } $OS::Common::Config::silent $OS::Common::Config::trash" );
 exit $rc;
 

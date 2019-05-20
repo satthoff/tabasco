@@ -111,7 +111,7 @@ sub _init {
 
 
    $self->SUPER::_init( -type => 'brtype', @_ );
-   return;
+   return $self;
 } # _init
 
 
@@ -179,7 +179,7 @@ __END__
 
 =head1 BUGS
 
-Address bug reports and comments to: uwe@satthoff.eu.
+Address bug reports and comments to: satthoff@icloud.com.
 
 When   sending   bug   reports,   please  provide   the   version   of
 BrType.pm, the  version of Perl and  the name and version  of the

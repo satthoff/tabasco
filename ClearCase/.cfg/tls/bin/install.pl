@@ -48,12 +48,12 @@ my $mainTask = TaBasCo::Task->getMainTask();
 
 # label the installation
 ClearCase::mklabel(
-		   -pathname => $TaBasCo::Common::Config::myVob->getTag() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolPath,
+		   -argv => $TaBasCo::Common::Config::myVob->getTag() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolPath,
 		   -label    => $TaBasCo::Common::Config::toolSelectLabel,
 		   -recurse  => 1
 		  );
 ClearCase::mklabel(
-                   -pathname => $TaBasCo::Common::Config::myVob->getTag() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot,
+                   -argv => $TaBasCo::Common::Config::myVob->getTag() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot,
                    -label    => $TaBasCo::Common::Config::toolSelectLabel
                   );
 
@@ -62,7 +62,7 @@ Transaction::commit();
 # finaly create all trigger types
 foreach my $trg ( keys %TaBasCo::Common::Config::allTrigger )
   {
-    my $trt = ClearCase::TrType->new( -name => $trg, -vob => $vob );
+    my $trt = ClearCase::TrType->new( -name => $trg, -vob => $TaBasCo::Common::Config::myVob );
     $trt->create(
                  -all     => $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'all' },
                  -element => $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'element' },

@@ -47,7 +47,7 @@ sub AUTOLOAD {
    ( my $method = $AUTOLOAD ) =~ s/.*:://;
 
    # Creating
-   if ( grep ( /$method/, @OS::Config::CMD ) )
+   if ( grep ( /$method/, @OS::Common::Config::CMD ) )
    {
 my $func = <<EOF
       sub OS::Common::OsTool::$method {
@@ -270,7 +270,7 @@ __END__
 
 =head1 BUGS
 
-Address bug reports and comments to: uwe@satthoff.eu
+Address bug reports and comments to: satthoff@icloud.com
 
 =head1 SEE ALSO
 

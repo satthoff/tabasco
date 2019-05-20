@@ -40,7 +40,7 @@ BEGIN
     $base = File::Basename::dirname (File::Basename::dirname ( Cwd::abs_path( File::Basename::dirname $0 ) ) );
     $configFilePath = $base . $OS::Common::Config::slash . $configFile;
 
-    $myVob = $ClearCase::Common::Config::myHost->getRegion()->getVob( File::Basename::dirname ( File::Basename::dirname ( $base ) ) );
+    $myVob = $ClearCase::Common::Config::myHost->getRegion()->getVob( File::Basename::dirname ( $base ) );
 
 
     %allTrigger = (
@@ -94,9 +94,9 @@ sub getConfigElement {
 	    );
 	ClearCase::mkelem(
 	    -eltype   => 'text_file',
+	    -nocheckout => 1,
 	    -argv => $TaBasCo::Common::Config::configFilePath
 	    );
-	# the file is checkedout after creation
     }
     $configElement = ClearCase::Element->new(
 	-pathname => $TaBasCo::Common::Config::configFilePath

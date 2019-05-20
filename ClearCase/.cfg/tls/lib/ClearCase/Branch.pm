@@ -28,7 +28,6 @@ sub BEGIN {
        BranchString => undef,
        Name => undef,
        MyElement => { CALCULATE => \&loadMyElement },
-       LatestVersion => { CALCULATE => \&loadLatestVersion },
        ZeroVersion   => { CALCULATE => \&loadZeroVersion }
        );
 
@@ -48,29 +47,23 @@ sub _init {
 }
 
 sub create {
-    # must be moved to ClearCase::Element and renamed to createBranch
     my $self = shift;
-    my ( $fve, @other ) = $self->rearrange(
-	[ 'FROMVERSION' ],
+    my ( $name, $fve, @other ) = $self->rearrange(
+	[ 'NAME', 'FROMVERSION' ],
 	@_ );
 
-    my $branchType = ClearCase::BrType->new( -name => $self->getName(), -vob => $self->getVob()  );
-    unless( $branchType->exist() )
+    my $branchType = ClearCase::BrType->new( -name => $name, -vob => $fve->getVob()  );
+    unless( $branchType->exists() )
     {
         $branchType->create();
     }
     ClearCase::mkbranch(
 	-argv => $fve->getVXPN(),
-	-name     => $self->getName(),
+	-branchtype => $branchType,
 	-checkout => 0
 	);
-    ClearCase::describe(
-	-argv => File::Basename::dirname( $fve->getVXPN() ),
-	-fmt => '%On'
-	);
-    my $oid = ClearCase::getOutputLine();
-    $self->setOid( $oid );
-    return $self;
+    my $newBranch = $self->new( -pathname => File::Basename::dirname( $fve->getVXPN() ) . $OS::Common::Config::slash . $name );
+    return $newBranch; # it should be a TaBasCo::Task as well, because $self is a Task
   }
 
 sub loadMyElement {
@@ -79,12 +72,12 @@ sub loadMyElement {
     return $self->setMyElement( ClearCase::Element->new( -pathname => $self->getVXPN() ) );
 }
 
-sub loadLatestVersion
+sub getLatestVersion
   {
     my $self = shift;
 
     my $latestVersion = ClearCase::Version->new( -pathname => $self->getVXPN() . $OS::Common::Config::slash . 'LATEST' );
-    return $self->setLatestVersion( $latestVersion );
+    return $latestVersion;
   }
 
 sub loadZeroVersion
@@ -123,7 +116,7 @@ __END__
 
 =head1 BUGS
 
-Address bug reports and comments to: uwe@satthoff.eu
+Address bug reports and comments to: satthoff@icloud.com
 
 
 =head1 SEE ALSO

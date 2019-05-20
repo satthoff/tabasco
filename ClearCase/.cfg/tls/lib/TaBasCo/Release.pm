@@ -123,8 +123,7 @@ sub loadName
     my $self = shift;
 
     my @labels = $self->getLabels();
-    my @names = grep !m/^${TaBasCo::COMMON::Config::cspecLabel}$/, @labels;
-    return undef unless( @names );
+    my @names = grep !m/^${TaBasCo::Common::Config::cspecLabel}$/, @labels;
     return undef unless( $#names == 0 );
     return $self->setName( $names[0] );
   }
@@ -173,7 +172,7 @@ __END__
 
 =head1 BUGS
 
-Address bug reports and comments to: uwe@satthoff.eu
+Address bug reports and comments to: satthoff@icloud.com
 
 
 =head1 SEE ALSO

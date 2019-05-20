@@ -56,7 +56,7 @@ sub _init {
 sub loadVobs {
    my $self = shift;
 
-   ClearCase::lsvob( -short => 1 );
+   ClearCase::lsvob( -short => 1, -region => $self->getName() );
    my @erg = ClearCase::getOutput();
    grep chomp, @erg;
 
@@ -70,7 +70,7 @@ sub loadVobs {
 sub loadViews {
    my $self = shift;
 
-   ClearCase::lsview( -short => 1 );
+   ClearCase::lsview( -short => 1, -region => $self->getName() );
    my @erg = ClearCase::getOutput();
    grep chomp, @erg;
 
@@ -133,7 +133,7 @@ __END__
 
 =head1 BUGS
 
-Address bug reports and comments to: uwe@satthoff.eu
+Address bug reports and comments to: satthoff@icloud.com
 
 =head1 SEE ALSO
 

@@ -5,7 +5,7 @@ use Carp;
 use Getopt::Long;
 use Cwd;
 use File::Basename;
-use OS::Config;
+use OS::Common::Config;
 
 sub BEGIN {
    use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $COPYRIGHT );
@@ -33,7 +33,7 @@ BEGIN {
 
     $baseDir = dirname ( Cwd::abs_path( dirname $0 ) );
     $myHome  = Cwd::abs_path( dirname $0 );
-    $mySelf  = $myHome . $OS::Config::slash . 'sdev';
+    $mySelf  = $myHome . $OS::Common::Config::slash . 'sdev';
 
     $location = $baseDir;
     $tmpWorkspace = '/tmp/tmpws';

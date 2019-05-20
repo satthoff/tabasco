@@ -11,6 +11,7 @@ sub BEGIN {
    require TaBasCo::Common::Config;
    require TaBasCo::Task;
    require TaBasCo::Release;
+   require TaBasCo::UI;
 }
 
 
@@ -27,7 +28,7 @@ __END__
 =head1 BUGS
 
  Address bug reports and comments to:
-	uwe@satthoff.eu
+	satthoff@icloud.com
 
 =head1 SEE ALSO
 

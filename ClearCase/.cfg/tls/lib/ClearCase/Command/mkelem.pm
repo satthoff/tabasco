@@ -21,9 +21,10 @@ sub BEGIN {
    );
 
    %DATA = (
-      ElType      => undef,
-      Comment     => undef,
-      Argv => undef
+       ElType      => undef,
+       Comment     => undef,
+       NoCheckout  => undef,
+       Argv => undef
    );
 
    Data::init(
@@ -39,9 +40,9 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $transaction, $argv, $eltype, $comment, @other ) =
+   my ( $transaction, $argv, $eltype, $comment, $noco, @other ) =
       $class->rearrange(
-         [ qw( TRANSACTION ARGV ELTYPE COMMENT) ],
+         [ qw( TRANSACTION ARGV ELTYPE COMMENT NOCHECKOUT ) ],
          @_ );
    confess join( ' ', @other ) if @other;
 
@@ -50,6 +51,7 @@ sub new {
 
    $self->setElType( $eltype );
    $self->setComment( $comment );
+   $self->setNoCheckout( $noco );
    $self->setArgv($argv);
 
    return $self;
@@ -68,7 +70,8 @@ sub do_execute {
       push @options, ' -nc';
    }
 
-   push @options , '-eltype ' . $self->getElType()  if $self->getElType();
+   push @options, '-eltype ' . $self->getElType()  if $self->getElType();
+   push @options, '-nco' if $self->getNoCheckout();
 
    ClearCase::Common::Cleartool::mkelem(
       @options,
@@ -80,7 +83,7 @@ sub do_commit {
    ClearCase::Common::Cleartool::checkin(
       '-nc',
       '-ident',
-      $self->getArgv() );
+      $self->getArgv() ) unless( $self->getNoCheckout() );
 }
 
 sub do_rollback {
@@ -88,7 +91,7 @@ sub do_rollback {
    ClearCase::Common::Cleartool::checkin(
       '-nc',
       '-ident',
-      $self->getArgv() );
+      $self->getArgv() ) unless( $self->getNoCheckout() );
 
    ClearCase::Common::Cleartool::rmelem(
       '-f',
@@ -116,7 +119,7 @@ __END__
 
 =head1 BUGS
 
-Address bug reports and comments to: uwe@satthoff.eu
+Address bug reports and comments to: satthoff@icloud.com
 
 
 =head1 SEE ALSO

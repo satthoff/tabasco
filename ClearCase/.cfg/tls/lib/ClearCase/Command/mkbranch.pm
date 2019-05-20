@@ -21,9 +21,9 @@ sub BEGIN {
    );
 
    %DATA = (
-	    Name     => undef,
-	    Version  => undef,
-	    Checkout => undef
+       BranchType  => undef,
+       Checkout => undef,
+       Argv => undef
    );
 
    Data::init(
@@ -37,17 +37,16 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $transaction, $argv, $version, $name, $co, @other ) =
+   my ( $transaction, $argv, $branchType, $co, @other ) =
       $class->rearrange(
-         [ qw( TRANSACTION ARGV VERSION NAME CHECKOUT ) ],
+         [ qw( TRANSACTION ARGV BRANCHTYPE CHECKOUT ) ],
          @_ );
    confess join( ' ', @other ) if @other;
 
    my $self  = $class->SUPER::new( $transaction );
    bless $self, $class;
 
-   $self->setName( $name );
-   $self->setVersion( $version ) if( $version );
+   $self->setBranchType( $branchType );
    $self->setCheckout( 1 );
    $self->setCheckout( $co ) if( defined $co );
    $self->setArgv($argv);
@@ -60,9 +59,8 @@ sub do_execute {
    my @options = ();
 
    push @options, '-nc';
-   push @options, '-version ' . $self->getVersion() if( $self->getVersion();
    push @options, '-nco' unless( $self->getCheckout() );
-   push @options, $self->getName();
+   push @options, $self->getBranchType()->getFullName();
    ClearCase::Common::Cleartool::mkbranch(
 				  @options, $self->getArgv()
 				 );
@@ -74,13 +72,10 @@ sub do_commit {
 
 sub do_rollback {
    my $self = shift;
-   my $v = $self->getVersion();
-   $v =~ s/\\/\//g if( defined $ENV{ OS } ); # always UNIX style
-   $v =~ s/^(.*\/)\d+$/$1/;
    my $p = $self->getArgv();
    $p =~ s/\"//g;
    $p =~ s/\'//g;
-   my $branch =  '"' . $p . '@@' . $v . $self->getName() . '"';
+   my $branch =  '"' . $p . '@@/' . $self->getBranchType()->getName() . '"';
    my @options = ();
    push @options, '-nc';
    push @options, '-force';
@@ -107,7 +102,7 @@ __END__
 
 =head1 BUGS
 
-Address bug reports and comments to: uwe@satthoff.eu
+Address bug reports and comments to: satthoff@icloud.com
 
 =head1 SEE ALSO
 

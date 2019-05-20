@@ -168,7 +168,7 @@ sub main {
          };
 
       # specific check only for TABASCO
-      unless( TaBasCo::Config::getConfigElement() ) {
+      unless( TaBasCo::Common::Config::getConfigElement() ) {
 	  Error( [ '', "Cannot load the configuration element in CLI::Command", '' ] );
           $self->exitInstance( -1 );
       }
@@ -202,7 +202,7 @@ __END__
 =head1 BUGS
 
  Address bug reports and comments to:
-  uwe@satthoff.eu
+  satthoff@icloud.com
 
 =head1 SEE ALSO
 

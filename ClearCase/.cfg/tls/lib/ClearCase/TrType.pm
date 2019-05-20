@@ -115,30 +115,23 @@ sub _init {
 
 
 
-# ===========================================================================
-
-=head2 FUNCTION create
-
-DESCRIPTION
-
-ARGUMENTS
-
- $self         the object
-
-RETURN VALUE
-
-=cut
-
 sub create {
    my $self = shift;
 
-   ClearCase::mktrtype(
-      -name    => $self->getName(),
-      -vob     => $self->getVob()->getTag()
-      );
-
+   ClearCase::mktrtype( @_ );
    return;
 } # create
+
+sub attach {
+    my $self = shift;
+    my $element = shift;
+
+    ClearCase(
+	trigger => $self->getFullName(),
+	element => $element
+	);
+    return;
+}
 
 
 
@@ -168,7 +161,7 @@ __END__
 
 =head1 BUGS
 
-Address bug reports and comments to: uwe@satthoff.eu.
+Address bug reports and comments to: satthoff@icloud.com.
 
 When   sending   bug   reports,   please  provide   the   version   of
 BrType.pm, the  version of Perl and  the name and version  of the

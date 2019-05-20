@@ -246,7 +246,7 @@ __END__
 =head1 AUTHOR INFORMATION
 
   Copyright (C) 2007, 2010 Uwe Satthoff
-   uwe@satthoff.eu
+   satthoff@icloud.com
 
 =cut
 

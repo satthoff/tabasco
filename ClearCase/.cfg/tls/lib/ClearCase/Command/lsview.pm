@@ -21,9 +21,10 @@ sub BEGIN {
    );
 
    %DATA = (
-      Long     => undef,
-      Short    => undef,
-      ViewTag  => undef
+       Long     => undef,
+       Short    => undef,
+       ViewTag  => undef,
+       Region   => undef
    );
 
    Data::init(
@@ -39,9 +40,9 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $transaction, $viewtag, $long, $short, @other ) =
+   my ( $transaction, $viewtag, $long, $short, $region, @other ) =
       $class->rearrange(
-         [ qw( TRANSACTION VIEWTAG LONG SHORT) ],
+         [ qw( TRANSACTION VIEWTAG LONG SHORT REGION ) ],
          @_ );
    confess join( ' ', @other ) if @other;
 
@@ -51,6 +52,7 @@ sub new {
    $self->setLong( $long );
    $self->setShort( $short );
    $self->setViewTag( $viewtag );
+   $self->setRegion( $region );
 
    return $self;
 }
@@ -61,6 +63,7 @@ sub do_execute {
 
    push @options, '-long'              if $self->getLong();
    push @options, '-short'             if $self->getShort();
+   push @options, '-reg ' . $self->getRegion() if $self->getRegion();
    push @options, $self->getViewTag()  if $self->getViewTag();
 
    ClearCase::Common::Cleartool::lsview( @options );
@@ -92,7 +95,7 @@ __END__
 
 =head1 BUGS
 
-Address bug reports and comments to: uwe@satthoff.eu
+Address bug reports and comments to: satthoff@icloud.com
 
 =head1 SEE ALSO
 
