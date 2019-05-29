@@ -24,7 +24,8 @@ sub BEGIN {
        Name => undef,
        Type => undef,
        Vob => undef,
-       FullName => undef
+       FullName => undef,
+       Exists => undef
       );
 
    require Data;
@@ -88,6 +89,7 @@ sub _init {
 sub exists {
     my $self = shift;
 
+    return 1 if( $self->getExists() );
     ClearCase::disableErrorOut();
     ClearCase::disableDieOnErrors();
     ClearCase::describe(
@@ -97,6 +99,7 @@ sub exists {
     my $ex = ( ClearCase::getRC() == 0 );
     ClearCase::enableErrorOut();
     ClearCase::enableDieOnErrors();
+    $self->setExists( 1 ) if( $ex );
     return $ex;
 }
 

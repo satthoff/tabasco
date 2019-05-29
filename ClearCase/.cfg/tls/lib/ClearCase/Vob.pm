@@ -293,10 +293,9 @@ sub ensureHyperlinkType {
 
     my %tmp = %{ $self->getHyperlinkTypes() };
 
-    my @config = $self->typeCreationConfig();
-
     $hltype = ClearCase::HlType->new( -name => $name, -vob  => $config[1] );
     unless( $hltype->exists() ) {
+	my @config = $self->typeCreationConfig();
 	ClearCase::mkhltype(
 	    -name    => $name,
 	    -global  => $config[0],
@@ -396,10 +395,9 @@ sub ensureLabelType {
     }
     my %tmp = %{ $self->getLabelTypes() };
 
-    my @config = $self->typeCreationConfig();
-
     $lbtype = ClearCase::LbType->new( -name => $name, -vob => $config[1] );
     unless( $lbtype->exists() ) {
+	my @config = $self->typeCreationConfig();
 	ClearCase::mklbtype(
 	    -name    => $name,
 	    -pbranch => $pbranch,
@@ -471,10 +469,9 @@ sub ensureBranchType {
     }
     my %tmp = %{ $self->getBranchTypes() };
 
-    my @config = $self->typeCreationConfig();
-
     $brtype = ClearCase::BrType->new( -name => $name, -vob => $config[1] );
     unless( $brtype->exists() ) {
+	my @config = $self->typeCreationConfig();
 	ClearCase::mkbrtype(
 	    -name    => $name,
 	    -pbranch => $pbranch,
