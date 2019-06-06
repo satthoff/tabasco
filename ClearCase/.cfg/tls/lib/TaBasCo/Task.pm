@@ -101,6 +101,7 @@ sub createNewRelease
     
     my $file = TaBasCo::Common::Config::getConfigElement()->getNormalizedPath();
     my $newRelease = TaBasCo::Release->new( -pathname => $file );
+    $newRelease->setName( $releaseName );
 
     # create the configuration specification
     my @cspec = $self->createCspecBlock( $newRelease, $view );
