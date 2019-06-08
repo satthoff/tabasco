@@ -26,7 +26,8 @@ sub BEGIN {
    %DATA = (
        VersionString => undef,
        MyBranch => { CALCULATE => \&loadMyBranch },
-       PreviousVersion => { CALCULATE => \&loadPreviousVersion }
+       PreviousVersion => { CALCULATE => \&loadPreviousVersion },
+       Labels => { CALCULATE => \&loadLabels }
        );
 
    Data::init(
@@ -59,16 +60,21 @@ sub attachLabel {
 	$replace = 0;
     }
 
-    ClearCase::mklabel(
-	-argv    => $self->getVXPN(),
-	-label   => $name,
-	-replace => $replace
+    my @labels = @{ $self->getLabels() };
+    my $newLabel = ClearCase::Label->new(
+	-name => $name,
+	-version => $self,
+	-replace => $replace,
+	-alreadyattached => 0
 	);
-    return undef if( ClearCase::getRC() != 0 );
-    return $self;
+    return undef unless( $newLabel );
+    
+    push @labels, $newLabel;
+    $self->setLabels( \@labels );
+    return $newLabel;
 }
 
-sub getLabels {
+sub loadLabels {
     my $self = shift;
 
     ClearCase::describe(
@@ -77,8 +83,17 @@ sub getLabels {
 	);
     my $l = ClearCase::getOutputLine();
     chomp $l;
-    my @labels = split /\s+/, $l;
-    return @labels;
+    my @labelNames = split /\s+/, $l;
+
+    my @labels = ();
+    foreach my $n ( @labelNames ) {
+	push @labels, ClearCase::Label->new(
+	    -name => $n,
+	    -version => $self,
+	    -alreadyattached => 1
+	    );
+    }
+    return $self->setLabels( \@labels );
 }
 
 
