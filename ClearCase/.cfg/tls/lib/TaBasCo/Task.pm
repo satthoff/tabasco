@@ -11,7 +11,7 @@ sub BEGIN {
    require Exporter;
    require ClearCase::Branch;
 
-   @ISA = qw(  Exporter Data ClearCase::Branch );
+   @ISA = qw(  Exporter Data ClearCase::BrType );
 
    @EXPORT = qw(
    );
