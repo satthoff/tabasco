@@ -45,7 +45,7 @@
     createRelease -task <task name>  [ -name <new release name> ]  [ -comment <free text line> ]
 
 
-    This command creates a new release with the specified baseline.
+    This command creates a new release in the specified task.
     If option -name is not specified then the new release name is
     upper_count_of( <task name> . GMT . <actual GMT time> )
 

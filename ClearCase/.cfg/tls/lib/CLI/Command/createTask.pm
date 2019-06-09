@@ -65,8 +65,8 @@ sub run {
   
   Transaction::start( -comment => 'create new task' . $self->getOption( 'name' ) );
   
-  my $baseline = TaBasCo::Release->load( -name => $baselineName );
-  unless( $baseline ) {
+  my $baseline = TaBasCo::Release->new( -name => $baselineName );
+  unless( $baseline->exists() ) {
       Error( [ "No release exists for the specified baseline $baselineName" ] );
       $self->exitInstance( -1 );
   }

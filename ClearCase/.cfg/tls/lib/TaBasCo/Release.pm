@@ -35,31 +35,6 @@ sub BEGIN {
 
 } # sub BEGIN()
 
-sub load {
-    my $proto = shift;
-    my $class = ref ($proto) || $proto;
-    my $self  = {};
-    bless $self, $class;
-
-    Debug( [ '', 'BEGIN: ' . __PACKAGE__ . '::new' ] );
-
-    my ( $name, @other ) = $self->rearrange(
-	[ 'NAME' ],
-	@_ );
-
-    ClearCase::find(
-	-argv => TaBasCo::Common::Config::getConfigElement()->getNormalizedPath(),
-	-version => 'lbtype(' . $name . ')',
-	-print => 1
-	);
-    my @versions = ClearCase::getOutput();
-    return undef unless( @versions );
-    my $latestVersion = $versions[$#versions];
-
-    my $theRelease = $self->new( -pathname => $latestVersion );
-    return $theRelease;
-}
-
 sub applyName
   {
     my $self = shift;
