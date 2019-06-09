@@ -75,22 +75,9 @@ sub run {
       -baseline => $baseline
       );
   
-  if( $newTask )
-    {
-	# create the config spec in version zero of new task = branch
-	# because of the triggers it should be possible just to checkout the task branch zero version
-	ClearCase::checkout(
-	    -argv => $newTask->getZeroVersion()->getVXPN()
-	);
-
-	Transaction::commit();
-	Message( [ '', "Successfully created new task  $taskName"  ] );
-	return 0;
-    }
+  Transaction::commit();
+  Message( [ '', "Successfully created new task  $taskName"  ] );
   
-  Error( [ '', 'Task creation failed.', '' ] );
-  Transaction::rollback();
-  $self->exitInstance( -1 );
 } # run
 
 1;
