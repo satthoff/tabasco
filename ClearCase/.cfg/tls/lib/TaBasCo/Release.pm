@@ -10,7 +10,7 @@ sub BEGIN {
    $VERSION = '0.01';
    require Exporter;
 
-   @ISA = qw(  Exporter Data ClearCase::Version );
+   @ISA = qw(  Exporter Data ClearCase::LbType );
 
    @EXPORT = qw(
    );
