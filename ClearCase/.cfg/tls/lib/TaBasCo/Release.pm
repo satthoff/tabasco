@@ -35,6 +35,14 @@ sub BEGIN {
 
 } # sub BEGIN()
 
+sub _init {
+   my $self = shift;
+
+   $self->SUPER::_init( -vob => $TaBasCo::Common::Config::myVob, @_ );
+   return $self;
+} # _init
+
+
 sub applyName
   {
     my $self = shift;

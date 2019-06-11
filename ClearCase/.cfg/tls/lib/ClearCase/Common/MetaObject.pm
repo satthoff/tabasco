@@ -25,7 +25,8 @@ sub BEGIN {
        Type => undef,
        Vob => undef,
        FullName => undef,
-       Exists => undef
+       Exists => undef,
+       GlobalAndAcquire => undef
       );
 
    require Data;
@@ -81,7 +82,9 @@ sub _init {
 
    $self->setType( $typeName );
    $self->setName( $name );
-   $self->setVob( $ClearCase::Common::Config::myHost->getRegion()->getVob( $vobTag ) );
+   my @vobConfig = $ClearCase::Common::Config::myHost->getRegion()->getVob( $vobTag )->typeCreationConfig();
+   $self->setGlobalAndAcquire( $vobConfig[0] );
+   $self->setVob( $vobConfig[1] );
    $self->setFullName( $typeName . ':' . $name . "\@$vobTag" );
    return $self;
 }

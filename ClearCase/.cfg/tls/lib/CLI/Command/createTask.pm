@@ -61,7 +61,6 @@ sub run {
   my $comment = '';
   $comment = $self->getOption( 'comment' ) if( $self->getOption( 'comment' ) );
 
-
   
   Transaction::start( -comment => 'create new task' . $self->getOption( 'name' ) );
   
@@ -70,10 +69,17 @@ sub run {
       Error( [ "No release exists for the specified baseline $baselineName" ] );
       $self->exitInstance( -1 );
   }
-  my $newTask = TaBasCo::Task->create(
-      -name => $taskName,
-      -baseline => $baseline
-      );
+  
+  my $newTask = TaBasCo::Task->new( -name => $taskName );
+  if( $newTask->exists() ) {
+      Error( [ "A task with name $taskName already exists." ] );
+      $self->exitInstance( -1 );
+  }
+  $newTask = $newTask->create( -baseline => $baseline );
+  unless( $newTask ) {
+      Error( [ '', "Creation of new task $taskName failed."  ] );
+      $self->exitInstance( -1 );
+  }
   
   Transaction::commit();
   Message( [ '', "Successfully created new task  $taskName"  ] );

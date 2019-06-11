@@ -36,11 +36,7 @@ sub BEGIN {
                                                           # both attributes are set to 0 resp. undef.
                                                           # Otherwise new type objects will be created in the appropriate admin vob as global type objects.
 
-       LabelTypes => { CALCULATE => \&loadLabelTypes },   # we do not use the "cashing by load subroutines" fully implemented, because
-       BranchTypes => { CALCULATE => \&loadBranchTypes }, # the number of existing label or branch types could easily go into the thousands,
-                                                          # so loading all existing type objects could decrease the performance heavily.
-                                                          # see implementation of subroutines loadLabelTypes and loadBranchTypes
-
+       LabelTypes => { CALCULATE => \&loadLabelTypes },
        HyperlinkTypes => { CALCULATE => \&loadHyperlinkTypes },
        ElementTypes => { CALCULATE => \&loadElementTypes },
        TriggerTypes => { CALCULATE => \&loadTriggerTypes },
@@ -425,64 +421,6 @@ sub renameLabelType {
     $tmp{ $newName } = $oldLabelType->rename( $newName );
     $self->setLabelTypes( \%tmp );
     return $tmp{ $newName };
-}
-
-sub loadBranchTypes {
-    my $self = shift;
-
-    # this subroutine will only be called once,
-    # it initializes the attribute BranchTypes
-    # with a reference to an empty hash.
-    my %types = ();
-    return $self->setBranchTypes( \%types );
-}
-
-sub getBrType {
-    my $self = shift;
-    my $name = shift;
-
-    my %tmp = %{ $self->getBranchTypes() };
-    return $tmp{ $name } if( defined $tmp{ $name } );
-    my $brtype = ClearCase::BrType->new( -name => $name, -vob => $self );
-    if( $brtype->exists() ) {
-	$tmp{ $name } = $brtype;
-	$self->setBranchTypes( \%tmp );
-	return $brtype;
-    }
-    return undef;
-}
-
-sub ensureBranchType {
-    my $self = shift;
-
-    my ( $name, $pbranch, @other ) = $self->rearrange(
-	[ qw( NAME PBRANCH ) ],
-	@_ );
-
-    my $brtype = $self->getBrType( $name );
-    return $brtype if( $brtype );
-
-    if( $pbranch ) {
-	$pbranch = 1;
-    } else {
-	$pbranch = 0;
-    }
-    my %tmp = %{ $self->getBranchTypes() };
-
-    unless( $brtype->exists() ) {
-	my @config = $self->typeCreationConfig();
-	$brtype = ClearCase::BrType->new( -name => $name, -vob => $config[1] );
-	ClearCase::mkbrtype(
-	    -name    => $name,
-	    -pbranch => $pbranch,
-	    -global  => $config[0],
-	    -acquire => $config[0],
-	    -vob     => $config[1]->getTag()
-	    );
-    }
-    $tmp{ $name } = $brtype;
-    $self->setBranchTypes( \%tmp );
-    return $brtype;
 }
 
 sub loadFamilyID

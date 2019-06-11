@@ -39,6 +39,36 @@ sub BEGIN {
 
 } # sub BEGIN()
 
+sub _init {
+   my $self = shift;
+
+   $self->SUPER::_init( -vob => $TaBasCo::Common::Config::myVob, @_ );
+   return $self;
+} # _init
+
+sub create {
+    my $self = shift;
+
+   my ( $baseline, $comment, @other ) = $self->rearrange(
+      [ 'BASELINE', 'COMMENT' ],
+      @_ );
+
+    unless( $baseline->exists() ) {
+	Error( [ __PACKAGE__ . '::create : Baseline ' . $baseline->getName() . ' does not exist.' ] );
+	return undef;
+    }
+    $self->SUPER::create( -comment => $comment );
+
+    ClearCase::mkhlink(
+	-hltype => TaBasCo::Common::Config::TabascoBaseline,
+	-from => $self,
+	-to => $baseline
+	);
+    
+    return $self;
+  }
+
+
 sub loadMainTask {
     my $proto = shift;
     my $class = ref ($proto) || $proto;
@@ -297,24 +327,6 @@ sub createCspecBlock
     return @config_spec;
   }
 
-sub create
-  {
-   my $proto = shift;
-   my $class = ref ($proto) || $proto;
-   my $self  = {};
-   bless $self, $class;
-
-   my ( $baseline, $name, @other ) = $self->rearrange(
-      [ 'BASELINE', 'NAME' ],
-      @_ );
-
-   my $newTask = $self->SUPER::create(
-       -fromVersion => $baseline,
-       -name => $name
-       );
-   TaBasCo::Release::createFloatingRelease( $newTask );
-   return $newTask;
-  }
 
 sub mkPath
   {

@@ -24,21 +24,22 @@ sub BEGIN {
    );
 } # sub BEGIN()
 
-use vars qw/ $pathLink $cspecLabel $nextLabelExtension $base $myVob
+use vars qw/ $pathLink $cspecLabel $nextLabelExtension $base $myVob $baselineLink
 	     $toolPath $configFile $toolRoot $configFilePath %allTrigger $toolSelectLabel $configElement /;
 
 
 BEGIN
   {
-    $pathLink = 'path';
-    $cspecLabel = 'CSPEC';
-    $nextLabelExtension = '_NEXT';
-    $toolRoot = '.cfg';
-    $toolPath = 'tls';
-    $configFile = 'config.txt';
-    $toolSelectLabel = 'TABASCO';
-    $base = File::Basename::dirname (File::Basename::dirname ( Cwd::abs_path( File::Basename::dirname $0 ) ) );
-    $configFilePath = $base . $OS::Common::Config::slash . $configFile;
+      $pathLink = 'TabascoPath';
+      $baselineLink = 'TabascoBaseline';
+      $cspecLabel = 'CSPEC';
+      $nextLabelExtension = '_NEXT';
+      $toolRoot = '.cfg';
+      $toolPath = 'tls';
+      $configFile = 'config.txt';
+      $toolSelectLabel = 'TABASCO';
+      $base = File::Basename::dirname (File::Basename::dirname ( Cwd::abs_path( File::Basename::dirname $0 ) ) );
+      $configFilePath = $base . $OS::Common::Config::slash . $configFile;
 
     $myVob = $ClearCase::Common::Config::myHost->getRegion()->getVob( File::Basename::dirname ( $base ) );
 

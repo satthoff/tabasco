@@ -53,111 +53,35 @@ sub BEGIN {
 
 } # sub BEGIN()
 
-
-# ============================================================================
-# non exported package globals
-
-# ============================================================================
-# initialize package globals ( exported )
-
-# ============================================================================
-# initialize package globals ( not exported )
-
-# ============================================================================
-# file private lexicals
-
-
-# ============================================================================
-# Description
-
-=head1 NAME
-
-BrType - <short description>
-
-=head1 SYNOPSIS
-
-B<BrType.pm> [options]
-
-=head1 DESCRIPTION
-
-<long description>
-
-=head1 USAGE
-
-=head1 METHODS
-
-=cut
-
-# ============================================================================
-# Preloaded methods go here.
-
-
-# ===========================================================================
-
-=head2 FUNCTION _init
-
-DESCRIPTION
-
-ARGUMENTS
-
- $self         the object
-
-RETURN VALUE
-
-=cut
-
 sub _init {
    my $self = shift;
-
 
    $self->SUPER::_init( -type => 'brtype', @_ );
    return $self;
 } # _init
 
 
-
-# ===========================================================================
-
-=head2 FUNCTION create
-
-DESCRIPTION
-
-ARGUMENTS
-
- $self         the object
-
-RETURN VALUE
-
-=cut
-
 sub create {
-   my $self = shift;
+    my $self = shift;
 
-   my ( $pbranch, $global, $acquire, @other ) =
-      $self->rearrange(
-         [ qw( PBRANCH GLOBAL ACQUIRE ) ],
-         @_ );
-   confess join( ' ', @other ) if @other;
+    my ( $pbranch, $comment, @other ) = $self->rearrange(
+	[ 'PBRANCH', 'COMMENT' ],
+	@_ );
+    unless( $pbranch ) {
+	$pbranch = 0;
+    }
+    
+    ClearCase::mkbrtype(
+	-name    => $self->getName(),
+	-pbranch => $pbranch,
+	-global  => $self->getGlobalAndAcquire(),
+	-acquire => $self->getGlobalAndAcquire(),
+	-vob     => $self->getVob()->getTag()
+	);
 
-   if( $pbranch ) {
-       $pbranch = 1;
-   } else {
-       $pbranch = 0;
-   }
+    return $self;
+}
 
-   # ensure the branch type to exist in my Vob
-   $self->getVob()->ensureBranchType( -name => $self->getName(), -pbranch => $pbranch );
-
-   return $self;
-} # create
-
-
-
-# ============================================================================
-# Autoload methods go after =cut, and are processed by the autosplit program.
-#
-# remeber to
-#  require AutoLoader
 
 1;
 
