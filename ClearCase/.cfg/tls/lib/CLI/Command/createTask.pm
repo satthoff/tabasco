@@ -66,7 +66,7 @@ sub run {
   
   my $baseline = TaBasCo::Release->new( -name => $baselineName );
   unless( $baseline->exists() ) {
-      Error( [ "No release exists for the specified baseline $baselineName" ] );
+      Error( [ "No TaBasCo::Release exists for the specified baseline name $baselineName" ] );
       $self->exitInstance( -1 );
   }
   
@@ -75,7 +75,7 @@ sub run {
       Error( [ "A task with name $taskName already exists." ] );
       $self->exitInstance( -1 );
   }
-  $newTask = $newTask->create( -baseline => $baseline );
+  $newTask = $newTask->create( -baseline => $baseline, -comment => $comment );
   unless( $newTask ) {
       Error( [ '', "Creation of new task $taskName failed."  ] );
       $self->exitInstance( -1 );

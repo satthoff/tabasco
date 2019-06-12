@@ -76,7 +76,8 @@ sub create {
 	-pbranch => $pbranch,
 	-global  => $self->getGlobalAndAcquire(),
 	-acquire => $self->getGlobalAndAcquire(),
-	-vob     => $self->getVob()->getTag()
+	-vob     => $self->getVob()->getTag(),
+	-comment => $comment
 	);
 
     return $self;

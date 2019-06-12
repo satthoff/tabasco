@@ -60,13 +60,35 @@ sub create {
     $self->SUPER::create( -comment => $comment );
 
     ClearCase::mkhlink(
-	-hltype => TaBasCo::Common::Config::TabascoBaseline,
+	-hltype => $TaBasCo::Common::Config::TabascoBaseline,
 	-from => $self,
 	-to => $baseline
 	);
     
     return $self;
-  }
+}
+
+sub loadBaseline {
+    my $self = shift;
+
+    ClearCase::describe(
+	-short    => 1,
+	-ahl      => $TaBasCo::Common::Config::TabascoBaseline,
+	-argv => $self->getFullName()
+	);
+    my @result = ClearCase::getOutput();
+    grep chomp, @result;
+    if( $#result != 0 ) {
+	Die( [ '', "incorrect number ($#result) of baseline links $TaBasCo::Common::Config::TabascoBaseline at task " . $self->getFullName(), '' ] );
+    }
+    # we expect the result to be a TaBasCo::Release
+    my $baseline = TaBasCo::Release->new( -name => $result[0], -vob => $self->getVob() );
+    unless( $baseline ) {
+	Die( [ '', "Hyperlink $TaBasCo::Common::Config::TabascoBaseline on task " . $self->getFullName() . " does not point to a TaBasCo::Release in Vob " . $self->getVob()->getTag(), '' ] );
+    }
+    
+    return $self->setBaseline( $baseline );
+}
 
 
 sub loadMainTask {
@@ -375,17 +397,6 @@ sub loadParent
     return $self->setParent( $baseline->getTask() );
   }
 
-sub loadBaseline
-  {
-    my $self = shift;
-
-    my $pv = $self->getZeroVersion()->getPreviousVersion();
-    return undef unless( $pv );
-    # here we have to load explicitely the Release object, because
-    # pv is only a ClearCase::Version, but not a TaBasCo::Release
-    my $baseline = TaBasCo::Release->new( -pathname => $pv->getVXPN() );
-    return $self->setBaseline( $baseline );
-  }
 
 sub loadCspecPath
   {
