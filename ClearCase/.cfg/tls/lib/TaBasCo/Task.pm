@@ -61,8 +61,14 @@ sub create {
 
     ClearCase::mkhlink(
 	-hltype => $TaBasCo::Common::Config::TabascoBaseline,
-	-from => $self,
-	-to => $baseline
+	-from => $self->getFullName(),
+	-to => $baseline->getFullName()
+	);
+
+    ClearCase::mkhlink(
+	-hltype => $TaBasCo::Common::Config::TabascoTask,
+	-from => $self->getVob()->getMyReplica()->getFullName(),
+	-to => $self->getFullName()
 	);
     
     return $self;
@@ -83,8 +89,8 @@ sub loadBaseline {
     }
     # we expect the result to be a TaBasCo::Release
     my $baseline = TaBasCo::Release->new( -name => $result[0], -vob => $self->getVob() );
-    unless( $baseline ) {
-	Die( [ '', "Hyperlink $TaBasCo::Common::Config::TabascoBaseline on task " . $self->getFullName() . " does not point to a TaBasCo::Release in Vob " . $self->getVob()->getTag(), '' ] );
+    unless( $baseline->exists() ) {
+	Die( [ '', "Hyperlink $TaBasCo::Common::Config::TabascoBaseline on task " . $self->getFullName() . " does not point to an existing TaBasCo::Release in Vob " . $self->getVob()->getTag(), '' ] );
     }
     
     return $self->setBaseline( $baseline );
