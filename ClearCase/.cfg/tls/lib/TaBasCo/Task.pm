@@ -74,6 +74,33 @@ sub create {
     return $self;
 }
 
+sub exists {
+    my $self = shift;
+
+    if( $self->SUPER::exists() ) {
+	ClearCase::describe(
+	    -short    => 1,
+	    -ahl      => $TaBasCo::Common::Config::TabascoTask,
+	    -argv => $self->getFullName()
+	    );
+	my @result = ClearCase::getOutput();
+	grep chomp, @result;
+	if( $#result > 0 ) {
+	    Die( [ '', "FATAL ERROR: Incorrect number ($#result) of task registration links $TaBasCo::Common::Config::TabascoTask at task " . $self->getFullName(), '' ] );
+	} elsif( $#result == 0 ) {
+	    # we expect the result to be our own replica
+	    if( $self->getVob()->getMyReplica()->getFullName() eq $result[0] ) {
+		return 1;
+	    }
+	    return 0;
+	} else {
+	    Debug( [ '', "A branch type named " . $self->getName() . " exists, but it is no TaBasCo::Task", '' ] );
+	    return 0;
+	}
+    }
+    return 0;
+}
+
 sub loadBaseline {
     my $self = shift;
 
