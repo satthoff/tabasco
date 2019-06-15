@@ -28,7 +28,8 @@ sub BEGIN {
        Parent    => { CALCULATE => \&loadParent },
        Path      => { CALCULATE => \&loadPath },
        CspecPath => { CALCULATE => \&loadCspecPath },
-       Baseline  => { CALCULATE => \&loadBaseline }
+       Baseline  => { CALCULATE => \&loadBaseline },
+       FloatingRelease => { CALCULATE => \&loadFloatingRelease }
        );
 
    Data::init(
@@ -46,32 +47,95 @@ sub _init {
    return $self;
 } # _init
 
+sub _createFloatingRelease {
+    my $self = shift;
+    my $comment = shift;
+
+    my $floatingRelease = TaBasCo::Release->new( -name -> uc( $self->getName() . $TaBasCo::Common::Config::floatingReleaseExtension ) );
+    $floatingRelease->create(
+	-task => $self,
+	-comment => $comment
+	);
+    return $self->setFloatingRelease( $floatingRelease );
+}
+
 sub create {
     my $self = shift;
 
-   my ( $baseline, $comment, @other ) = $self->rearrange(
-      [ 'BASELINE', 'COMMENT' ],
-      @_ );
+    my ( $baseline, $comment, @other ) = $self->rearrange(
+	[ 'BASELINE', 'COMMENT' ],
+	@_ );
 
     unless( $baseline->exists() ) {
 	Error( [ __PACKAGE__ . '::create : Baseline ' . $baseline->getName() . ' does not exist.' ] );
 	return undef;
     }
+    unless( $comment ) {
+	$comment = __PACKAGE__ . '::create - no purpose specified.';
+    }
     $self->SUPER::create( -comment => $comment );
 
-    ClearCase::mkhlink(
-	-hltype => $TaBasCo::Common::Config::TabascoBaseline,
-	-from => $self->getFullName(),
-	-to => $baseline->getFullName()
+    # register the new task as a known task
+    my $registerLinkType = ClearCase::HlType->new( -name => $TaBasCo::Common::Config::taskLink );
+    my $registerLink = ClearCase::HyperLink->new(
+	-hltype => $registerLinkType,
+	-from => $self->getVob()->getMyReplica(),
+	-to => $self
 	);
+    $registerLink->create();
 
-    ClearCase::mkhlink(
-	-hltype => $TaBasCo::Common::Config::TabascoTask,
-	-from => $self->getVob()->getMyReplica()->getFullName(),
-	-to => $self->getFullName()
+    # register the provided baseline as the task baseline
+    my $baselineLinkType = ClearCase::HlType->new( -name => $TaBasCo::Common::Config::baselineLink );
+    my $baselineLink = ClearCase::HyperLink->new(
+	-hltype => $baselineLinkType,
+	-from => $self,
+	-to => $baseline
 	);
-    
+    $baselineLink->create();
+
+    # create the task's floating release
+    my $floatingRelease = $self->_createFloatingRelease();
+
+    # and register it as the task's first release
+    my $firstReleaseLinkType = ClearCase::HlType->new( -name => $TaBasCo::Common::Config::firstReleaseLink );
+    my $firstReleaseLink = ClearCase::HyperLink->new(
+	-hltype => $firstReleaseLinkType,
+	-from => $self,
+	-to => $floatingRelease
+	);
+    $firstReleaseLink->create();
+
     return $self;
+}
+
+sub createNewRelease {
+    my $self = shift;
+    
+    my ( $name, $comment, @other ) = $self->rearrange(
+	[ 'NAME', 'COMMENT' ],
+	@_ );
+
+    unless( $name ) {
+	$name = $self->nextReleaseName();
+	Progress( [ __PACKAGE__ . '::createNewRelease', 'No release name has been specified.', "Default name $releaseName will be used." ] );
+    }
+
+    my $newRelease = $self->getFloatingRelease();
+    $newRelease->rename(
+	-name => $name
+	);
+    my $floatingRelease = $self->_createFloatingRelease();
+
+    # register the new floating release as the next release of the task
+    my $nextReleaseLinkType = ClearCase::HlType->new( -name => $TaBasCo::Common::Config::nextReleaseLink );
+    my $nextReleaseLink = ClearCase::HyperLink->new(
+	-hltype => $nextReleaseLinkType,
+	-from => $newRelease,
+	-to => $floatingRelease
+	);
+    $nextReleaseLink->create();
+
+    return $newRelease;
 }
 
 sub exists {
@@ -80,13 +144,13 @@ sub exists {
     if( $self->SUPER::exists() ) {
 	ClearCase::describe(
 	    -short    => 1,
-	    -ahl      => $TaBasCo::Common::Config::TabascoTask,
+	    -ahl      => $TaBasCo::Common::Config::taskLink,
 	    -argv => $self->getFullName()
 	    );
 	my @result = ClearCase::getOutput();
 	grep chomp, @result;
 	if( $#result > 0 ) {
-	    Die( [ '', "FATAL ERROR: Incorrect number ($#result) of task registration links $TaBasCo::Common::Config::TabascoTask at task " . $self->getFullName(), '' ] );
+	    Die( [ __PACKAGE__ , "FATAL ERROR: Incorrect number ($#result) of task registration links $TaBasCo::Common::Config::TabascoTask at task " . $self->getFullName(), '' ] );
 	} elsif( $#result == 0 ) {
 	    # we expect the result to be our own replica
 	    if( $self->getVob()->getMyReplica()->getFullName() eq $result[0] ) {
@@ -94,30 +158,34 @@ sub exists {
 	    }
 	    return 0;
 	} else {
-	    Debug( [ '', "A branch type named " . $self->getName() . " exists, but it is no TaBasCo::Task", '' ] );
+	    Debug( [ __PACKAGE__ , "A branch type named " . $self->getName() . ' exists, but it is no ' . __PACKAGE__ ] );
 	    return 0;
 	}
     }
     return 0;
 }
 
+
+sub loadFloatingRelease {
+    my $self = shift;
+
+    my $floatingRelease = TaBasCo::Release->new( -name -> uc( $self->getName() . $TaBasCo::Common::Config::floatingReleaseExtension ) );
+    return $self->setFloatingRelease( $floatingRelease ) if( $floatingRelease->exists() );
+    return undef;
+}
+
 sub loadBaseline {
     my $self = shift;
 
-    ClearCase::describe(
-	-short    => 1,
-	-ahl      => $TaBasCo::Common::Config::TabascoBaseline,
-	-argv => $self->getFullName()
-	);
-    my @result = ClearCase::getOutput();
-    grep chomp, @result;
+    my @result = $self->getFrmHyperlinkedObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::baselineLink ) );
+
     if( $#result != 0 ) {
 	Die( [ '', "incorrect number ($#result) of baseline links $TaBasCo::Common::Config::TabascoBaseline at task " . $self->getFullName(), '' ] );
     }
     # we expect the result to be a TaBasCo::Release
-    my $baseline = TaBasCo::Release->new( -name => $result[0], -vob => $self->getVob() );
+    my $baseline = TaBasCo::Release->new( -name => $result[0] );
     unless( $baseline->exists() ) {
-	Die( [ '', "Hyperlink $TaBasCo::Common::Config::TabascoBaseline on task " . $self->getFullName() . " does not point to an existing TaBasCo::Release in Vob " . $self->getVob()->getTag(), '' ] );
+	Die( [ '', "Hyperlink $TaBasCo::Common::Config::baselineLink on task " . $self->getFullName() . " does not point to an existing TaBasCo::Release in Vob " . $self->getVob()->getTag(), '' ] );
     }
     
     return $self->setBaseline( $baseline );

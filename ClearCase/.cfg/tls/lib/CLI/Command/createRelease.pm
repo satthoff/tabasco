@@ -54,36 +54,30 @@ sub run {
 
   my $task = TaBasCo::Task->new( -name => $taskName );
   unless( $task->exists() ) {
-      Error( [ "No TaBasCo::Task exists for the specified task name $taskName" ] );
+      Error( [ __PACKAGE__ , "No TaBasCo::Task exists for the specified task name $taskName" ] );
       $self->exitInstance( -1 );
   }
-  
-  my $releaseName = $self->getOption( 'name' );
-  unless( $releaseName ) {
-      $releaseName = $task->nextReleaseName();
-      Progress( [ 'No release name has been specified.', "Default name $releaseName will be used." ] );
-  }
+  $taskName = $task->getName();
   
   my $comment = '';
   $comment = $self->getOption( 'comment' ) if( $self->getOption( 'comment' ) );
 
   
   Transaction::start( -comment => 'create new release ' . $releaseName );
-  
-  my $newRelease = TaBasCo::Release->new( -name => $releaseName );
-  if( $newRelease->exists() ) {
-      Error( [ "TaBasCo::Release $releaseName already exists." ] );
-      $self->exitInstance( -1 );
-  }
- 
-  $newRelease = $newRelease->create( -task => $task, -comment => $comment );
+
+  my $newRelease = $task->createNewRelease(
+      -name => $self->getOption( 'name' ),
+      -comment => $comment
+      );
+
   unless( $newRelease ) {
-      Error( [ "Creation of new release $releaseName failed."  ] );
+      Error( [ __PACKAGE__ , "Creation of new release $releaseName failed."  ] );
       $self->exitInstance( -1 );
   }
-  
+  $releaseName = $newRelease->getName();
+ 
   Transaction::commit();
-  Message( [ '', "Successfully created new release $releaseName in task $taskName" ] );
+  Message( [ __PACKAGE__ , "Successfully created new release $releaseName in task $taskName" ] );
   
 } # run
 

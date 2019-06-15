@@ -42,6 +42,25 @@ sub _init {
    return $self;
 } # _init
 
+sub create {
+    my $self = shift;
+
+   my ( $task, $comment, @other ) = $self->rearrange(
+      [ 'TASK', 'COMMENT' ],
+      @_ );
+
+    unless( $task->exists() ) {
+	Error( [ __PACKAGE__ . '::create : Task ' . $task->getName() . ' does not exist.' ] );
+	return undef;
+    }
+    unless( $comment ) {
+	$comment = __PACKAGE__ . '::create - no purpose specified.';
+    }
+    $self->SUPER::create( -comment => $comment );
+
+    return $self;
+}
+
 
 sub applyName
   {

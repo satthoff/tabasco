@@ -63,25 +63,27 @@ sub _init {
 } # _init
 
 sub create {
-   my $self = shift;
+    my $self = shift;
 
-   my ( $pbranch, @other ) =
-      $self->rearrange(
-         [ qw( PBRANCH GLOBAL ACQUIRE ) ],
-         @_ );
-   confess join( ' ', @other ) if @other;
+    my ( $pbranch, $comment, @other ) = $self->rearrange(
+	[ 'PBRANCH', 'COMMENT' ],
+	@_ );
+    unless( $pbranch ) {
+	$pbranch = 0;
+    }
+    
+    ClearCase::mklbtype(
+	-name    => $self->getName(),
+	-pbranch => $pbranch,
+	-global  => $self->getGlobalAndAcquire(),
+	-acquire => $self->getGlobalAndAcquire(),
+	-vob     => $self->getVob()->getTag(),
+	-comment => $comment
+	);
 
-   if( $pbranch ) {
-       $pbranch = 1;
-   } else {
-       $pbranch = 0;
-   }
+    return $self;
+}
 
-   # ensure the label type to exist in my Vob
-   $self->getVob()->ensureLabelType( -name => $self->getName(), -pbranch => $pbranch );
-   $self->setPerBranch( $pbranch );
-   return $self;
-} # create
 
 sub rename {
     my $self = shift;

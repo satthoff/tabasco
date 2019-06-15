@@ -106,6 +106,38 @@ sub exists {
     return $ex;
 }
 
+sub getFromHyperlinkedObjects {
+    my $self = shift;
+    my $hltype = shift; # we expect an object of class ClearCase::HlType
+
+    Die( [ __PACKAGE__ . '::getFromHyperlinkedObjects', 'FATAL ERROR: subroutine parameter is not a ClearCase::HlType' ] ) unless( $hltype->isa( 'ClearCase::HlType' ) );
+
+    ClearCase::describe(
+	-long => 1,
+	-ahl => $hltype->getName(),
+	-argv => $self->getFullName()
+	);
+    my @result = ClearCase::getOutput();
+    grep chomp, @result;
+    return @results
+}
+
+sub getToHyperlinkedObjects {
+    my $self = shift;
+    my $hltype = shift; # we expect an object of class ClearCase::HlType
+
+    Die( [ __PACKAGE__ . '::getToHyperlinkedObjects', 'FATAL ERROR: subroutine parameter is not a ClearCase::HlType' ] ) unless( $hltype->isa( 'ClearCase::HlType' ) );
+
+    ClearCase::describe(
+	-long => 1,
+	-ahl => $hltype->getName(),
+	-argv => $self->getFullName()
+	);
+    my @result = ClearCase::getOutput();
+    grep chomp, @result;
+    return @results
+}
+
 1;
 
 __END__

@@ -87,7 +87,8 @@ sub create {
 	);
     return $self if( ClearCase::getRC() == 0 );
     return undef;
-}  
+}
+
 
 1;
 

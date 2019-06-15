@@ -25,11 +25,23 @@ sub BEGIN {
 } # sub BEGIN()
 
 use vars qw/ $pathLink $cspecLabel $nextLabelExtension $base $myVob $baselineLink
-	     $toolPath $configFile $toolRoot $configFilePath %allTrigger $toolSelectLabel $configElement /;
+	     $toolPath $configFile $toolRoot $configFilePath %allTrigger $toolSelectLabel $configElement
+    $baselineLink # name of hyperlinks connecting a release (lbtype)  with a task (brtype) -> release is baseline of task
+    $taskLink     # name of hyperlinks connecting a task (brtype) with the Vob replica -> brtype registered as task
+    $firstReleaseLink
+    $nextReleaseLink
+    $floatingReleaseExtension
+    /;
 
 
-BEGIN
-  {
+BEGIN {
+    $baselineLink = 'taskBaseline';
+    $taskLink = 'registeredTask';
+    $firstReleaseLink = 'taskFirstRelease';
+    $nextReleaseLink = 'taskNextRelease';
+    $floatingReleaseExtension = '_NEXT';
+    $floatingReleaseLink = 'floatingReleaseLink';
+    
       $pathLink = 'TabascoPath';
       $baselineLink = 'TabascoBaseline';
       $cspecLabel = 'CSPEC';

@@ -65,24 +65,21 @@ sub run {
   Transaction::start( -comment => 'create new task' . $self->getOption( 'name' ) );
   
   my $baseline = TaBasCo::Release->new( -name => $baselineName );
-  unless( $baseline->exists() ) {
-      Error( [ "No TaBasCo::Release exists for the specified baseline name $baselineName" ] );
-      $self->exitInstance( -1 );
-  }
+  # existence of the release will be checked during task creation
   
   my $newTask = TaBasCo::Task->new( -name => $taskName );
   if( $newTask->exists() ) {
-      Error( [ "A task with name $taskName already exists." ] );
+      Error( [ __PACKAGE__ , "A task with name $taskName already exists." ] );
       $self->exitInstance( -1 );
   }
   $newTask = $newTask->create( -baseline => $baseline, -comment => $comment );
   unless( $newTask ) {
-      Error( [ '', "Creation of new task $taskName failed."  ] );
+      Error( [ __PACKAGE__ , "Creation of new task $taskName failed."  ] );
       $self->exitInstance( -1 );
   }
   
   Transaction::commit();
-  Message( [ '', "Successfully created new task  $taskName"  ] );
+  Message( [ __PACKAGE__ , "Successfully created new task  $taskName"  ] );
   
 } # run
 
