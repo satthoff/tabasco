@@ -1,2 +1,0 @@
-#!/bin/sh
-/opt/rational/clearcase/bin/Perl `dirname $0`/sdev.pl "$@"

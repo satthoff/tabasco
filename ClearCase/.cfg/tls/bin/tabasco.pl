@@ -1,10 +1,10 @@
-#!/opt/rational/clearcase/bin/Perl
+#!/usr/bin/perl
 #############################################################################
 use strict;
 
 require 5.6.1;
 
-my $script_name     = "sdev.pl";
+my $script_name     = "tabasco.pl";
 
 
 my @INCL_LIB;
