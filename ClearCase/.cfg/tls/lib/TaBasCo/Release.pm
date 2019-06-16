@@ -57,20 +57,32 @@ sub create {
 	$comment = __PACKAGE__ . '::create - no purpose specified.';
     }
     $self->SUPER::create( -comment => $comment );
-
+    $self->_registerAsTaskMember( $task );
     return $self;
 }
 
-
-sub applyName
-  {
+sub _registerAsTaskMember  {
     my $self = shift;
-    my $name = shift;
+    my $task = shift;
 
-    $self->attachLabel( -name => $name, -replace => 1 );
-    $self->setName( $name );
+    $self->createHyperlinkToObject(
+	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::myTaskLink ),
+	-object => $task
+	);
     return $self;
-  }
+}
+
+sub registerAsNextReleaseOf {
+    my $self = shift;
+    my $previous = shift;
+
+    $self->createHyperlinkToObject(
+	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::nextReleaseLink ),
+	-object => $previous
+	);
+    return $self;
+}
+
 
 sub pathVisible
   {
@@ -102,56 +114,39 @@ sub pathVisible
     return $ret;
   }
 
-sub createFloatingRelease
-  {
-    my $task = shift;
 
-    my $floatingLabel = uc( $task->getName() . $TaBasCo::Common::Config::nextLabelExtension );
-    my $lbtype = $task->getVob()->ensureLabelType( -name => $floatingLabel );
-    return $lbtype;
-  }
-
-sub renameFloatingRelease
-  {
-    my $task = shift;
-    my $name = shift;
-
-    my $floatingLabel = uc( $task->getName() . $TaBasCo::Common::Config::nextLabelExtension );
-    return $task->getVob()->renameLabelType( -oldname => $floatingLabel, -newname => $name );
-  }
-
-sub loadName
-  {
+sub loadPrevious {
     my $self = shift;
 
-    my @labels = $self->getLabels();
-    my @names = grep !m/^${TaBasCo::Common::Config::cspecLabel}$/, @labels;
-    return undef unless( $#names == 0 );
-    return $self->setName( $names[0] );
-  }
+    my @result = $self->getToHyperlinkedObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::nextReleaseLink ) );
+    return undef unless( @result );
+    if( $#result != 0 ) {
+	Die( [ '', "incorrect number ($#result) of next release links $TaBasCo::Common::Config::nextReleaseLink at release " . $self->getFullName(), '' ] );
+    }
+    # we expect the result to be a TaBasCo::Release
+    my $release = TaBasCo::Release->new( -name => $result[0] );
+    unless( $release->exists() ) {
+	Die( [ '', "Hyperlink $TaBasCo::Common::Config::nextReleaseLink on release " . $self->getFullName() . " does not point from an existing TaBasCo::Release in Vob " . $self->getVob()->getTag(), '' ] );
+    }
 
-sub loadPrevious
-  {
+    return $self->setPrevious( $release );
+}
+
+
+sub loadTask {
     my $self = shift;
 
-    my $pv = $self->getPreviousVersion();
-    return undef unless( $pv );
-    while( $pv )
-      {
-         my $name = $pv->getName();
-         return $self->setPrevious( $pv ) if( $name );
-         $pv = $pv->getPreviousVersion()
-      }
-    return undef;
-  }
-
-
-sub loadTask
-  {
-    my $self = shift;
-
-    Debug( [ '', 'BEGIN: ' . __PACKAGE__ . '::loadTask' ] );
-    return $self->setTask( TaBasCo::Task->new(  -pathname => $self->getMyBranch()->getVXPN() ) );
+    my @result = $self->getFromHyperlinkedObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::myTaskLink ) );
+    if( $#result != 0 ) {
+	Die( [ '', "incorrect number ($#result) of task member links $TaBasCo::Common::Config::myTaskLink at release " . $self->getFullName(), '' ] );
+    }
+    # we expect the result to be a TaBasCo::Task
+    my $task = TaBasCo::Task->new( -name => $result[0] );
+    unless( $task->exists() ) {
+	Die( [ '', "Hyperlink $TaBasCo::Common::Config::myTaskLink on release " . $self->getFullName() . " does not point to an existing TaBasCo::Task in Vob " . $self->getVob()->getTag(), '' ] );
+    }
+    
+    return $self->setTask( $task );
   }
 
 1;
@@ -168,7 +163,7 @@ __END__
 
 =head1 AUTHOR INFORMATION
 
- Copyright (C) 2010  Uwe Satthoff
+ Copyright (C) 2006, 2010  Uwe Satthoff
 
 =head1 CREDITS
 

@@ -56,36 +56,45 @@ sub _init {
       [ 'TYPE', 'NAME', 'VOB' ],
       @_ );
 
-   # the type and vob arguments will only be used/checked, if the appropriate information is not encoded in the name argument
-   my $typeName = '';
-   my $vobTag = '';
+   if( $name =~ m/^vob:/ or $type and $type eq 'vob' ) {
+       Die( [ __PAACKAGE__ , 'Wrong object initialization. Expecting to be a ClearCase::Vob object' ] ) unless( $self->isa( 'ClearCase::Vob' ) );
+       $name =~ s/^vob://;
+       $name =~ s/\@.*//;
+       $self->setName( $name );
+       $self->setVob( $self );
+       $self->setFullName( 'vob:' . $name );
+       } else {
+	   # the type and vob arguments will only be used/checked, if the appropriate information is not encoded in the name argument
+	   my $typeName = '';
+	   my $vobTag = '';
    
-   if( $name =~ m/^\s*(\S+):(\S+)\@(\S+).*$/ ) {
-       $typeName = $1;
-       $name = $2;
-       $vobTag = $3;
-   } elsif( $name =~ m/^\s*(\S+)\@(\S+).*$/ ) {
-       Die( [ '', 'Wrong object initialization in ' .  __PACKAGE__ . ". Missing type specification.", '' ] ) unless( $type );
-       $typeName = $type;
-       $name = $1;
-       $vobTag = $2;
-   } elsif( $name !~ m/:|\@/ ) {
-       Die( [ '', 'Wrong object initialization in ' .  __PACKAGE__ . ". Missing type specification.", '' ] ) unless( $type );
-       Die( [ '', 'Wrong object initialization in ' .  __PACKAGE__ . ". Missing Vob specification.", '' ] ) unless( $vob );
-       $typeName = $type;
-       $vobTag = $vob->getTag();
-   } else {
-       Die( [ '', 'Wrong object initialization in ' .  __PACKAGE__ . " with name = $name", "Possibly missing type and/or Vob specification.", '' ] );
+	   if( $name =~ m/^\s*(\S+):(\S+)\@(\S+).*$/ ) {
+	       $typeName = $1;
+	       $name = $2;
+	       $vobTag = $3;
+	   } elsif( $name =~ m/^\s*(\S+)\@(\S+).*$/ ) {
+	       Die( [ '', 'Wrong object initialization in ' .  __PACKAGE__ . ". Missing type specification.", '' ] ) unless( $type );
+	       $typeName = $type;
+	       $name = $1;
+	       $vobTag = $2;
+	   } elsif( $name !~ m/:|\@/ ) {
+	       Die( [ '', 'Wrong object initialization in ' .  __PACKAGE__ . ". Missing type specification.", '' ] ) unless( $type );
+	       Die( [ '', 'Wrong object initialization in ' .  __PACKAGE__ . ". Missing Vob specification.", '' ] ) unless( $vob );
+	       $typeName = $type;
+	       $vobTag = $vob->getTag();
+	   } else {
+	       Die( [ '', 'Wrong object initialization in ' .  __PACKAGE__ . " with name = $name", "Possibly missing type and/or Vob specification.", '' ] );
+	   }
+
+	   Die( [ '', 'Wrong object initialization in ' .  __PACKAGE__ . ". Unknown object type = $typeName.", '' ] ) unless( grep m/^${typeName}$/, @knownTypes );
+
+	   $self->setType( $typeName );
+	   $self->setName( $name );
+	   my @vobConfig = $ClearCase::Common::Config::myHost->getRegion()->getVob( $vobTag )->typeCreationConfig();
+	   $self->setGlobalAndAcquire( $vobConfig[0] );
+	   $self->setVob( $vobConfig[1] );
+	   $self->setFullName( $typeName . ':' . $name . "\@$vobTag" );
    }
-
-   Die( [ '', 'Wrong object initialization in ' .  __PACKAGE__ . ". Unknown object type = $typeName.", '' ] ) unless( grep m/^${typeName}$/, @knownTypes );
-
-   $self->setType( $typeName );
-   $self->setName( $name );
-   my @vobConfig = $ClearCase::Common::Config::myHost->getRegion()->getVob( $vobTag )->typeCreationConfig();
-   $self->setGlobalAndAcquire( $vobConfig[0] );
-   $self->setVob( $vobConfig[1] );
-   $self->setFullName( $typeName . ':' . $name . "\@$vobTag" );
    return $self;
 }
 
@@ -112,14 +121,31 @@ sub getFromHyperlinkedObjects {
 
     Die( [ __PACKAGE__ . '::getFromHyperlinkedObjects', 'FATAL ERROR: subroutine parameter is not a ClearCase::HlType' ] ) unless( $hltype->isa( 'ClearCase::HlType' ) );
 
+    my $hltypeName => $hltype->getName();
     ClearCase::describe(
 	-long => 1,
-	-ahl => $hltype->getName(),
+	-ahl => $hltypeName,
 	-argv => $self->getFullName()
 	);
-    my @result = ClearCase::getOutput();
-    grep chomp, @result;
-    return @results
+    my @results = ClearCase::getOutput();
+    grep chomp, @results;
+
+    # get the hyperlink lines
+    @results = grep m/$hltypeName\@/, @results;
+    return @results unless( @results );
+
+    # get only the from hyperlinks
+    @results = grep m/\->/, @results;
+    return @results unless( @results );
+
+    # reduce to object identifiers, which are Meta objects or Vob pathnames
+    my @objectIdentifiers = ();
+    foreach my $line ( @results ) {
+	my @tmp = split /\s+/, $line;
+	push @objectIdentifiers, $tmp[$#tmp];
+    }
+    
+    return \@objectIdentifiers;
 }
 
 sub getToHyperlinkedObjects {
@@ -128,16 +154,67 @@ sub getToHyperlinkedObjects {
 
     Die( [ __PACKAGE__ . '::getToHyperlinkedObjects', 'FATAL ERROR: subroutine parameter is not a ClearCase::HlType' ] ) unless( $hltype->isa( 'ClearCase::HlType' ) );
 
+    my $hltypeName => $hltype->getName();
     ClearCase::describe(
 	-long => 1,
-	-ahl => $hltype->getName(),
+	-ahl => $hltypeName,
 	-argv => $self->getFullName()
 	);
-    my @result = ClearCase::getOutput();
-    grep chomp, @result;
-    return @results
+    my @results = ClearCase::getOutput();
+    grep chomp, @results;
+
+    # get the hyperlink lines
+    @results = grep m/$hltypeName\@/, @results;
+    return @results unless( @results );
+
+    # get only the to hyperlinks
+    @results = grep m/<\-/, @results;
+    return @results unless( @results );
+
+    # reduce to object identifiers, which are Meta objects or Vob pathnames
+    my @objectIdentifiers = ();
+    foreach my $line ( @results ) {
+	my @tmp = split /\s+/, $line;
+	push @objectIdentifiers, $tmp[$#tmp];
+    }
+    
+    return \@objectIdentifiers;
 }
 
+
+sub createHyperlinkFromObject {
+   my $self = shift;
+
+   my ( $hltype, $object, @other ) = $self->rearrange(
+      [ 'HLTYPE', 'OBJECT' ],
+       @_ );
+
+   Die( [ __PACKAGE__ . '::createHyperlinkFromObject', 'FATAL ERROR: subroutine parameter is not a ClearCase::HlType' ] ) unless( $hltype->isa( 'ClearCase::HlType' ) );
+   
+   my $registerLink = ClearCase::HyperLink->new(
+       -hltype => $hltype,
+       -from => $object,
+       -to => $self
+       );
+   $registerLink->create();
+}
+
+sub createHyperlinkToObject {
+   my $self = shift;
+
+   my ( $hltype, $object, @other ) = $self->rearrange(
+      [ 'HLTYPE', 'OBJECT' ],
+       @_ );
+   
+   Die( [ __PACKAGE__ . '::createHyperlinkToObject', 'FATAL ERROR: subroutine parameter is not a ClearCase::HlType' ] ) unless( $hltype->isa( 'ClearCase::HlType' ) );
+  
+   my $registerLink = ClearCase::HyperLink->new(
+       -hltype => $hltype,
+       -from => $self,
+       -to => $object
+       );
+   $registerLink->create();
+}
 1;
 
 __END__

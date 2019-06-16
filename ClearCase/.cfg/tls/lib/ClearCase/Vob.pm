@@ -10,7 +10,7 @@ sub BEGIN {
    require Exporter;
    require Data;
 
-   @ISA = qw(Exporter Data);
+   @ISA = qw(Exporter Data ClearCase::Common::MetaObject);
 
    @EXPORT = qw(
    );
@@ -29,19 +29,7 @@ sub BEGIN {
        AdminVob => { CALCULATE => \&loadVob },            # will be set to 1 (true) if the vob is an administrative vob
        MyAdminVob => { CALCULATE => \&loadVob },          # will contain the Vob object of the adminstrative vob of this vob, if this vob is a vob client.
                                                           # if this vob is not a client of an administrative vob then this attribute will be set to undef.
-                                                          #
-                                                          # The creation of type objects (currently only implemented for hyperlink, label and branch types)
-                                                          # depends on the setting of these two attributes: AdminVob, MyAdminVob.
-                                                          # It is guaranteed that new type objects will only be created as ordinary type objects if
-                                                          # both attributes are set to 0 resp. undef.
-                                                          # Otherwise new type objects will be created in the appropriate admin vob as global type objects.
-
-       LabelTypes => { CALCULATE => \&loadLabelTypes },
-       HyperlinkTypes => { CALCULATE => \&loadHyperlinkTypes },
-       ElementTypes => { CALCULATE => \&loadElementTypes },
-       TriggerTypes => { CALCULATE => \&loadTriggerTypes },
        RootElement => { CALCULATE => \&loadRootElement },
-       Name         => { CALCULATE => \&loadName },
        Hostname  => { CALCULATE => \&loadVob },
        Owner        => { CALCULATE => \&loadVob },
        Hpath         => { CALCULATE => \&loadVob },
@@ -54,7 +42,7 @@ sub BEGIN {
 
    Data::init(
       PACKAGE  => __PACKAGE__,
-      SUPER    => undef
+       SUPER    => ClearCase::Common::MetaObject
       );
 
 } # sub BEGIN()
@@ -68,6 +56,8 @@ sub _init {
 	@_ );
 
     Die( [ "Missing tag for ClearCase::Vob initialization" ] ) unless( $tag );
+
+    $self->SUPER::init( -type => 'vob', -name => $tag );
       
     $self->setPassword( $passwd ) if $passwd;
     $self->setGpath( $gpath ) if( $gpath );
@@ -75,21 +65,6 @@ sub _init {
     $self->setHostname( $hostname ) if( $hostname );
     $self->setTag( $tag );
   }
-
-sub new {
-    my $proto = shift;
-    my $class = ref ($proto) || $proto;
-    my $self  = {};
-    bless $self, $class;
-    $self->_init( @_ );
-    return $self;
-} # new ()
-
-sub loadName {
-   my $self = shift;
-   require File::Basename;
-   return $self->setName( File::Basename::basename( $self->getTag() ) );
-}
 
 sub loadRootElement {
     my $self = shift;
@@ -118,7 +93,7 @@ sub loadMyReplica {
 
     ClearCase::describe(
 	-fmt => '"%[replica_name]p"',
-	-argv => 'vob:' . $self->getTag()
+	-argv => $self->getFullName()
 	);
     my $rep = ClearCase::getOutputLine();
     chomp $rep;
@@ -135,7 +110,7 @@ sub loadVob {
 
     ClearCase::describe(
 	-long => 1,
-	-argv => 'vob:' . $self->getTag()
+	-argv => $self->getFullName()
 	);
     my @erg = ClearCase::getOutput();
     grep chomp, @erg;
@@ -168,26 +143,24 @@ sub loadVob {
     return;
 }
 
-sub exists
-  {
-      my $self = shift;
+sub exists {
+    my $self = shift;
 
-      unless( defined $self->getExists() ) {
-	  ClearCase::disableErrorOut();
-	  ClearCase::disableDieOnErrors();
-	  ClearCase::describe(
-	      -argv => 'vob:' . $self->getTag(),
-	      -short    => 1
-	      );
-	  my $ex = ( ClearCase::getRC() == 0 );
-	  ClearCase::enableErrorOut();
-	  ClearCase::enableDieOnErrors();
-	  $self->setExists( $ex ) if( $ex );
-	  return $ex;
-      } else {
-	  return $self->getExists();
-      }
-  }
+    unless( defined $self->getExists() ) {
+	ClearCase::disableErrorOut();
+	ClearCase::disableDieOnErrors();
+	ClearCase::describe(
+	    -argv => $self->getFullName(),
+	    -short    => 1
+	    );
+	my $ex = ( ClearCase::getRC() == 0 );
+	ClearCase::enableErrorOut();
+	ClearCase::enableDieOnErrors();
+	$self->setExists( $ex ) if( $ex );
+	return $ex;
+    }
+    return $self->getExists();
+}
 
 sub mount
   {
@@ -238,189 +211,6 @@ sub typeCreationConfig {
     $config[0] = $GlobalAndAcquire;
     $config[1] = $targetVob;
     return @config;
-}
-
-sub loadHyperlinkTypes {
-   my $self = shift;
-
-   # this subroutine will only be called once,
-   # it initializes the attribute HyperlinkTypes
-   # with a reference to an hash containing the hyperlink type objects,
-   # for hyperlink types existed at time of subroutine execution.
-   ClearCase::lstype(
-      -short      => 1,
-      -kind       => 'hltype',
-      -invob      => $self->getTag() );
-
-   my @hyperlinks = ClearCase::getOutput();
-   grep( chomp, @hyperlinks );
-
-   my %hltypes = ();
-   foreach ( @hyperlinks ) {
-       $hltypes{ $_ } = ClearCase::HlType->new( -name => "$_", -vob => $self );
-   }
-   return $self->setHyperlinkTypes( \%hltypes );
-}
-
-sub getHlType {
-    my $self = shift;
-    my $name = shift;
-
-    my %tmp = %{ $self->getHyperlinkTypes() };
-    return $tmp{ $name } if( defined $tmp{ $name } );
-    my $hltype = ClearCase::HlType->new( -name => $name, -vob => $self );
-    if( $hltype->exists() ) {
-	$tmp{ $name } = $hltype;
-	$self->setHyperlinkTypes( \%tmp );
-	return $hltype;
-    }
-    return undef;
-}
-
-sub ensureHyperlinkType {
-    my $self = shift;
-
-    my ( $name, @other ) = $self->rearrange(
-	[ qw( NAME ) ],
-	@_ );
-
-    my $hltype = $self->getHlType( $name );
-    return $hltype if( $hltype );
-
-    my %tmp = %{ $self->getHyperlinkTypes() };
-
-    unless( $hltype->exists() ) {
-	my @config = $self->typeCreationConfig();
-	$hltype = ClearCase::HlType->new( -name => $name, -vob  => $config[1] );
-	ClearCase::mkhltype(
-	    -name    => $name,
-	    -global  => $config[0],
-	    -acquire => $config[0],
-	    -vob     => $config[1]->getTag()
-	    );
-    }
-    $tmp{ $name } = $hltype;
-    $self->setHyperlinkTypes( \%tmp );
-    return $hltype;
-}
-
-sub loadElementTypes {
-   my $self = shift;
-
-   # this subroutine will only be called once,
-   # it initializes the attribute ElementTypes
-   # with a reference to an hash containing the element type objects,
-   # for element types existed at time of subroutine execution.
-   ClearCase::lstype(
-      -short      => 1,
-      -kind       => 'eltype',
-      -invob      => $self->getTag() );
-
-   my @typenames = ClearCase::getOutput();
-   grep( chomp, @typenames );
-
-   my %types = ();
-   foreach ( @typenames ) {
-       $types{ $_ } = ClearCase::ElType->new( -name => "$_", -vob => $self );
-   }
-   return $self->setElementTypes( \%types );
-}
-
-sub loadTriggerTypes {
-   my $self = shift;
-
-   # this subroutine will only be called once,
-   # it initializes the attribute TriggerTypes
-   # with a reference to an hash containing the trigger type objects,
-   # for trigger types existed at time of subroutine execution.
-   ClearCase::lstype(
-      -short      => 1,
-      -kind       => 'trtype',
-      -invob      => $self->getTag() );
-
-   my @typenames = ClearCase::getOutput();
-   grep( chomp, @typenames );
-
-
-   my %types = ();
-   foreach ( @typenames ) {
-       $types{ $_ } = ClearCase::TrType->new( -name => "$_", -vob => $self );
-   }
-   return $self->setTriggerTypes( \%types );
-}
-
-sub loadLabelTypes {
-    my $self = shift;
-
-    # this subroutine will only be called once,
-    # it initializes the attribute LabelTypes
-    # with a reference to an empty hash.
-    my %types = ();
-    return $self->setLabelTypes( \%types );
-}
-
-sub getLbType {
-    my $self = shift;
-    my $name = shift;
-
-    my %tmp = %{ $self->getLabelTypes() };
-    return $tmp{ $name } if( defined $tmp{ $name } );
-    my $lbtype = ClearCase::LbType->new( -name => $name, -vob => $self );
-    if( $lbtype->exists() ) {
-	$tmp{ $name } = $lbtype;
-	$self->setLabelTypes( \%tmp );
-	return $lbtype;
-    }
-    return undef;
-}
-
-sub ensureLabelType {
-    my $self = shift;
-
-    my ( $name, $pbranch, @other ) = $self->rearrange(
-	[ qw( NAME PBRANCH ) ],
-	@_ );
-
-    my $lbtype = $self->getLbType( $name );
-    return $lbtype if( $lbtype );
-
-    if( $pbranch ) {
-	$pbranch = 1;
-    } else {
-	$pbranch = 0;
-    }
-    my %tmp = %{ $self->getLabelTypes() };
-
-    unless( $lbtype->exists() ) {
-	my @config = $self->typeCreationConfig();
-	$lbtype = ClearCase::LbType->new( -name => $name, -vob => $config[1] );
-	ClearCase::mklbtype(
-	    -name    => $name,
-	    -pbranch => $pbranch,
-	    -global  => $config[0],
-	    -acquire => $config[0],
-	    -vob     => $config[1]->getTag()
-	    );
-    }
-    $lbtype->setPerBranch( $pbranch );
-    $tmp{ $name } = $lbtype;
-    $self->setLabelTypes( \%tmp );
-    return $lbtype;
-}
-
-sub renameLabelType {
-    my $self = shift;
-
-    my ( $oldName, $newName, @other ) = $self->rearrange(
-	[ qw( OLDNAME NEWNAME ) ],
-	@_ );
-
-    my $oldLabelType = $self->getLbType( $oldName );
-    my %tmp = %{ $self->getLabelTypes() };
-    $tmp{ $oldName } = undef;
-    $tmp{ $newName } = $oldLabelType->rename( $newName );
-    $self->setLabelTypes( \%tmp );
-    return $tmp{ $newName };
 }
 
 sub loadFamilyID
@@ -509,7 +299,7 @@ __END__
 
 =head1 AUTHOR INFORMATION
 
- Copyright (C) 2007 Uwe Satthoff
+ Copyright (C) 2001, 2007 Uwe Satthoff
 
 =head1 CREDITS
 
