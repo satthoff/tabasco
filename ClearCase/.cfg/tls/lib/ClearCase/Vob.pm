@@ -56,6 +56,7 @@ sub _init {
 	@_ );
 
     Die( [ "Missing tag for ClearCase::Vob initialization" ] ) unless( $tag );
+    $tag =~ s/^vob://;
 
     $self->SUPER::init( -type => 'vob', -name => $tag );
       
@@ -270,7 +271,8 @@ sub load
 	 chomp $tag;
      }
    else
-     {
+   {
+       $path =~ s/^vob://;
 	 ClearCase::describe(
 			     -short => 1,
 			     -argv => 'vob:' . $path

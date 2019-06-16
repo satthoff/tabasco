@@ -89,59 +89,37 @@ B<BrType.pm> [options]
 =cut
 
 # ============================================================================
-# Preloaded methods go here.
 
-
-# ===========================================================================
-
-=head2 FUNCTION _init
-
-DESCRIPTION
-
-ARGUMENTS
-
- $self         the object
-
-RETURN VALUE
-
-=cut
 
 sub _init {
    my $self = shift;
 
-   $self->SUPER::_init( -type => 'attype', @_ );
-   return;
+   $self->SUPER::_init( -type => 'brtype', @_ );
+   return $self;
 } # _init
 
 
-
-# ===========================================================================
-
-=head2 FUNCTION create
-
-DESCRIPTION
-
-ARGUMENTS
-
- $self         the object
-
-RETURN VALUE
-
-=cut
-
 sub create {
-   my $self = shift;
+    my $self = shift;
 
-   # needs to be changed to use $self->getVob()->ensureAttributeType( -name => $self->getName() )
-   ClearCase::mkattype(
-      -name    => $self->getName(),
-      -vob     => $self->getVob()->getTag()
-      );
+    my ( $pbranch, $comment, @other ) = $self->rearrange(
+	[ 'PBRANCH', 'COMMENT' ],
+	@_ );
+    unless( $pbranch ) {
+	$pbranch = 0;
+    }
+    
+    ClearCase::mkattype(
+	-name    => $self->getName(),
+	-pbranch => $pbranch,
+	-global  => $self->getGlobalAndAcquire(),
+	-acquire => $self->getGlobalAndAcquire(),
+	-vob     => $self->getAdminVob()->getTag(),
+	-comment => $comment
+	);
 
-   return;
-} # create
-
-
+    return $self;
+}
 
 # ============================================================================
 # Autoload methods go after =cut, and are processed by the autosplit program.

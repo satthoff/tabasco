@@ -26,7 +26,8 @@ sub BEGIN {
        Registry => { CALCULATE => \&loadHostinfo },
        CCVersion => { CALCULATE => \&loadHostinfo },
        OS => { CALCULATE => \&loadHostinfo },
-       LicenseHost => { CALCULATE => \&loadHostinfo }
+       LicenseHost => { CALCULATE => \&loadHostinfo },
+       CurrentView => { CALCULATE => \&loadCurrentView }
        );
 
    Data::init(
@@ -66,7 +67,7 @@ sub loadRegion {
     return $self->setRegion( $self->getRegistry()->getRegion( $self->getRegionName() ) );
 }
 
-sub currentView {
+sub loadCurrentView {
     my $self = shift;
     
     require ClearCase::View;
@@ -74,7 +75,7 @@ sub currentView {
     my $tag = ClearCase::getOutputLine();
     chomp $tag;
     if( defined $tag and $tag !~ m/NONE/ ) {
-        return $self->getRegion()->getView( $tag );
+        return $self->setCurrentView( $self->getRegion()->getView( $tag ) );
     } else {
         return undef;
     }

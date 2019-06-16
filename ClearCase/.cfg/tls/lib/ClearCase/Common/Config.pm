@@ -17,10 +17,10 @@ sub BEGIN {
    );
 } # sub BEGIN()
 
-use vars qw/ $myHost /;
+use vars qw/ $myHost $adminVobLink /;
 
 BEGIN {
-    
+    $adminVobLink = 'AdminVOB';
     my $hostname = `hostname`;
     chomp $hostname;
     $myHost = ClearCase::Host->new( -hostname => $hostname );

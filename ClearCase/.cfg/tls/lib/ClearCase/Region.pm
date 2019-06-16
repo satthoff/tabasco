@@ -98,6 +98,7 @@ sub getVob {
     return $tmp{ $tag } if( defined $tmp{ $tag } );
 
     # the provided tag could be a valid pathname into the vob
+    # or a full name with prefix vob:
     my $tryVob = ClearCase::Vob->load( -tag => $tag );
     if( $tryVob ) {
 	$tag = $tryVob->getTag();

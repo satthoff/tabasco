@@ -92,8 +92,64 @@ sub create {
 	-object => $self->_createFloatingRelease()
 	);
 
+    # TBD - insert code for sub path selection!
+    # TBD - insert code for sub path selection!
+    
+    my $cspec = $self->_createConfigSpec();
+    
     return $self;
 }
+
+sub initializeMainTask {
+    my $baselineName = shift;
+
+    my $mainTask = TaBasCo::Task->new( -name => 'main' );
+    my $baseline = TaBasCo::Release->new( -name => $baselineName );
+    unless( $baseline->SUPER::exists() ) {
+	Die( [ __PACKAGE__ . '::initializeMainTask', "Label Type $baselineName to be used as baseline for the main task does not exist." ] );
+    }
+    
+    # register the main task as a known task
+    $mainTask>createHyperlinkFromObject(
+	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::taskLink ),
+	-object => $self->getVob()->getMyReplica()
+	);
+
+    # register the provided baseline as the task baseline
+    $mainTask->createHyperlinkToObject(
+	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::baselineLink ),
+	-object => $baseline
+	);
+    
+    # create the main task's floating release
+    # and register it as the task's first release
+    my $floatingRelease = TaBasCo::Release->new( -name -> uc( $self->getName() . $TaBasCo::Common::Config::floatingReleaseExtension ) );
+    $floatingRelease->SUPER::create();
+    $mainTask->createHyperlinkToObject(
+	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::firstReleaseLink ),
+	-object => $floatingRelease
+	);
+    $floatingRelease->_registerAsTaskMember( $mainTask );
+    $mainTask->setFloatingRelease( $floatingRelease );
+
+    # attach the initial path hyperlinks
+    my @elements = ();
+    if( $mainTask->getVob()->getAdminVob() ) {
+	# the TABASCO installation Vob is an administrative Vob
+	my @siblingVobs = $mainTask->getVob()->getToHyperlinkedObjects( ClearCase::HlType->new( -name => $ClearCase::Common::Config::adminVobLink ) );
+	foreach my $sv ( @siblingVobs ) {
+	    push @elements, $ClearCase::Common::Config::myhost->getRegion()->getVob( $sv )->getRootElement();
+	}
+    }
+    push @elements, $mainTask->getVob()->getRootElement();
+    
+    foreach my $elem ( @elements ) {
+	$mainTask->createHyperlinkToObject(
+	    -hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::pathLink ),
+	    -object => $elem
+	    );
+    }
+}   
 
 sub createNewRelease {
     my $self = shift;
@@ -169,16 +225,6 @@ sub loadParent {
     return $self->setParent( $baseline->getTask() );
 }
 
-sub gmtTimeString {
-    my $self = shift;
-
-    my @gmt = gmtime();
-    my @month = qw( Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
-    my $year = $gmt[5] + 1900;
-    my $timeString = sprintf( "%s.%s.%s-GMT-%d.%d.%d", $gmt[3], $month[ $gmt[4] ], $year, $gmt[2], $gmt[1], $gmt[0]);
-    return $timeString;
-}
-
 sub nextReleaseName {
     my $self = shift;
     return uc( $self->getName() ) . '_' . $self->gmtTimeString();
@@ -189,7 +235,7 @@ sub mkPath {
     my $path = shift;
     ClearCase::mkhlink(
 	-hltype => $TaBasCo::Common::Config::pathLink,
-	-from   => $self->getVXPN(),
+	-from   => $self->getFullName(),
 	-to     => $path . '/.@@'
 	);
     $self->setPath( $path );
@@ -222,6 +268,76 @@ sub loadCspecPath {
 	push @cspecPaths, ClearCase::Element->new( -pathname => $p )->getCspecPath();
     }
     return $self->setCspecPath( \@cspecPaths );
+}
+
+sub _createConfigSpec  {
+    my $self = shift;
+
+    my $config_spec = &TaBasCo::Common::Config::cspecHeader();
+
+    push @$config_spec, '';
+    push @$config_spec, $TaBasCo::Common::Config::cspecDelimiter;
+    push @$config_spec, '# BEGIN  Task : ' . $self->getName();
+    my $pT = 'NONE';
+    if( $self->getParent() )
+      {
+	$pT = $self->getParent()->getName();
+      }
+    push @$config_spec, '# Parent Task : ' . $pT;
+    push @$config_spec, $TaBasCo::Common::Config::cspecDelimiter;
+
+    my $act = $self;
+    my $baseline = $act->getBaseline();
+    unless( $baseline )
+      {
+	foreach my $p ( @{ $act->getCspecPath() } )
+	  {
+	    push @$config_spec, "element $p /" . $act->getName() . "/LATEST";
+	  }
+      }
+    else
+      {
+	foreach my $p ( @{ $act->getCspecPath() } )
+	  {
+	    push @$config_spec, "element $p .../" . $act->getName() . "/LATEST";
+	  }
+	push @$config_spec, "mkbranch " . $act->getName();
+	my @paths = @{ $act->getPath() };
+	my @cspecPaths = @{ $act->getCspecPath() };
+	while( my $p = shift  @paths and  my $cp = shift @cspecPaths  )
+	  {
+	    while( $baseline )
+	      {
+		if( $baseline->pathVisible( $p, $view ) )
+		  {
+		    push @$config_spec, "element $cp " . $baseline->getName();
+		  }
+		$baseline = $baseline->getPrevious();
+	      }
+	    $baseline = $act->getBaseline();
+	  }
+	$baseline = $act->getBaseline();
+	foreach my $p ( @{ $act->getCspecPath() } )
+	  {
+	    push @$config_spec, "element $p /main/0";
+	  }
+	push @$config_spec, "end mkbranch " . $act->getName();
+	while( $baseline )
+	  {
+	    foreach my $p ( @{ $baseline->getTask()->getCspecPath() } )
+	      {
+		push @$config_spec, "element " . $p . ' ' . $baseline->getName() . " -nocheckout";
+	      }
+	    $baseline = $baseline->getPrevious();
+	  }
+      }
+
+    push @$config_spec, '# END   Task : ' . $self->getName();
+    push @$config_spec, $TaBasCo::Common::Config::cspecDelimiter;
+    push @$config_spec, 'element * /main/0 -nocheckout';
+    grep chomp, @$config_spec;
+
+    return $config_spec;
 }
 1;
 

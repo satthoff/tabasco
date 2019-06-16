@@ -24,6 +24,7 @@ sub BEGIN {
        Name => undef,
        Type => undef,
        Vob => undef,
+       AdminVob => undef,
        FullName => undef,
        Exists => undef,
        GlobalAndAcquire => undef
@@ -62,6 +63,7 @@ sub _init {
        $name =~ s/\@.*//;
        $self->setName( $name );
        $self->setVob( $self );
+       $self->setAdminVob( $self );
        $self->setFullName( 'vob:' . $name );
        } else {
 	   # the type and vob arguments will only be used/checked, if the appropriate information is not encoded in the name argument
@@ -73,26 +75,27 @@ sub _init {
 	       $name = $2;
 	       $vobTag = $3;
 	   } elsif( $name =~ m/^\s*(\S+)\@(\S+).*$/ ) {
-	       Die( [ '', 'Wrong object initialization in ' .  __PACKAGE__ . ". Missing type specification.", '' ] ) unless( $type );
+	       Die( [ __PACKAGE__ , 'Wrong object initialization. Missing type specification.' ] ) unless( $type );
 	       $typeName = $type;
 	       $name = $1;
 	       $vobTag = $2;
 	   } elsif( $name !~ m/:|\@/ ) {
-	       Die( [ '', 'Wrong object initialization in ' .  __PACKAGE__ . ". Missing type specification.", '' ] ) unless( $type );
-	       Die( [ '', 'Wrong object initialization in ' .  __PACKAGE__ . ". Missing Vob specification.", '' ] ) unless( $vob );
+	       Die( [ __PACKAGE__ , 'Wrong object initialization. Missing type specification.' ] ) unless( $type );
+	       Die( [ __PACKAGE__ , 'Wrong object initialization. Missing Vob specification.' ] ) unless( $vob );
 	       $typeName = $type;
 	       $vobTag = $vob->getTag();
 	   } else {
-	       Die( [ '', 'Wrong object initialization in ' .  __PACKAGE__ . " with name = $name", "Possibly missing type and/or Vob specification.", '' ] );
+	       Die( [ __PACKAGE__ , "Wrong object initialization with name = $name", "Possibly missing type and/or Vob specification." ] );
 	   }
 
-	   Die( [ '', 'Wrong object initialization in ' .  __PACKAGE__ . ". Unknown object type = $typeName.", '' ] ) unless( grep m/^${typeName}$/, @knownTypes );
+	   Die( [ __PACKAGE__ , "Wrong object initialization. Unknown object type = $typeName." ] ) unless( grep m/^${typeName}$/, @knownTypes );
 
 	   $self->setType( $typeName );
 	   $self->setName( $name );
-	   my @vobConfig = $ClearCase::Common::Config::myHost->getRegion()->getVob( $vobTag )->typeCreationConfig();
+	   $self->setVob( $ClearCase::Common::Config::myHost->getRegion()->getVob( $vobTag ) );
+	   my @vobConfig = $self->getVob( $vobTag )->typeCreationConfig();
 	   $self->setGlobalAndAcquire( $vobConfig[0] );
-	   $self->setVob( $vobConfig[1] );
+	   $self->setAdminVob( $vobConfig[1] );
 	   $self->setFullName( $typeName . ':' . $name . "\@$vobTag" );
    }
    return $self;

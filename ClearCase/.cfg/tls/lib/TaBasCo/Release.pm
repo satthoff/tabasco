@@ -83,38 +83,6 @@ sub registerAsNextReleaseOf {
     return $self;
 }
 
-
-sub pathVisible
-  {
-    my $self = shift;
-    my $path = shift;
-    my $view = shift;
-
-    Transaction::start( -comment => "set correct config spec to check path existence in release " . $self->getName() );
-    my $cspecFile = $self->getVXPN();
-    open FD, "$cspecFile";
-    my @cspec = <FD>;
-    close FD;
-    grep chomp, @cspec;
-    # delete all carrige return from contents,
-    # which will be added by changes edited on Windows
-    grep s/\r//g, @cspec;
-    $view->setConfigSpec( \@cspec );
-    my $ret = ( -e $path );
-    Debug( [  __PACKAGE__ . "::pathVisible >$path<" ] );
-    if( $ret )
-      {
-	Debug( [ '    path is visible' ] );
-      }
-    else
-      {
-	Debug( [ '    path is NOT visible' ] );
-      }
-    Transaction::rollback(); # reset the config spec
-    return $ret;
-  }
-
-
 sub loadPrevious {
     my $self = shift;
 
@@ -132,7 +100,6 @@ sub loadPrevious {
     return $self->setPrevious( $release );
 }
 
-
 sub loadTask {
     my $self = shift;
 
@@ -147,8 +114,14 @@ sub loadTask {
     }
     
     return $self->setTask( $task );
-  }
+}
 
+sub createConfigSpec  {
+    my $self = shift;
+
+    my $config_spec = &TaBasCo::Common::Config::cspecHeader();
+
+}
 1;
 
 __END__
