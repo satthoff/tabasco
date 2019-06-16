@@ -227,7 +227,7 @@ sub loadParent {
 
 sub nextReleaseName {
     my $self = shift;
-    return uc( $self->getName() ) . '_' . $self->gmtTimeString();
+    return uc( $self->getName() ) . '_' . &TaBasCo::Common::Config::gmtTimeString();
 }
 
 sub mkPath {

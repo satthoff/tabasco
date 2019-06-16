@@ -68,6 +68,7 @@ sub run {
   # existence of the release will be checked during task creation
   
   my $newTask = TaBasCo::Task->new( -name => $taskName );
+  $taskName = $newTask->getFullName();
   if( $newTask->exists() ) {
       Error( [ __PACKAGE__ , "A task with name $taskName already exists." ] );
       $self->exitInstance( -1 );

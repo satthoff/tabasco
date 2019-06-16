@@ -58,8 +58,7 @@ sub BEGIN {
 sub _init {
    my $self = shift;
 
-   $self->SUPER::_init( -type => 'lbtype', @_ );
-   return $self;
+   return $self->SUPER::_init( -type => 'lbtype', @_ );
 } # _init
 
 sub create {

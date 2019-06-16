@@ -38,8 +38,7 @@ sub BEGIN {
 sub _init {
    my $self = shift;
 
-   $self->SUPER::_init( -vob => $TaBasCo::Common::Config::myVob, @_ );
-   return $self;
+   return $self->SUPER::_init( -vob => $TaBasCo::Common::Config::myVob, @_ );
 } # _init
 
 sub create {
