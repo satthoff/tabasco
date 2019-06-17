@@ -24,7 +24,6 @@ sub BEGIN {
        Name => undef,
        Type => undef,
        Vob => undef,
-       AdminVob => undef,
        FullName => undef,
        Exists => undef,
        GlobalAndAcquire => undef
@@ -63,7 +62,6 @@ sub _init {
        $name =~ s/\@.*//;
        $self->setName( $name );
        $self->setVob( $self );
-       $self->setAdminVob( $self );
        $self->setFullName( 'vob:' . $name );
        } else {
 	   # the type and vob arguments will only be used/checked, if the appropriate information is not encoded in the name argument
@@ -93,9 +91,13 @@ sub _init {
 	   $self->setType( $typeName );
 	   $self->setName( $name );
 	   $self->setVob( $ClearCase::Common::Config::myHost->getRegion()->getVob( $vobTag ) );
+
+	   # check for an administrative Vob hierarchy
 	   my @vobConfig = $self->getVob( $vobTag )->typeCreationConfig();
+	   
 	   $self->setGlobalAndAcquire( $vobConfig[0] );
-	   $self->setAdminVob( $vobConfig[1] );
+	   $self->setVob( $vobConfig[1] );
+	   $vobTag = $self->getVob()->getTag();
 	   $self->setFullName( $typeName . ':' . $name . "\@$vobTag" );
    }
    return $self;

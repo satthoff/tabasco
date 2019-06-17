@@ -134,8 +134,10 @@ sub create {
 
    # still needs to be changed to use $self->getVob()->ensureElementType( -name => $self->getName() )
    ClearCase::mkeltype(
-      -name    => $self->getName(),
-      -vob     => $self->getVob()->getTag()
+       -name    => $self->getName(),
+       -global  => $self->getGlobalAndAcquire(),
+       -acquire => $self->getGlobalAndAcquire(),
+       -vob     => $self->getVob()->getTag()
       );
 
    return;

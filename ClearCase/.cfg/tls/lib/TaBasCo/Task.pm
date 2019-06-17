@@ -95,7 +95,7 @@ sub create {
     # TBD - insert code for sub path selection!
     # TBD - insert code for sub path selection!
     
-    my $cspec = $self->_createConfigSpec();
+    # my $cspec = $self->_createConfigSpec();
     
     return $self;
 }
@@ -134,12 +134,9 @@ sub initializeMainTask {
 
     # attach the initial path hyperlinks
     my @elements = ();
-    if( $mainTask->getVob()->getAdminVob() ) {
-	# the TABASCO installation Vob is an administrative Vob
-	my @siblingVobs = $mainTask->getVob()->getToHyperlinkedObjects( ClearCase::HlType->new( -name => $ClearCase::Common::Config::adminVobLink ) );
-	foreach my $sv ( @siblingVobs ) {
-	    push @elements, $ClearCase::Common::Config::myhost->getRegion()->getVob( $sv )->getRootElement();
-	}
+    my @siblingVobs = $mainTask->getVob()->getToHyperlinkedObjects( ClearCase::HlType->new( -name => $ClearCase::Common::Config::adminVobLink ) );
+    foreach my $sv ( @siblingVobs ) {
+	push @elements, ClearCase::Vob->new( -tag => $sv )->getRootElement();
     }
     push @elements, $mainTask->getVob()->getRootElement();
     

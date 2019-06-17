@@ -133,9 +133,13 @@ RETURN VALUE
 sub create {
    my $self = shift;
 
-   # ensure the hyperlink type exists in my Vob
-   $self->getVob()->ensureHyperlinkType( -name => $self->getName() );
-
+   ClearCase::mkbrtype(
+       -name    => $self->getName(),
+       -global  => $self->getGlobalAndAcquire(),
+       -acquire => $self->getGlobalAndAcquire(),
+       -vob     => $self->getVob()->getTag(),
+       -comment => $comment
+       );
    return $self;
 } # create
 
