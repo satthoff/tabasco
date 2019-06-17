@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/opt/rational/clearcase/bin/Perl
 #############################################################################
 use strict;
 
