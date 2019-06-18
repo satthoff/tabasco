@@ -88,13 +88,18 @@ sub rename {
     my $self = shift;
     my $newName = shift;
 
-    my $newLbType = $self->new( -name => $newName, -vob => $self->getVob() );
+    my $tmpLbType = $self->new( -name => $newName, -vob => $self->getVob() );
     ClearCase::rename(
 	-oldname => $self->getFullName(),
-	-newname => $newLbType->getFullName()
+	-newname => $tmpLbType->getFullName()
 	);
-    $newLbType->setPerBranch( $self->getPerBranch() );
-    return $newLbType;
+
+    # in ClearCase the label type has been renamed,
+    # but we have to do it as well for our ClearCase::LbType object in our process memory
+    $self->setName( $tmpLbType->getName() );
+    $self->setFullName( $tmpLbType->getFullName() );
+    
+    return $self;
 }
 
 

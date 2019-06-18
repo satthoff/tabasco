@@ -27,7 +27,8 @@ sub BEGIN {
        Path      => { CALCULATE => \&loadPath },
        CspecPath => { CALCULATE => \&loadCspecPath },
        Baseline  => { CALCULATE => \&loadBaseline },
-       FloatingRelease => { CALCULATE => \&loadFloatingRelease }
+       FloatingRelease => { CALCULATE => \&loadFloatingRelease },
+       LastRelease => { CALCULATE => \&loadLastRelease }
        );
 
    Data::init(
@@ -105,13 +106,20 @@ sub initializeMainTask {
 
     my $mainTask = TaBasCo::Task->new( -name => 'main' );
     my $baseline = TaBasCo::Release->new( -name => $baselineName );
+    
+    # check whether the initialization has already been performed
+    my $taskLink = ClearCase::HlType->new( -name => $TaBasCo::Common::Config::taskLink );
+    if( $mainTask->getToHyperlinkedObjects->( $taskLink ) )  {
+	Die( [ __PACKAGE__ . '::initializeMainTask', "The main task has already been initialized." ] );
+    }
+    
     unless( $baseline->SUPER::exists() ) {
 	Die( [ __PACKAGE__ . '::initializeMainTask', "Label Type $baselineName to be used as baseline for the main task does not exist." ] );
     }
-    
+
     # register the main task as a known task
-    $mainTask>createHyperlinkFromObject(
-	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::taskLink ),
+    $mainTask->createHyperlinkFromObject(
+	-hltype => $taskLink,
 	-object => $self->getVob()->getMyReplica()
 	);
 
@@ -133,6 +141,7 @@ sub initializeMainTask {
     $mainTask->setFloatingRelease( $floatingRelease );
 
     # attach the initial path hyperlinks
+    # we expect that TABASCO has been installed in the root Vob of an adminstrative Vob hierarchy or in an ordinary Vob.
     my @elements = ();
     my @siblingVobs = $mainTask->getVob()->getToHyperlinkedObjects( ClearCase::HlType->new( -name => $ClearCase::Common::Config::adminVobLink ) );
     foreach my $sv ( @siblingVobs ) {
@@ -146,6 +155,12 @@ sub initializeMainTask {
 	    -object => $elem
 	    );
     }
+
+    # We create a new release in the main task.
+    # This new release can be used as the baseline for the first other tasks being created.
+    $mainTask->createNewRelease();
+    
+    return $mainTask;
 }   
 
 sub createNewRelease {
@@ -198,6 +213,15 @@ sub loadFloatingRelease {
     return undef;
 }
 
+sub loadLastRelease {
+    my $self = shift;
+
+    my $floatingRelease = ;
+    my $lastRelease = $self->getFloatingRelease()->getPrevious();
+    return $self->setLastRelease if( $lastRelease );
+    return undef;
+}
+
 sub loadBaseline {
     my $self = shift;
 
@@ -217,6 +241,7 @@ sub loadBaseline {
 sub loadParent {
     my $self = shift;
 
+    return undef if( $self->getName() eq 'main' ); # Task 'main' has no parent task, it is the root task of all ever existing tasks.
     my $baseline = $self->getBaseline();
     return undef unless( $baseline );
     return $self->setParent( $baseline->getTask() );
