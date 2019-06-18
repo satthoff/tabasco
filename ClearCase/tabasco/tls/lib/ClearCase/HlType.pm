@@ -133,7 +133,7 @@ RETURN VALUE
 sub create {
    my $self = shift;
 
-   ClearCase::mkbrtype(
+   ClearCase::mkhltype(
        -name    => $self->getName(),
        -global  => $self->getGlobalAndAcquire(),
        -acquire => $self->getGlobalAndAcquire(),

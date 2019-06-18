@@ -120,6 +120,20 @@ sub exists {
     return $ex;
 }
 
+
+sub lock {
+    my $self = shift;
+
+    my ( $obsolete, @other ) = $self->rearrange(
+	[ 'OBSOLETE' ],
+	@_ );
+
+    ClearCase::lock(
+	-obsolete => $obsolete,
+	-object   => $self->getFullName()
+	);
+}
+
 sub getFromHyperlinkedObjects {
     my $self = shift;
     my $hltype = shift; # we expect an object of class ClearCase::HlType

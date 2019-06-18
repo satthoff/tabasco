@@ -32,22 +32,26 @@ use vars qw/ $pathLink $cspecLabel $nextLabelExtension $base $myVob $baselineLin
     $nextReleaseLink
     $floatingReleaseExtension
     $myTaskLink
+    $initialTaBasCoBaseline
 
     @allHlTypes
+    @allLbTypes
     
     /;
 
 
 BEGIN {
-    $baselineLink = 'taskBaseline';
-    $taskLink = 'registeredTask';
-    $firstReleaseLink = 'taskFirstRelease';
-    $nextReleaseLink = 'taskNextRelease';
+    my $tabascoPrefix = 'tabasco_';
+    $initialTaBasCoBaseline = $tabascoPrefix . 'InitialBaseline';
+    $baselineLink = $tabascoPrefix . 'TaskBaseline';
+    $taskLink = $tabascoPrefix . 'RegisteredTask';
+    $firstReleaseLink = $tabascoPrefix . 'TaskFirstRelease';
+    $nextReleaseLink = $tabascoPrefix . 'TaskNextRelease';
     $floatingReleaseExtension = '_NEXT';
-    $floatingReleaseLink = 'floatingReleaseLink';
-    $myTaskLink = 'memberOfTask';
+    $floatingReleaseLink = $tabascoPrefix . 'FloatingReleaseLink';
+    $myTaskLink = $tabascoPrefix . 'MemberOfTask';
     $cspecDelimiter = '#-------------------------------------------------------------------------------------';
-    $pathLink = 'TabascoPath';
+    $pathLink = $tabascoPrefix . 'Path';
     $nextLabelExtension = '_NEXT';
     $toolRoot = 'tabasco';
     $toolPath = 'tls';
@@ -61,6 +65,10 @@ BEGIN {
     @allHlTypes = qw/
 	$baselineLink $taskLink $nextReleaseLink
 	$floatingReleaseLink $myTaskLink $pathLink
+	/;
+    
+    @allLbTypes = qw/
+	$toolInstallLabel $initialTaBasCoBaseline
 	/;
 
     %allTrigger = (

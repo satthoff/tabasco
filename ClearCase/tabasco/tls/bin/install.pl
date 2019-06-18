@@ -41,26 +41,36 @@ use Log;
 Log::setVerbosity( "debug" );
 Transaction::start( -comment => 'TaBasCo installation' );
 
-# ensure all meta types existing
+# declare all hyperlink types
+foreach my $hltypeName ( @TaBasCo::Common::Config::allHlTypes ) {
+    my $newType = ClearCase::HlType->new( -name => $hltypeName );
+    $newType->create() unless( $newType->exists() );
+}
 
-
-
-# loading the main task the very first time means also
-# that all initialization in the vob will be performed
-my $mainTask = TaBasCo::Task->getMainTask();
-
+# declare all label types
+foreach my $lbtypeName ( @TaBasCo::Common::Config::allLbTypes ) {
+    my $newType = ClearCase::LbType->new( -name => $lbtypeName );
+    $newType->create() unless( $newType->exists() );
+}
 
 # label the installation
 ClearCase::mklabel(
-		   -argv => $TaBasCo::Common::Config::myVob->getTag() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolPath,
-		   -label    => $TaBasCo::Common::Config::toolSelectLabel,
-		   -recurse  => 1
-		  );
+    -argv => $TaBasCo::Common::Config::myVob->getTag() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolPath,
+    -label    => $TaBasCo::Common::Config::toolInstallLabel,
+    -recurse  => 1
+    );
 ClearCase::mklabel(
-                   -argv => $TaBasCo::Common::Config::myVob->getTag() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot,
-                   -label    => $TaBasCo::Common::Config::toolSelectLabel
-                  );
+    -argv => $TaBasCo::Common::Config::myVob->getTag() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot,
+    -label    => $TaBasCo::Common::Config::toolInstallLabel
+    );
+ClearCase::LbType->new( -name => $TaBasCo::Common::Config::toolInstallLabel )->lock();
 
+# initialize the main task - based on the default ClearCase branch type 'main'
+my $mainTask = TaBasCo::Task::initializeMainTask( $TaBasCo::Common::Config::initialTaBasCoBaseline );
+
+# create the task tabasco to manage the installed tool within its own task
+my $tabascoTask = TaBasCo::Task->new( -name => 'tabasco' );
+$tabascoTask->create( -baseline => $mainTask->getLastRelease() );
 
 # finaly create all trigger types
 foreach my $trg ( keys %TaBasCo::Common::Config::allTrigger )

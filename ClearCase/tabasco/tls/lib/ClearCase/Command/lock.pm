@@ -22,7 +22,7 @@ sub BEGIN {
 
    %DATA = (
       Obsolete  => undef,
-      Objects   => undef
+      Object   => undef
    );
 
    Data::init(
@@ -37,16 +37,16 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $transaction, $obs, $objects, @other ) =
+   my ( $transaction, $obs, $object, @other ) =
       $class->rearrange(
-         [ qw( TRANSACTION OBSOLETE OBJECTS) ],
+         [ qw( TRANSACTION OBSOLETE OBJECT) ],
          @_ );
    confess join( ' ', @other ) if @other;
 
    my $self  = $class->SUPER::new( $transaction );
    bless $self, $class;
 
-   $self->setObjects( $objects );
+   $self->setObject( $object );
    $self->setObsolete( $obs ) if ( $obs );
 
    return $self;
@@ -55,11 +55,10 @@ sub new {
 sub do_execute {
    my $self = shift;
 
-   my $objects = $self->getObjects();
    my @options = ();
    push @options, '-obsolete' if $self->getObsolete();
    ClearCase::Common::Cleartool::lock( @options,
-      @$objects );
+      $self->getObject() );
 
 }
 
@@ -70,9 +69,8 @@ sub do_commit {
 sub do_rollback {
    my $self = shift;
 
-      my $objects = $self->getObjects();
       ClearCase::Common::Cleartool::unlock(
-         @$objects );
+         $self->getObject() );
 }
 
 1;
