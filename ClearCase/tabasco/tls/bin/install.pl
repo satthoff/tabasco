@@ -6,9 +6,6 @@ use Cwd;
 # execute this BEGIN block as the very first set of statements
 # to define OS specific parameters and to include the lib
 # directory to the Perl INC list.
-use vars qw/
-	    $trash $silent $slash $qslash $base $ccp_newline $tempDir
-	    /;
 my @INCL_LIB = ();
 BEGIN {
 
