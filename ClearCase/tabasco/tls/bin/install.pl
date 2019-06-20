@@ -50,42 +50,25 @@ foreach my $lbtypeName ( @TaBasCo::Common::Config::allLbTypes ) {
     $newType->create() unless( $newType->exists() );
 }
 
-# label the installation
-ClearCase::mklabel(
-    -argv => $TaBasCo::Common::Config::myVob->getTag() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolPath,
-    -label    => $TaBasCo::Common::Config::toolInstallLabel,
-    -recurse  => 1
-    );
-ClearCase::mklabel(
-    -argv => $TaBasCo::Common::Config::myVob->getTag() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot,
-    -label    => $TaBasCo::Common::Config::toolInstallLabel
-    );
-ClearCase::LbType->new( -name => $TaBasCo::Common::Config::toolInstallLabel )->lock();
+# declare all trigger types
+foreach my $trtypeName ( @TaBasCo::Common::Config::allTrTypes ) {
+    my $newType = ClearCase::TrType->new( -name => $trtypeName );
+    $newType->create() unless( $newType->exists() );
+}
 
 # initialize the main task - based on the default ClearCase branch type 'main'
+# the main task gets attached the root path of the installation Vob and
+# of all sibling Vobs if the installation Vob is an admin Vob
 my $mainTask = TaBasCo::Task::initializeMainTask( $TaBasCo::Common::Config::initialTaBasCoBaseline );
+$mainTask->getFloatingRelease()->ensureAsFullRelease();
 my $firstMainRelease = $mainTask->createNewRelease();
 
 # create the task tabasco to manage the installed tool within its own task
+# STILL MISSING: specify the installation root path as the only path of the tabasco task
 my $tabascoTask = TaBasCo::Task->new( -name => 'tabasco' );
 $tabascoTask->create( -baseline => $firstMainRelease );
-
-# finaly create all trigger types
-foreach my $trg ( keys %TaBasCo::Common::Config::allTrigger )
-  {
-    my $trt = ClearCase::TrType->new( -name => $trg, -vob => $TaBasCo::Common::Config::myVob );
-    $trt->create(
-                 -all     => $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'all' },
-                 -element => $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'element' },
-                 -execu   => '"' . $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'execu' } . '"',
-                 -execw   => '"' . $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'execw' } . '"',
-                 -command => $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'ops' }
-                );
-    if( defined( $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'att' } ) )
-      {
-        $trt->attach( TaBasCo::Common::Config::getConfigElement()->getVXPN() );
-      }
-  }
+$tabascoTask->getFloatingRelease()->ensureAsFullRelease();
+$tabascoTask->createNewRelease();
 
 Transaction::commit(); # TaBasCo installation
 
@@ -94,12 +77,5 @@ my $ui = TaBasCo::UI->new();
 
 my $cf = TaBasCo::Common::Config::getConfigElement()->getNormalizedPath();
 $ui->okMessage( "Installation finished.
-You should now label your configuration
-from where you want to start from with
-the initial baseline.
-Open the version tree browser for file
-$cf
-to see the name of the initial baseline.
-At least the root directory of the Vob
-has to be labeled.
-And DO NOT label the imported $TaBasCo::Common::Config::toolRoot subtree !!! " );
+
+" );
