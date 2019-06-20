@@ -21,7 +21,7 @@ sub BEGIN {
    );
 
    %DATA = (
-      Objects   => undef
+      Object   => undef
    );
 
    Data::init(
@@ -36,16 +36,16 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $transaction, $objects, @other ) =
+   my ( $transaction, $object, @other ) =
       $class->rearrange(
-         [ qw( TRANSACTION OBJECTS) ],
+         [ qw( TRANSACTION OBJECT) ],
          @_ );
    confess join( ' ', @other ) if @other;
 
    my $self  = $class->SUPER::new( $transaction );
    bless $self, $class;
 
-   $self->setObjects( $objects );
+   $self->setObject( $object );
 
    return $self;
 }
@@ -53,9 +53,9 @@ sub new {
 sub do_execute {
    my $self = shift;
 
-   my $objects = $self->getObjects();
+   my $object = $self->getObject();
    ClearCase::Common::Cleartool::unlock(
-      @$objects );
+      $object );
 
 }
 
@@ -66,9 +66,9 @@ sub do_commit {
 sub do_rollback {
    my $self = shift;
 
-      my $objects = $self->getObjects();
+      my $object = $self->getObject();
       ClearCase::Common::Cleartool::lock(
-         @$objects );
+         $object );
 }
 
 

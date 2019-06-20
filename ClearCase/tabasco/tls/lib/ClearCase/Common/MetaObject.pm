@@ -134,6 +134,12 @@ sub lock {
 	);
 }
 
+sub unlock {
+    my $self = shift;
+
+    ClearCase::unlock( -object => $self->getFullName() );
+}
+
 sub getFromHyperlinkedObjects {
     my $self = shift;
     my $hltype = shift; # we expect an object of class ClearCase::HlType

@@ -156,10 +156,6 @@ sub initializeMainTask {
 	    );
     }
 
-    # We create a new release in the main task.
-    # This new release can be used as the baseline for the first other tasks being created.
-    $mainTask->createNewRelease();
-    
     return $mainTask;
 }   
 
@@ -216,7 +212,6 @@ sub loadFloatingRelease {
 sub loadLastRelease {
     my $self = shift;
 
-    my $floatingRelease = ;
     my $lastRelease = $self->getFloatingRelease()->getPrevious();
     return $self->setLastRelease if( $lastRelease );
     return undef;

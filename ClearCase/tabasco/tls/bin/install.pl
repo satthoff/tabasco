@@ -64,10 +64,11 @@ ClearCase::LbType->new( -name => $TaBasCo::Common::Config::toolInstallLabel )->l
 
 # initialize the main task - based on the default ClearCase branch type 'main'
 my $mainTask = TaBasCo::Task::initializeMainTask( $TaBasCo::Common::Config::initialTaBasCoBaseline );
+my $firstMainRelease = $mainTask->createNewRelease();
 
 # create the task tabasco to manage the installed tool within its own task
 my $tabascoTask = TaBasCo::Task->new( -name => 'tabasco' );
-$tabascoTask->create( -baseline => $mainTask->getLastRelease() );
+$tabascoTask->create( -baseline => $firstMainRelease );
 
 # finaly create all trigger types
 foreach my $trg ( keys %TaBasCo::Common::Config::allTrigger )
