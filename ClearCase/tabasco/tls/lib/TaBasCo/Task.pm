@@ -78,20 +78,20 @@ sub create {
 
     # register the new task as a known task
     $self->createHyperlinkFromObject(
-	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::taskLink ),
+	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::taskLink, -vob => $self->getVob() ),
 	-object => $self->getVob()->getMyReplica()
 	);
     
     # register the provided baseline as the task baseline
     $self->createHyperlinkToObject(
-	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::baselineLink ),
+	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::baselineLink, -vob => $self->getVob() ),
 	-object => $baseline
 	);
 
     # create the task's floating release
     # and register it as the task's first release
     $self->createHyperlinkToObject(
-	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::firstReleaseLink ),
+	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::firstReleaseLink, -vob => $self->getVob() ),
 	-object => $self->_createFloatingRelease()
 	);
     
@@ -105,7 +105,10 @@ sub initializeMainTask {
     my $baseline = TaBasCo::Release->new( -name => $baselineName );
     
     # check whether the initialization has already been performed, never execute this subroutine twice!!!!
-    my $taskLink = ClearCase::HlType->new( -name => $TaBasCo::Common::Config::taskLink );
+    my $taskLink = ClearCase::HlType->new(
+	-name => $TaBasCo::Common::Config::taskLink,
+	-vob => $TaBasCo::Common::Config::myVob
+	);
     if( $mainTask->getToHyperlinkedObjects->( $taskLink ) )  {
 	Die( [ __PACKAGE__ . '::initializeMainTask', "The main task has already been initialized." ] );
     }
@@ -122,7 +125,7 @@ sub initializeMainTask {
 
     # register the provided baseline as the task baseline
     $mainTask->createHyperlinkToObject(
-	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::baselineLink ),
+	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::baselineLink, -vob => $TaBasCo::Common::Config::myVob ),
 	-object => $baseline
 	);
     
@@ -131,7 +134,7 @@ sub initializeMainTask {
     my $floatingRelease = TaBasCo::Release->new( -name -> uc( $mainTask->getName() . $TaBasCo::Common::Config::floatingReleaseExtension ) );
     $floatingRelease->SUPER::create();
     $mainTask->createHyperlinkToObject(
-	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::firstReleaseLink ),
+	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::firstReleaseLink, -vob => $TaBasCo::Common::Config::myVob ),
 	-object => $floatingRelease
 	);
     $floatingRelease->_registerAsTaskMember( $mainTask );
@@ -140,8 +143,13 @@ sub initializeMainTask {
     # attach the initial path hyperlinks
     # we expect that TABASCO has been installed in the root Vob of an adminstrative Vob hierarchy or in an ordinary Vob.
     my @elements = ();
-    my @siblingVobs = $mainTask->getVob()->getToHyperlinkedObjects( ClearCase::HlType->new( -name => $ClearCase::Common::Config::adminVobLink ) );
-    foreach my $sv ( @siblingVobs ) {
+    my @clientVobs = $mainTask->getVob()->getToHyperlinkedObjects(
+	ClearCase::HlType->new( 
+	    -name => $ClearCase::Common::Config::adminVobLink,
+	    -vob => $TaBasCo::Common::Config::myVob
+	)
+	);
+    foreach my $sv ( @clientVobs ) {
 	push @elements, ClearCase::Vob->new( -tag => $sv )->getRootElement();
     }
     push @elements, $mainTask->getVob()->getRootElement();
