@@ -63,42 +63,42 @@ sub _init {
        $self->setName( $name );
        $self->setVob( $self );
        $self->setFullName( 'vob:' . $name );
-       } else {
-	   # the type and vob arguments will only be used/checked, if the appropriate information is not encoded in the name argument
-	   my $typeName = '';
-	   my $vobTag = '';
+   } else {
+       # the type and vob arguments will only be used/checked, if the appropriate information is not encoded in the name argument
+       my $typeName = '';
+       my $vobTag = '';
    
-	   if( $name =~ m/^\s*(\S+):(\S+)\@(\S+).*$/ ) {
-	       $typeName = $1;
-	       $name = $2;
-	       $vobTag = $3;
-	   } elsif( $name =~ m/^\s*(\S+)\@(\S+).*$/ ) {
-	       Die( [ __PACKAGE__ , 'Wrong object initialization. Missing type specification.' ] ) unless( $type );
-	       $typeName = $type;
-	       $name = $1;
-	       $vobTag = $2;
-	   } elsif( $name !~ m/:|\@/ ) {
-	       Die( [ __PACKAGE__ , 'Wrong object initialization. Missing type specification.' ] ) unless( $type );
-	       Die( [ __PACKAGE__ , 'Wrong object initialization. Missing Vob specification.' ] ) unless( $vob );
-	       $typeName = $type;
-	       $vobTag = $vob->getTag();
-	   } else {
-	       Die( [ __PACKAGE__ , "Wrong object initialization with name = $name", "Possibly missing type and/or Vob specification." ] );
-	   }
+       if( $name =~ m/^\s*(\S+):(\S+)\@(\S+).*$/ ) {
+	   $typeName = $1;
+	   $name = $2;
+	   $vobTag = $3;
+       } elsif( $name =~ m/^\s*(\S+)\@(\S+).*$/ ) {
+	   Die( [ __PACKAGE__ , 'Wrong object initialization. Missing type specification.' ] ) unless( $type );
+	   $typeName = $type;
+	   $name = $1;
+	   $vobTag = $2;
+       } elsif( $name !~ m/:|\@/ ) {
+	   Die( [ __PACKAGE__ , 'Wrong object initialization. Missing type specification.' ] ) unless( $type );
+	   Die( [ __PACKAGE__ , 'Wrong object initialization. Missing Vob specification.' ] ) unless( $vob );
+	   $typeName = $type;
+	   $vobTag = $vob->getTag();
+       } else {
+	   Die( [ __PACKAGE__ , "Wrong object initialization with name = $name", "Possibly missing type and/or Vob specification." ] );
+       }
 
-	   Die( [ __PACKAGE__ , "Wrong object initialization. Unknown object type = $typeName." ] ) unless( grep m/^${typeName}$/, @knownTypes );
+       Die( [ __PACKAGE__ , "Wrong object initialization. Unknown object type = $typeName." ] ) unless( grep m/^${typeName}$/, @knownTypes );
 
-	   $self->setType( $typeName );
-	   $self->setName( $name );
-	   $self->setVob( ClearCase::Vob->new( -tag => $vobTag ) );
+       $self->setType( $typeName );
+       $self->setName( $name );
+       $self->setVob( ClearCase::Vob->new( -tag => $vobTag ) );
 
-	   # check for an administrative Vob hierarchy
-	   my @vobConfig = $self->getVob( $vobTag )->typeCreationConfig();
+       # check for an administrative Vob hierarchy
+       my @vobConfig = $self->getVob( $vobTag )->typeCreationConfig();
 	   
-	   $self->setGlobalAndAcquire( $vobConfig[0] );
-	   $self->setVob( $vobConfig[1] );
-	   $vobTag = $self->getVob()->getTag();
-	   $self->setFullName( $typeName . ':' . $name . "\@$vobTag" );
+       $self->setGlobalAndAcquire( $vobConfig[0] );
+       $self->setVob( $vobConfig[1] );
+       $vobTag = $self->getVob()->getTag();
+       $self->setFullName( $typeName . ':' . $name . "\@$vobTag" );
    }
    return $self;
 }
