@@ -66,6 +66,7 @@ sub _init {
     $self->setHpath( $hpath ) if( $hpath );
     $self->setHostname( $hostname ) if( $hostname );
     $self->setTag( $tag );
+    return $self;
   }
 
 sub loadRootElement {
