@@ -71,14 +71,9 @@ BEGIN {
 
     $myVob = ClearCase::Vob->new( -tag => File::Basename::dirname ( $base ) );
 
-    @allHlTypes = qw/
-	$baselineLink $taskLink $nextReleaseLink
-	$floatingReleaseLink $myTaskLink $pathLink
-	/;
+    @allHlTypes = ( $baselineLink, $taskLink, $nextReleaseLink, $floatingReleaseLink, $myTaskLink, $pathLink );
     
-    @allLbTypes = qw/
-	$toolInstallLabel $initialTaBasCoBaseline
-	/;
+    @allLbTypes = ( $initialTaBasCoBaseline );
 
     %allTrigger = (
                     'remove_empty_branch' => {
