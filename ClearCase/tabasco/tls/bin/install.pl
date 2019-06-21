@@ -94,11 +94,13 @@ my $ui = TaBasCo::UI->new();
 
 my $notice = $TaBasCo::Common::Config::myVob->getRootElement()->getNormalizedPath() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot;
 my $label = $tabascoTask->getLastRelease()->getName();
-my $cf = TaBasCo::Common::Config::getConfigElement()->getNormalizedPath();
-$ui->okMessage( "Installation finished.
+$ui->okMessage( "
+
+Installation finished.
 
 TaBasCo is installed in $notice.
 It is fully labeled with $label.
 
 A task named tabasco has been created to manage changes of the implementation of TaBasCo.
+
 " );
