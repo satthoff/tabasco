@@ -39,13 +39,13 @@ Transaction::start( -comment => 'TaBasCo installation' );
 
 # declare all hyperlink types
 foreach my $hltypeName ( @TaBasCo::Common::Config::allHlTypes ) {
-    my $newType = ClearCase::HlType->new( -name => $hltypeName );
+    my $newType = ClearCase::HlType->new( -name => $hltypeName, -vob => $TaBasCo::Common::Config::myVob );
     $newType->create() unless( $newType->exists() );
 }
 
 # declare all label types
 foreach my $lbtypeName ( @TaBasCo::Common::Config::allLbTypes ) {
-    my $newType = ClearCase::LbType->new( -name => $lbtypeName );
+    my $newType = ClearCase::LbType->new( -name => $lbtypeName, -vob => $TaBasCo::Common::Config::myVob );
     $newType->create() unless( $newType->exists() );
 }
 
@@ -60,7 +60,7 @@ my $firstMainRelease = $mainTask->createNewRelease();
 my $tabascoTask = TaBasCo::Task->new( -name => 'tabasco' );
 $tabascoTask->create( -baseline => $firstMainRelease );
 my $tabascoRootPathElement = ClearCase::Element->new(
-    -pathname => $ClearCase::Common::Config::myVob->getRootElement()->getNormalizedPath() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot
+    -pathname => $TaBasCo::Common::Config::myVob->getRootElement()->getNormalizedPath() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot
     );
 my @tmp = (); push @tmp, $tabascoRootPathElement;
 $tabascoTask->mkPaths( \@tmp );
@@ -92,7 +92,7 @@ Transaction::commit(); # TaBasCo installation
 # load the user interface
 my $ui = TaBasCo::UI->new();
 
-my $notice = $ClearCase::Common::Config::myVob->getRootElement()->getNormalizedPath() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot;
+my $notice = $TaBasCo::Common::Config::myVob->getRootElement()->getNormalizedPath() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot;
 my $label = $tabascoTask->getLastRelease()->getName();
 my $cf = TaBasCo::Common::Config::getConfigElement()->getNormalizedPath();
 $ui->okMessage( "Installation finished.
