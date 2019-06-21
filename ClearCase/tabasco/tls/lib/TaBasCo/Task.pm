@@ -117,7 +117,7 @@ sub initializeMainTask {
     # register the main task as a known task
     $mainTask->createHyperlinkFromObject(
 	-hltype => $taskLink,
-	-object => $self->getVob()->getMyReplica()
+	-object => $mainTask->getVob()->getMyReplica()
 	);
 
     # register the provided baseline as the task baseline
@@ -128,7 +128,7 @@ sub initializeMainTask {
     
     # create the main task's floating release
     # and register it as the task's first release
-    my $floatingRelease = TaBasCo::Release->new( -name -> uc( $self->getName() . $TaBasCo::Common::Config::floatingReleaseExtension ) );
+    my $floatingRelease = TaBasCo::Release->new( -name -> uc( $mainTask->getName() . $TaBasCo::Common::Config::floatingReleaseExtension ) );
     $floatingRelease->SUPER::create();
     $mainTask->createHyperlinkToObject(
 	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::firstReleaseLink ),
@@ -245,7 +245,7 @@ sub mkPaths {
     my $elements = shift; # we expect a reference to an array of ClearCase::Element objects
 
     foreach my $elem ( @$elements ) {
-	$mainTask->createHyperlinkToObject(
+	$self->createHyperlinkToObject(
 	    -hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::pathLink ),
 	    -object => $elem
 	    );
@@ -307,22 +307,22 @@ sub loadConfigSpec  {
 
     if( $self->getName() eq 'main' ) {
 	foreach my $p ( @{ $self->getCspecPaths() } ) {
-	    push @config_spec, "element $p /" . $act->getName() . "/LATEST";
+	    push @config_spec, "element $p /" . $self->getName() . "/LATEST";
 	}
     } else {
-	foreach my $cp ( @{ $act->getCspecPaths() } ) {
-	    push @config_spec, "element $cp .../" . $act->getName() . "/LATEST";
+	foreach my $cp ( @{ $self->getCspecPaths() } ) {
+	    push @config_spec, "element $cp .../" . $self->getName() . "/LATEST";
 	}
 	my $baseline = $self->getBaseline();
-	push @config_spec, "mkbranch " . $act->getName();
-	foreach my $cp (  @{ $act->getCspecPaths() } ) {
+	push @config_spec, "mkbranch " . $self->getName();
+	foreach my $cp (  @{ $self->getCspecPaths() } ) {
 	    while( $baseline ) {
 		push @config_spec, "element $cp " . $baseline->getName();
 		$baseline = $baseline->getPrevious();
 	    }
 	    $baseline = $self->getBaseline();
 	}
-	foreach my $cp ( @{ $act->getCspecPaths() } ) {
+	foreach my $cp ( @{ $self->getCspecPaths() } ) {
 	    push @config_spec, "element $cp /main/0";
 	}
 	push @config_spec, "end mkbranch " . $self->getName();

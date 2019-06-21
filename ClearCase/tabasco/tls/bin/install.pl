@@ -60,7 +60,7 @@ my $firstMainRelease = $mainTask->createNewRelease();
 my $tabascoTask = TaBasCo::Task->new( -name => 'tabasco' );
 $tabascoTask->create( -baseline => $firstMainRelease );
 my $tabascoRootPathElement = ClearCase::Element->new(
-    -pathname => $ClearCase::Common::myVob()->getRootElement()->getNormalizedPath() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot
+    -pathname => $ClearCase::Common::Config::myVob->getRootElement()->getNormalizedPath() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot
     );
 my @tmp = (); push @tmp, $tabascoRootPathElement;
 $tabascoTask->mkPaths( \@tmp );
@@ -92,7 +92,7 @@ Transaction::commit(); # TaBasCo installation
 # load the user interface
 my $ui = TaBasCo::UI->new();
 
-my $notice = $ClearCase::Common::myVob()->getRootElement()->getNormalizedPath() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot;
+my $notice = $ClearCase::Common::Config::myVob->getRootElement()->getNormalizedPath() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot;
 my $label = $tabascoTask->getLastRelease()->getName();
 my $cf = TaBasCo::Common::Config::getConfigElement()->getNormalizedPath();
 $ui->okMessage( "Installation finished.

@@ -152,33 +152,34 @@ sub gmtTimeString {
 }
 
 
-sub pathVisible {
-    my $path = shift;
-
-    my $view = $ClearCase::Common::Config::myHost->getCurrentView();
-    Transaction::start( -comment => "set correct config spec to check path existence in release " . $self->getName() );
-    my $cspecFile = $self->getVXPN();
-    open FD, "$cspecFile";
-    my @cspec = <FD>;
-    close FD;
-    grep chomp, @cspec;
-    # delete all carrige return from contents,
-    # which will be added by changes edited on Windows
-    grep s/\r//g, @cspec;
-    $view->setConfigSpec( \@cspec );
-    my $ret = ( -e $path );
-    Debug( [  __PACKAGE__ . "::pathVisible >$path<" ] );
-    if( $ret )
-      {
-	Debug( [ '    path is visible' ] );
-      }
-    else
-      {
-	Debug( [ '    path is NOT visible' ] );
-      }
-    Transaction::rollback(); # reset the config spec
-    return $ret;
-  }
+#sub pathVisible {
+#    my $path = shift;
+#
+#    my $view = $ClearCase::Common::Config::myHost->getCurrentView();
+#    Transaction::start( -comment => "set correct config spec to check path existence in release " . $self->getName() );
+#    my $cspecFile = $self->getVXPN();
+#    open FD, "$cspecFile";
+#    my @cspec = <FD>;
+#    close FD;
+#    grep chomp, @cspec;
+#    # delete all carrige return from contents,
+#    # which will be added by changes edited on Windows
+#    grep s/\r//g, @cspec;
+#    $view->setConfigSpec( \@cspec );
+#    my $ret = ( -e $path );
+#    Debug( [  __PACKAGE__ . "::pathVisible >$path<" ] );
+#    if( $ret )
+#      {
+#	Debug( [ '    path is visible' ] );
+#      }
+#    else
+#      {
+#	Debug( [ '    path is NOT visible' ] );
+#      }
+#    Transaction::rollback(); # reset the config spec
+#    return $ret;
+#  }
+#XXXX
 
 sub cspecHeader {
     my @config_spec = ();

@@ -166,7 +166,7 @@ sub loadConfigSpec {
     push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
     push @config_spec, '';
     
-    return $self->setConfigSpec( \@ocnfig_spec );
+    return $self->setConfigSpec( \@config_spec );
 }
 1;
 

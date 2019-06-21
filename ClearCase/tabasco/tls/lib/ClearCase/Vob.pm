@@ -59,7 +59,7 @@ sub _init {
     Die( [ "Missing tag for ClearCase::Vob initialization" ] ) unless( $tag );
     $tag =~ s/^vob://;
 
-    $self->SUPER::init( -type => 'vob', -name => $tag );
+    $self->SUPER::_init( -type => 'vob', -name => $tag );
       
     $self->setPassword( $passwd ) if $passwd;
     $self->setGpath( $gpath ) if( $gpath );
