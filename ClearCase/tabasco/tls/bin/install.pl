@@ -27,12 +27,11 @@ BEGIN {
       push @INCL_LIB, '/home/usatthof/myPerl/lib/site_perl/5.8.4/x86_64-linux';
     }
   unshift @INC, @INCL_LIB;
-
-  require ClearCase;
-  require TaBasCo;
-  require OS;
 }
 
+use ClearCase;
+use TaBasCo;
+use OS;
 use Log;
 
 Log::setVerbosity( "debug" );
@@ -85,9 +84,6 @@ foreach my $trgVob ( @trgVobs ) {
 	    -execw   => '"' . $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'execw' } . '"',
 	    -command => $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'ops' }
 	    );
-	if( defined( $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'att' } ) ) {
-	    $trt->attach( TaBasCo::Common::Config::getConfigElement()->getVXPN() );
-	}
     }
 }
 

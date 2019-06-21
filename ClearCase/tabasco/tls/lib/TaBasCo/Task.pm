@@ -28,7 +28,8 @@ sub BEGIN {
        CspecPaths => { CALCULATE => \&loadCspecPaths },
        Baseline  => { CALCULATE => \&loadBaseline },
        FloatingRelease => { CALCULATE => \&loadFloatingRelease },
-       LastRelease => { CALCULATE => \&loadLastRelease }
+       LastRelease => { CALCULATE => \&loadLastRelease },
+       ConfigSpec => { CALCULATE => \&loadConfigSpec }
        );
 
    Data::init(
@@ -93,11 +94,6 @@ sub create {
 	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::firstReleaseLink ),
 	-object => $self->_createFloatingRelease()
 	);
-
-    # TBD - insert code for sub path selection!
-    # TBD - insert code for sub path selection!
-    
-    # my $cspec = $self->_createConfigSpec();
     
     return $self;
 }
@@ -288,79 +284,63 @@ sub loadCspecPaths {
     my @paths = @{ $self->getPaths() };
     my @cspecPaths = ();
     foreach my $p ( @paths ) {
-	push @cspecPaths, ClearCase::Element->new( -pathname => $p )->getCspecPath();
+	push @cspecPaths, $p->getCspecPath();
     }
     return $self->setCspecPaths( \@cspecPaths );
 }
 
-sub _createConfigSpec  {
+sub loadConfigSpec  {
     my $self = shift;
 
-    my $config_spec = &TaBasCo::Common::Config::cspecHeader();
-
-    push @$config_spec, '';
-    push @$config_spec, $TaBasCo::Common::Config::cspecDelimiter;
-    push @$config_spec, '# BEGIN  Task : ' . $self->getName();
+    my @config_spec = ();
+    
+    push @config_spec, '';
+    push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
+    push @config_spec, '# BEGIN  Task : ' . $self->getName();
     my $pT = 'NONE';
     if( $self->getParent() )
       {
 	$pT = $self->getParent()->getName();
       }
-    push @$config_spec, '# Parent Task : ' . $pT;
-    push @$config_spec, $TaBasCo::Common::Config::cspecDelimiter;
+    push @config_spec, '# Parent Task : ' . $pT;
+    push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
 
-    my $act = $self;
-    my $baseline = $act->getBaseline();
-    unless( $baseline )
-      {
-	foreach my $p ( @{ $act->getCspecPath() } )
-	  {
-	    push @$config_spec, "element $p /" . $act->getName() . "/LATEST";
-	  }
-      }
-    else
-      {
-	foreach my $p ( @{ $act->getCspecPath() } )
-	  {
-	    push @$config_spec, "element $p .../" . $act->getName() . "/LATEST";
-	  }
-	push @$config_spec, "mkbranch " . $act->getName();
-	my @paths = @{ $act->getPath() };
-	my @cspecPaths = @{ $act->getCspecPath() };
-	while( my $p = shift  @paths and  my $cp = shift @cspecPaths  )
-	  {
-	    while( $baseline )
-	      {
-		if( $baseline->pathVisible( $p, $view ) )
-		  {
-		    push @$config_spec, "element $cp " . $baseline->getName();
-		  }
+    if( $self->getName() eq 'main' ) {
+	foreach my $p ( @{ $self->getCspecPaths() } ) {
+	    push @config_spec, "element $p /" . $act->getName() . "/LATEST";
+	}
+    } else {
+	foreach my $cp ( @{ $act->getCspecPaths() } ) {
+	    push @config_spec, "element $cp .../" . $act->getName() . "/LATEST";
+	}
+	my $baseline = $self->getBaseline();
+	push @config_spec, "mkbranch " . $act->getName();
+	foreach my $cp (  @{ $act->getCspecPaths() } ) {
+	    while( $baseline ) {
+		push @config_spec, "element $cp " . $baseline->getName();
 		$baseline = $baseline->getPrevious();
-	      }
-	    $baseline = $act->getBaseline();
-	  }
-	$baseline = $act->getBaseline();
-	foreach my $p ( @{ $act->getCspecPath() } )
-	  {
-	    push @$config_spec, "element $p /main/0";
-	  }
-	push @$config_spec, "end mkbranch " . $act->getName();
-	while( $baseline )
-	  {
-	    foreach my $p ( @{ $baseline->getTask()->getCspecPath() } )
-	      {
-		push @$config_spec, "element " . $p . ' ' . $baseline->getName() . " -nocheckout";
-	      }
+	    }
+	    $baseline = $self->getBaseline();
+	}
+	foreach my $cp ( @{ $act->getCspecPaths() } ) {
+	    push @config_spec, "element $cp /main/0";
+	}
+	push @config_spec, "end mkbranch " . $self->getName();
+	$baseline = $self->getParent()->getBaseline();
+	while( $baseline ) {
+	    foreach my $cp ( @{ $baseline->getTask()->getCspecPaths() } ) {
+		push @config_spec, "element " . $cp . ' ' . $baseline->getName() . " -nocheckout";
+	    }
 	    $baseline = $baseline->getPrevious();
-	  }
-      }
+	}
+    }
 
-    push @$config_spec, '# END   Task : ' . $self->getName();
-    push @$config_spec, $TaBasCo::Common::Config::cspecDelimiter;
-    push @$config_spec, 'element * /main/0 -nocheckout';
-    grep chomp, @$config_spec;
+    push @config_spec, '# END   Task : ' . $self->getName();
+    push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
+    push @config_spec, '';
+    grep chomp, @config_spec;
 
-    return $config_spec;
+    return $self->setConfigSpec( \@config_spec );
 }
 1;
 

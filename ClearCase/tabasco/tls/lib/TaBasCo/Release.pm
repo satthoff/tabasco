@@ -23,10 +23,11 @@ sub BEGIN {
    require Data;
 
    %DATA = (
-	    Task => { CALCULATE => \&loadTask },
-	    Name => { CALCULATE => \&loadName },
-	    Previous => { CALCULATE => \&loadPrevious }
-	   );
+       Task => { CALCULATE => \&loadTask },
+       Name => { CALCULATE => \&loadName },
+       Previous => { CALCULATE => \&loadPrevious },
+       ConfigSpec => { CALCULATE => \&loadConfigSpec }
+       );
 
    Data::init(
       PACKAGE  => __PACKAGE__,
@@ -85,6 +86,27 @@ sub registerAsNextReleaseOf {
 sub ensureAsFullRelease {
     my $self = shift;
 
+    my $view = $ClearCase::Common::Config::myHost->getCurrentView();
+    unless( $view ) {
+	Die( [ __PACKAGE__ . '::ensureAsFullRelease', 'We have no current view set.' ] );
+    }
+
+    Transaction::start( -comment => 'set required config spec to label a full release ' . $self->getName() );
+    $view->setConfigSpec( $self->getConfigSpec() );
+
+    Transaction::start( -comment => 'label entire release ' . $self->getName() );
+    foreach my $tP ( @{ $self->getTask()->getPaths() } ) {
+	my $normalPath = $tP->getNormalizedPath();
+	ClearCase::mklabel(
+	    -label => $self->getName(),
+	    -raplace => 1,
+	    -recurse => 1,
+	    -argv => $normalPath
+	    );
+    }
+    Transaction::commit(); # commit all label operations
+    
+    Transaction::rollback(); # reset the config spec
 }
 
 sub loadPrevious {
@@ -120,11 +142,31 @@ sub loadTask {
     return $self->setTask( $task );
 }
 
-sub createConfigSpec  {
+sub loadConfigSpec {
     my $self = shift;
 
-    my $config_spec = &TaBasCo::Common::Config::cspecHeader();
+    my @config_spec = ();
 
+    push @config_spec, '';
+    push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
+    push @config_spec, '# BEGIN Release : ' . $self->getName();
+    push @config_spec, '# My Task       : ' . $self->getTask()->getName();
+    push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
+    
+    my @taskCspecPaths = @{ $self->getTask()->getCspecPaths() };
+    my $actRelease = $self;
+    while( $actRelease ) {
+	foreach my $cp ( @taskCspecPaths ) {
+	    push @config_spec, "element " . $cp . ' ' . $actRelease->getName() . " -nocheckout";
+	}
+	$actRelease = $actRelease->getPrevious();
+    }
+
+    push @config_spec, '# END Release   : ' . $self->getName();
+    push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
+    push @config_spec, '';
+    
+    return $self->setConfigSpec( \@ocnfig_spec );
 }
 1;
 
