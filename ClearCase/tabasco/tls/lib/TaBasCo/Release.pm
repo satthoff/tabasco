@@ -82,6 +82,11 @@ sub registerAsNextReleaseOf {
     return $self;
 }
 
+sub ensureAsFullRelease {
+    my $self = shift;
+
+}
+
 sub loadPrevious {
     my $self = shift;
 

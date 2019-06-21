@@ -24,8 +24,8 @@ sub BEGIN {
 
    %DATA = (
        Parent    => { CALCULATE => \&loadParent },
-       Path      => { CALCULATE => \&loadPath },
-       CspecPath => { CALCULATE => \&loadCspecPath },
+       Paths      => { CALCULATE => \&loadPaths },
+       CspecPaths => { CALCULATE => \&loadCspecPaths },
        Baseline  => { CALCULATE => \&loadBaseline },
        FloatingRelease => { CALCULATE => \&loadFloatingRelease },
        LastRelease => { CALCULATE => \&loadLastRelease }
@@ -55,6 +55,7 @@ sub _createFloatingRelease {
 	-task => $self,
 	-comment => $comment
 	);
+    $floatingRelease->_registerAsTaskMember( $self );
     return $self->setFloatingRelease( $floatingRelease );
 }
 
@@ -107,7 +108,7 @@ sub initializeMainTask {
     my $mainTask = TaBasCo::Task->new( -name => 'main' );
     my $baseline = TaBasCo::Release->new( -name => $baselineName );
     
-    # check whether the initialization has already been performed
+    # check whether the initialization has already been performed, never execute this subroutine twice!!!!
     my $taskLink = ClearCase::HlType->new( -name => $TaBasCo::Common::Config::taskLink );
     if( $mainTask->getToHyperlinkedObjects->( $taskLink ) )  {
 	Die( [ __PACKAGE__ . '::initializeMainTask', "The main task has already been initialized." ] );
@@ -148,14 +149,7 @@ sub initializeMainTask {
 	push @elements, ClearCase::Vob->new( -tag => $sv )->getRootElement();
     }
     push @elements, $mainTask->getVob()->getRootElement();
-    
-    foreach my $elem ( @elements ) {
-	$mainTask->createHyperlinkToObject(
-	    -hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::pathLink ),
-	    -object => $elem
-	    );
-    }
-
+    $mainTask->mkPaths( \@elements );
     return $mainTask;
 }   
 
@@ -175,6 +169,9 @@ sub createNewRelease {
     # register the new floating release as the next release of the task
     $floatingRelease->registerAsNextReleaseOf( $newRelease );
 
+    # lock the new release
+    $newRelease->lock();
+    
     return $newRelease;
 }
 
@@ -247,44 +244,53 @@ sub nextReleaseName {
     return uc( $self->getName() ) . '_' . &TaBasCo::Common::Config::gmtTimeString();
 }
 
-sub mkPath {
+sub mkPaths {
     my $self = shift;
-    my $path = shift;
-    ClearCase::mkhlink(
-	-hltype => $TaBasCo::Common::Config::pathLink,
-	-from   => $self->getFullName(),
-	-to     => $path . '/.@@'
-	);
-    $self->setPath( $path );
-    return $self;
+    my $elements = shift; # we expect a reference to an array of ClearCase::Element objects
+
+    foreach my $elem ( @$elements ) {
+	$mainTask->createHyperlinkToObject(
+	    -hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::pathLink ),
+	    -object => $elem
+	    );
+    }
+    return $self->setPaths( $elements );
 }
 
-sub loadPath {
+sub loadPaths {
     my $self = shift;
 
     my @paths = $self->getHyperlinkedFromObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::pathLink ) );
     my $parent = undef;
+    if( @paths ) {
+	# results must be element paths, so construct them
+	# we sort them reverse, what is in general preferrable expected by all ClearCase functions, e.g. within config specs
+	my @tmp = @paths;
+	@paths = ();
+	foreach my $p ( reverse sort @tmp ) {
+	    push @paths, ClearCase::Element->new(
+		-pathanme => $p
+		);
+	}
+    }
     while( not @paths )
      {
         $parent = $self->getParent();
         return undef unless( $parent );
-        @paths = @{ $parent->getPath() };
+        @paths = @{ $parent->getPaths() };
      }
-    grep s/\.\@\@$//, @paths;
-    grep s/\@\@$//, @paths;
-    my @result = reverse sort @paths;
-    return $self->setPath( \@result );
+    return $self->setPaths( \@paths );
 }
 
-sub loadCspecPath {
+sub loadCspecPaths {
     my $self = shift;
 
-    my @paths = @{ $self->getPath() };
+    my @paths = @{ $self->getPaths() };
     my @cspecPaths = ();
     foreach my $p ( @paths ) {
 	push @cspecPaths, ClearCase::Element->new( -pathname => $p )->getCspecPath();
     }
-    return $self->setCspecPath( \@cspecPaths );
+    return $self->setCspecPaths( \@cspecPaths );
 }
 
 sub _createConfigSpec  {

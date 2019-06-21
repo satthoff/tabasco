@@ -50,12 +50,6 @@ foreach my $lbtypeName ( @TaBasCo::Common::Config::allLbTypes ) {
     $newType->create() unless( $newType->exists() );
 }
 
-# declare all trigger types
-foreach my $trtypeName ( @TaBasCo::Common::Config::allTrTypes ) {
-    my $newType = ClearCase::TrType->new( -name => $trtypeName );
-    $newType->create() unless( $newType->exists() );
-}
-
 # initialize the main task - based on the default ClearCase branch type 'main'
 # the main task gets attached the root path of the installation Vob and
 # of all sibling Vobs if the installation Vob is an admin Vob
@@ -64,18 +58,51 @@ $mainTask->getFloatingRelease()->ensureAsFullRelease();
 my $firstMainRelease = $mainTask->createNewRelease();
 
 # create the task tabasco to manage the installed tool within its own task
-# STILL MISSING: specify the installation root path as the only path of the tabasco task
 my $tabascoTask = TaBasCo::Task->new( -name => 'tabasco' );
 $tabascoTask->create( -baseline => $firstMainRelease );
+my $tabascoRootPathElement = ClearCase::Element->new(
+    -pathname => $ClearCase::Common::myVob()->getRootElement()->getNormalizedPath() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot
+    );
+my @tmp = (); push @tmp, $tabascoRootPathElement;
+$tabascoTask->mkPaths( \@tmp );
 $tabascoTask->getFloatingRelease()->ensureAsFullRelease();
 $tabascoTask->createNewRelease();
+
+# finaly create all trigger types in all Vobs
+my @trgVobs = ();
+push @trgVobs, $TaBasCo::Common::Config::myVob;
+my $adminClients = $TaBasCo::Common::Config::myVob->getVobsAdminClients();
+if( $adminClients ) {
+    push @trgVobs, @{ $adminClients };
+}
+foreach my $trgVob ( @trgVobs ) {
+    foreach my $trg ( keys %TaBasCo::Common::Config::allTrigger ) {
+	my $trt = ClearCase::TrType->new( -name => $trg, -vob => $trgVob );
+	$trt->create(
+	    -all     => $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'all' },
+	    -element => $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'element' },
+	    -execu   => '"' . $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'execu' } . '"',
+	    -execw   => '"' . $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'execw' } . '"',
+	    -command => $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'ops' }
+	    );
+	if( defined( $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'att' } ) ) {
+	    $trt->attach( TaBasCo::Common::Config::getConfigElement()->getVXPN() );
+	}
+    }
+}
 
 Transaction::commit(); # TaBasCo installation
 
 # load the user interface
 my $ui = TaBasCo::UI->new();
 
+my $notice = $ClearCase::Common::myVob()->getRootElement()->getNormalizedPath() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot;
+my $label = $tabascoTask->getLastRelease()->getName();
 my $cf = TaBasCo::Common::Config::getConfigElement()->getNormalizedPath();
 $ui->okMessage( "Installation finished.
 
+TaBasCo is installed in $notice.
+It is fully labeled with $label.
+
+A task named tabasco has been created to manage changes of the implementation of TaBasCo.
 " );
