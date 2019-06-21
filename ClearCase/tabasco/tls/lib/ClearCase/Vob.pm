@@ -43,7 +43,7 @@ sub BEGIN {
 
    Data::init(
       PACKAGE  => __PACKAGE__,
-       SUPER    => ClearCase::Common::MetaObject
+       SUPER    => 'ClearCase::Common::MetaObject'
       );
 
 } # sub BEGIN()

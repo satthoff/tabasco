@@ -133,6 +133,10 @@ RETURN VALUE
 sub create {
    my $self = shift;
 
+    my ( $comment, @other ) = $self->rearrange(
+        [ 'COMMENT' ],
+        @_ );
+
    ClearCase::mkhltype(
        -name    => $self->getName(),
        -global  => $self->getGlobalAndAcquire(),
@@ -140,6 +144,7 @@ sub create {
        -vob     => $self->getVob()->getTag(),
        -comment => $comment
        );
+
    return $self;
 } # create
 

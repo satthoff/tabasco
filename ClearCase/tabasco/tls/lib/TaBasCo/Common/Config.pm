@@ -39,8 +39,10 @@ use vars qw/
     $firstReleaseLink
     $nextReleaseLink
     $floatingReleaseExtension
+    $floatingReleaseLink
     $myTaskLink
     $initialTaBasCoBaseline
+    $cspecDelimiter
 
     @allHlTypes
     @allLbTypes
@@ -67,7 +69,7 @@ BEGIN {
     $base = File::Basename::dirname (File::Basename::dirname ( Cwd::abs_path( File::Basename::dirname $0 ) ) );
     $configFilePath = $base . $OS::Common::Config::slash . $configFile;
 
-    $myVob = $ClearCase::Common::Config::myHost->getRegion()->getVob( File::Basename::dirname ( $base ) );
+    $myVob = ClearCase::Vob->new( -tag => File::Basename::dirname ( $base ) );
 
     @allHlTypes = qw/
 	$baselineLink $taskLink $nextReleaseLink

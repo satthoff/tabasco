@@ -139,9 +139,7 @@ sub new()
    chomp $oid;
    $self->setOid( $oid );
 
-   # get the Vob from my ClearCase host region
-   # the Vob tag has already been determined in variable $vobTag (see above)
-   $self->setVob( $ClearCase::Common::Config::myHost->getRegion()->getVob( $vobTag ) );
+   $self->setVob( ClearCase::Vob->new( -tag => $vobTag ) );
    
    $self->_init();
    return $self;

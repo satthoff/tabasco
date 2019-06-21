@@ -57,7 +57,7 @@ sub _init {
       @_ );
 
    if( $name =~ m/^vob:/ or $type and $type eq 'vob' ) {
-       Die( [ __PAACKAGE__ , 'Wrong object initialization. Expecting to be a ClearCase::Vob object' ] ) unless( $self->isa( 'ClearCase::Vob' ) );
+       Die( [ __PACKAGE__ , 'Wrong object initialization. Expecting to be a ClearCase::Vob object' ] ) unless( $self->isa( 'ClearCase::Vob' ) );
        $name =~ s/^vob://;
        $name =~ s/\@.*//;
        $self->setName( $name );
@@ -90,7 +90,7 @@ sub _init {
 
 	   $self->setType( $typeName );
 	   $self->setName( $name );
-	   $self->setVob( $ClearCase::Common::Config::myHost->getRegion()->getVob( $vobTag ) );
+	   $self->setVob( ClearCase::Vob->new( -tag => $vobTag ) );
 
 	   # check for an administrative Vob hierarchy
 	   my @vobConfig = $self->getVob( $vobTag )->typeCreationConfig();
