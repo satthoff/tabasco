@@ -31,7 +31,7 @@ sub BEGIN {
 
    Data::init(
       PACKAGE  => __PACKAGE__,
-      SUPER    => "ClearCase::Version"
+      SUPER    => 'ClearCase::LbType'
       );
 
 } # sub BEGIN()

@@ -89,7 +89,8 @@ sub _init {
 
        $self->setType( $typeName );
        $self->setName( $name );
-       $self->setFullName( $typeName . ':' . $name . "\@$vobTag" );
+       $self->setVob( $vob );
+       $self->setFullName( $self->getType() . ':' . $self->getName() . '@' . $self->getVob()->getTag() );
    }
    return $self;
 }
@@ -137,18 +138,13 @@ sub getFromHyperlinkedObjects {
 
     Die( [ __PACKAGE__ . '::getFromHyperlinkedObjects', 'FATAL ERROR: subroutine parameter is not a ClearCase::HlType' ] ) unless( $hltype->isa( 'ClearCase::HlType' ) );
 
-    my $hltypeName => $hltype->getName();
     ClearCase::describe(
-	-long => 1,
-	-ahl => $hltypeName,
+	-short => 1,
+	-ahl => $hltype->getName(),
 	-argv => $self->getFullName()
 	);
     my @results = ClearCase::getOutput();
     grep chomp, @results;
-
-    # get the hyperlink lines
-    @results = grep m/$hltypeName\@/, @results;
-    return @results unless( @results );
 
     # get only the from hyperlinks
     @results = grep m/\->/, @results;
@@ -161,7 +157,7 @@ sub getFromHyperlinkedObjects {
 	push @objectIdentifiers, $tmp[$#tmp];
     }
     
-    return \@objectIdentifiers;
+    return @objectIdentifiers;
 }
 
 sub getToHyperlinkedObjects {
@@ -170,18 +166,13 @@ sub getToHyperlinkedObjects {
 
     Die( [ __PACKAGE__ . '::getToHyperlinkedObjects', 'FATAL ERROR: subroutine parameter is not a ClearCase::HlType' ] ) unless( $hltype->isa( 'ClearCase::HlType' ) );
 
-    my $hltypeName => $hltype->getName();
     ClearCase::describe(
-	-long => 1,
-	-ahl => $hltypeName,
+	-short => 1,
+	-ahl => $hltype->getName(),
 	-argv => $self->getFullName()
 	);
     my @results = ClearCase::getOutput();
     grep chomp, @results;
-
-    # get the hyperlink lines
-    @results = grep m/$hltypeName\@/, @results;
-    return @results unless( @results );
 
     # get only the to hyperlinks
     @results = grep m/<\-/, @results;
@@ -194,7 +185,7 @@ sub getToHyperlinkedObjects {
 	push @objectIdentifiers, $tmp[$#tmp];
     }
     
-    return \@objectIdentifiers;
+    return @objectIdentifiers;
 }
 
 

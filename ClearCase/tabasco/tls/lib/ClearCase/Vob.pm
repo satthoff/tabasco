@@ -97,10 +97,10 @@ sub loadMyReplica {
 	);
     my $rep = ClearCase::getOutputLine();
     chomp $rep;
-    my %reps = %{ $self->getAllReplicas() };
+    my %reps = %{ $self->getAllReplica() };
     unless( defined $reps{ $rep } ) {
 	$reps{ $rep } = ClearCase::Replica->new( -name => $rep, -vob => $self );
-	$self->setAllReplicas( \%reps );
+	$self->setAllReplica( \%reps );
     }
     return $self->setMyReplica( $reps{ $rep } );
 }

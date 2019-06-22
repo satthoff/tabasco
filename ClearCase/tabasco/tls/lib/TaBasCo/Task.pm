@@ -34,7 +34,7 @@ sub BEGIN {
 
    Data::init(
       PACKAGE  => __PACKAGE__,
-      SUPER    => "ClearCase::Branch"
+      SUPER    => 'ClearCase::BrType'
       );
 
 
@@ -51,7 +51,7 @@ sub _createFloatingRelease {
     my $self = shift;
     my $comment = shift;
 
-    my $floatingRelease = TaBasCo::Release->new( -name -> uc( $self->getName() . $TaBasCo::Common::Config::floatingReleaseExtension ) );
+    my $floatingRelease = TaBasCo::Release->new( -name => uc( $self->getName() . $TaBasCo::Common::Config::floatingReleaseExtension ) );
     $floatingRelease->create(
 	-task => $self,
 	-comment => $comment
@@ -109,7 +109,7 @@ sub initializeMainTask {
 	-name => $TaBasCo::Common::Config::taskLink,
 	-vob => $mainTask->getVob()
 	);
-    if( $mainTask->getToHyperlinkedObjects->( $taskLink ) )  {
+    if( $mainTask->getToHyperlinkedObjects( $taskLink ) )  {
 	Die( [ __PACKAGE__ . '::initializeMainTask', "The main task has already been initialized." ] );
     }
     
@@ -131,7 +131,7 @@ sub initializeMainTask {
     
     # create the main task's floating release
     # and register it as the task's first release
-    my $floatingRelease = TaBasCo::Release->new( -name -> uc( $mainTask->getName() . $TaBasCo::Common::Config::floatingReleaseExtension ) );
+    my $floatingRelease = TaBasCo::Release->new( -name => uc( $mainTask->getName() . $TaBasCo::Common::Config::floatingReleaseExtension ) );
     $floatingRelease->SUPER::create();
     $mainTask->createHyperlinkToObject(
 	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::firstReleaseLink, -vob => $mainTask->getVob() ),
