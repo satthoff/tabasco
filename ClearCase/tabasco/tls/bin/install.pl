@@ -50,6 +50,13 @@ sub allVobsInAdminHierarchy {
 #Log::setVerbosity( "debug" );
 Transaction::start( -comment => 'TaBasCo installation' );
 
+# Tabasco must be installed in an ordinay Vob or the root Vob of an administrative Vob hierarchy
+my $myAdminVob = $TaBasCo::Common::Config::myVob->getMyAdminVob();
+if( $myAdminVob ) {
+    Die( [ '', 'Tabasco must NOT be installed in a Vob which is the client of an admin Vob.',
+	   'Admin Vob is ' . $myAdminVob->getTag() ] );
+}
+  
 # declare all hyperlink types
 foreach my $hltypeName ( @TaBasCo::Common::Config::allHlTypes ) {
     my $newType = ClearCase::HlType->new( -name => $hltypeName, -vob => $TaBasCo::Common::Config::myVob );
@@ -101,13 +108,18 @@ my $ui = TaBasCo::UI->new();
 
 my $notice = $TaBasCo::Common::Config::myVob->getRootElement()->getNormalizedPath() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot;
 my $label = $tabascoTask->getLastRelease()->getName();
+my $tabasName = $tabascoTask->getName();
+my $mainLabel = $mainTask->getLastRelease()->getName();
 $ui->okMessage( "
 
 Installation finished.
 
 TaBasCo is installed in $notice.
-It is fully labeled with $label.
 
-A task named tabasco has been created to manage changes of the implementation of TaBasCo.
+A task named $tabasName has been created to manage changes of the of TaBasCo implementation.
+The TaBasCo installation has been fully labeled with $label.
+
+A task named main exists as well and the initial configuration in all participating Vobs
+has been fully labeled with $mainLabel.
 
 " );

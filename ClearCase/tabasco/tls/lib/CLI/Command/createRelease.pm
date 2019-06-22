@@ -54,7 +54,7 @@ sub run {
 
   my $task = TaBasCo::Task->new( -name => $TaBasCo::Common::Config::taskNamePrefix . $taskName );
   unless( $task->exists() ) {
-      Error( [ __PACKAGE__ , "No TaBasCo::Task exists for the specified task name $taskName" ] );
+      Error( [ __PACKAGE__ , "No TaBasCo::Task exists with name $taskName" ] );
       $self->exitInstance( -1 );
   }
   $taskName = $task->getName();

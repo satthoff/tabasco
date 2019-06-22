@@ -92,7 +92,7 @@ sub ensureAsFullRelease {
     }
 
     Transaction::start( -comment => 'set required config spec to label a full release ' . $self->getName() );
-    $view->setConfigSpec( $self->getConfigSpec() );
+    $view->setConfigSpec( $self->getTask()->getConfigSpec() );
 
     Transaction::start( -comment => 'label entire release ' . $self->getName() );
     foreach my $tP ( @{ $self->getTask()->getPaths() } ) {
