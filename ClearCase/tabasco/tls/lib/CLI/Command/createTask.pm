@@ -67,7 +67,7 @@ sub run {
   my $baseline = TaBasCo::Release->new( -name => $baselineName );
   # existence of the release will be checked during task creation
   
-  my $newTask = TaBasCo::Task->new( -name => $taskName );
+  my $newTask = TaBasCo::Task->new( -name => $TaBasCo::Common::Config::taskNamePrefix . $taskName );
   $taskName = $newTask->getFullName();
   if( $newTask->exists() ) {
       Error( [ __PACKAGE__ , "A task with name $taskName already exists." ] );

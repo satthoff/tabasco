@@ -25,10 +25,7 @@ sub BEGIN {
        Tag            => undef,
        Password   => undef,
        Exists         => undef,
-
-       AdminVob => { CALCULATE => \&loadVob },            # will be set to 1 (true) if the vob is an administrative vob
-       MyAdminVob => { CALCULATE => \&loadVob },          # will contain the Vob object of the adminstrative vob of this vob, if this vob is a vob client.
-                                                          # if this vob is not a client of an administrative vob then this attribute will be set to undef.
+       MyAdminVob => { CALCULATE => \&loadMyAdminVob },
        RootElement => { CALCULATE => \&loadRootElement },
        Hostname  => { CALCULATE => \&loadVob },
        Owner        => { CALCULATE => \&loadVob },
@@ -111,17 +108,20 @@ sub loadMyReplica {
 sub loadVob {
     my $self = shift;
 
-    ClearCase::describe(
-	-long => 1,
-	-argv => $self->getFullName()
-	);
-    my @erg = ClearCase::getOutput();
-    grep chomp, @erg;
+    my @erg = ();
+    if( $self->{ 'description' } ) {
+	@erg = @{ $self->{ 'description' } };
+    } else {
+	clearcase::describe(
+	    -long => 1,
+	    -argv => $self->getFullName()
+	    );
+	@erg = ClearCase::getOutput();
+	grep chomp, @erg;
+	$self->{ 'description' } = \@erg;
+    }
 
-    $self->setAdminVob( 0 );
-    $self->setMyAdminVob( undef );
     foreach ( @erg ) {
-	next if( $self->getAdminVob() == 1 and m/^\s*AdminVOB\s+<\-\s+/ ); # skip AdminVOB hyperlink lines, the vob has already been registered as Admin Vob
 	if( m/^\s*VOB storage host:pathname\s+(\S+).*$/ ) {
 	    my $tmp = $1;
 	    $tmp =~ s/"//g;
@@ -136,11 +136,6 @@ sub loadVob {
 	    $self->setGpath( $tmp );
 	} elsif( m/owner\s+(\S+).*/ ) {
 	    $self->setOwner( $1 );
-	} elsif( m/^\s*AdminVOB\s+<\-\s+/ ) {
-	    $self->setAdminVob( 1 );
-	} elsif( m/^\s*AdminVOB\s+\->\s+vob:(\S+).*$/ ) {
-	    my $adminVob = $ClearCase::Common::Config::myHost->getRegion()->getVob( $1 );
-	    $self->setMyAdminVob( $adminVob );
 	}
     }
     return;
@@ -207,7 +202,7 @@ sub typeCreationConfig {
     my @config = ();
     my $GlobalAndAcquire = 0;
     my $targetVob = $self;
-    $GlobalAndAcquire = 1 if( $self->getAdminVob() or $self->getMyAdminVob() );
+    $GlobalAndAcquire = 1 if( $self->getMyAdminVob() or $self->getVobsAdminClients() );
     while( $targetVob->getMyAdminVob() ) {
 	$targetVob = $self->getMyAdminVob();
     }
@@ -292,13 +287,23 @@ sub load
 sub loadVobsAdminClients {
     my $self = shift;
 
-    my @results = $self->getFromHyperlinkedObjects( ClearCase::HlType->new( -name => $ClearCase::Common::Config::adminVobLink ) );
+    my @results = $self->getToHyperlinkedObjects( ClearCase::HlType->new( -name => $ClearCase::Common::Config::adminVobLink ) );
     my @adminClients = ();
     if( @results ) {
 	foreach my $r ( @results ) {
-	    push @adminClients, ClearCase::Vob->new( -tag => $r );
+	    push @adminClients, $ClearCase::Common::Config::myHost->getRegion()->getVob( $r ) );
 	}
 	return $self->setVobsAdminClients( \@adminClients );
+    }
+    return undef;
+}
+
+sub loadMyAdminVob {
+    my $self = shift;
+
+    my @results = $self->getFromHyperlinkedObjects( ClearCase::HlType->new( -name => $ClearCase::Common::Config::adminVobLink ) );
+    if( @results ) {
+	return $self->setMyAdminVob( $ClearCase::Common::Config::myHost->getRegion()->getVob( $results[0] ) );
     }
     return undef;
 }

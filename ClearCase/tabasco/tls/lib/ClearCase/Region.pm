@@ -63,6 +63,7 @@ sub loadVobs {
    my %vobs = ();
    foreach ( @erg ) {
        $vobs{ $_ } = ClearCase::Vob->new( -tag => $_ );
+       $vobs{ $_ }->setExists( 1 );
    }
    return $self->setVobs( \%vobs );
 }

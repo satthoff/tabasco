@@ -139,7 +139,7 @@ sub new()
    chomp $oid;
    $self->setOid( $oid );
 
-   $self->setVob( ClearCase::Vob->new( -tag => $vobTag ) );
+   $self->setVob( $ClearCase::Common::Config::myHost->getRegion()->getVob( $vobTag ) );
    
    $self->_init();
    return $self;

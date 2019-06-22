@@ -28,7 +28,6 @@ sub initInstance {
 
    # first initialize the base classes
    $self->SUPER::initInstance(
-       '-name=s',
        '-task=s',
        '-comment=s'
        );
@@ -51,8 +50,9 @@ sub run {
       Error( [ 'No task name has been specified.' ] );
       $self->exitInstance( -1 );
   }
+  $taskName =~ s/^$TaBasCo::Common::Config::taskNamePrefix//;
 
-  my $task = TaBasCo::Task->new( -name => $taskName );
+  my $task = TaBasCo::Task->new( -name => $TaBasCo::Common::Config::taskNamePrefix . $taskName );
   unless( $task->exists() ) {
       Error( [ __PACKAGE__ , "No TaBasCo::Task exists for the specified task name $taskName" ] );
       $self->exitInstance( -1 );
@@ -63,18 +63,17 @@ sub run {
   $comment = $self->getOption( 'comment' ) if( $self->getOption( 'comment' ) );
 
   
-  Transaction::start( -comment => 'create new release ' . $releaseName );
+  Transaction::start( -comment => 'create new release ' );
 
   my $newRelease = $task->createNewRelease(
-      -name => $self->getOption( 'name' ),
       -comment => $comment
       );
 
   unless( $newRelease ) {
-      Error( [ __PACKAGE__ , "Creation of new release $releaseName failed."  ] );
+      Error( [ __PACKAGE__ , "Creation of new release failed."  ] );
       $self->exitInstance( -1 );
   }
-  $releaseName = $newRelease->getName();
+  my $releaseName = $newRelease->getName();
  
   Transaction::commit();
   Message( [ __PACKAGE__ , "Successfully created new release $releaseName in task $taskName" ] );

@@ -90,7 +90,7 @@ sub _init {
 
        $self->setType( $typeName );
        $self->setName( $name );
-       $self->setVob( ClearCase::Vob->new( -tag => $vobTag ) );
+       $self->setVob( $ClearCase::Common::Config::myHost->getRegion()->getVob( $vobTag ) );
 
        # check for an administrative Vob hierarchy
        my @vobConfig = $self->getVob( $vobTag )->typeCreationConfig();

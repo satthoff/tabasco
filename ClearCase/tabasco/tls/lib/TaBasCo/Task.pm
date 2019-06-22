@@ -107,7 +107,7 @@ sub initializeMainTask {
     # check whether the initialization has already been performed, never execute this subroutine twice!!!!
     my $taskLink = ClearCase::HlType->new(
 	-name => $TaBasCo::Common::Config::taskLink,
-	-vob => $TaBasCo::Common::Config::myVob
+	-vob => $mainTask->getVob()
 	);
     if( $mainTask->getToHyperlinkedObjects->( $taskLink ) )  {
 	Die( [ __PACKAGE__ . '::initializeMainTask', "The main task has already been initialized." ] );
@@ -125,7 +125,7 @@ sub initializeMainTask {
 
     # register the provided baseline as the task baseline
     $mainTask->createHyperlinkToObject(
-	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::baselineLink, -vob => $TaBasCo::Common::Config::myVob ),
+	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::baselineLink, -vob => $mainTask->getVob() ),
 	-object => $baseline
 	);
     
@@ -134,7 +134,7 @@ sub initializeMainTask {
     my $floatingRelease = TaBasCo::Release->new( -name -> uc( $mainTask->getName() . $TaBasCo::Common::Config::floatingReleaseExtension ) );
     $floatingRelease->SUPER::create();
     $mainTask->createHyperlinkToObject(
-	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::firstReleaseLink, -vob => $TaBasCo::Common::Config::myVob ),
+	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::firstReleaseLink, -vob => $mainTask->getVob() ),
 	-object => $floatingRelease
 	);
     $floatingRelease->_registerAsTaskMember( $mainTask );
@@ -143,19 +143,23 @@ sub initializeMainTask {
     # attach the initial path hyperlinks
     # we expect that TABASCO has been installed in the root Vob of an adminstrative Vob hierarchy or in an ordinary Vob.
     my @elements = ();
-    my @clientVobs = $mainTask->getVob()->getToHyperlinkedObjects(
-	ClearCase::HlType->new( 
-	    -name => $ClearCase::Common::Config::adminVobLink,
-	    -vob => $TaBasCo::Common::Config::myVob
-	)
-	);
-    foreach my $sv ( @clientVobs ) {
-	push @elements, ClearCase::Vob->new( -tag => $sv )->getRootElement();
-    }
-    push @elements, $mainTask->getVob()->getRootElement();
+    push @elements, &TaBasCo::Task::_allAdminClientsRootElements( $mainTask->getVob() );
     $mainTask->mkPaths( \@elements );
     return $mainTask;
-}   
+}
+
+sub _allAdminClientsRootElements {
+    my $vob = shift;
+
+    my @allRootElements = ( $vob->getRootElement() );
+    my $clients = $vob->getVobsAdminClients();
+    if( $clients ) {
+	foreach my $cl ( @$clients ) {
+	    push @allRootElements, &TaBasCo::Task::_allAdminClientsRootElements( $cl );
+	}
+    }
+    return @allRootElements;
+}
 
 sub createNewRelease {
     my $self = shift;
@@ -183,7 +187,7 @@ sub exists {
     my $self = shift;
 
     if( $self->SUPER::exists() ) {
-	my @result = $self->getToHyperlinkedObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::taskLink ) );
+	my @result = $self->getToHyperlinkedObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::taskLink, -vob => $self->getVob() ) );
 	if( $#result > 0 ) {
 	    Die( [ __PACKAGE__ , "FATAL ERROR: Incorrect number ($#result) of task registration links $TaBasCo::Common::Config::taskLink at task " . $self->getFullName(), '' ] );
 	} elsif( $#result == 0 ) {
@@ -192,7 +196,7 @@ sub exists {
 		return 1;
 	    }
 	    Die( [ __PACKAGE__ , "FATAL ERROR: Task registration link $TaBasCo::Common::Config::taskLink at task " . $self->getFullName(),
-		 ' is connected to wrong meta object (our own replica expected)' . $result[0] ] );
+		 ' is connected to wrong meta object (our own replica expected) ' . $result[0] ] );
 	} else {
 	    Debug( [ __PACKAGE__ , "A branch type named " . $self->getName() . ' exists, but it is no ' . __PACKAGE__ ] );
 	    return 0;
@@ -221,7 +225,7 @@ sub loadLastRelease {
 sub loadBaseline {
     my $self = shift;
 
-    my @result = $self->getFromHyperlinkedObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::baselineLink ) );
+    my @result = $self->getFromHyperlinkedObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::baselineLink, -vob => $self->getVob() ) );
     if( $#result != 0 ) {
 	Die( [ '', "incorrect number ($#result) of baseline links $TaBasCo::Common::Config::baselineLink at task " . $self->getFullName(), '' ] );
     }
@@ -254,7 +258,7 @@ sub mkPaths {
 
     foreach my $elem ( @$elements ) {
 	$self->createHyperlinkToObject(
-	    -hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::pathLink ),
+	    -hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::pathLink, -vob => $self->getVob ),
 	    -object => $elem
 	    );
     }
@@ -264,7 +268,7 @@ sub mkPaths {
 sub loadPaths {
     my $self = shift;
 
-    my @paths = $self->getHyperlinkedFromObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::pathLink ) );
+    my @paths = $self->getHyperlinkedFromObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::pathLink, -vob => $self->getVob() ) );
     my $parent = undef;
     if( @paths ) {
 	# results must be element paths, so construct them

@@ -43,6 +43,8 @@ use vars qw/
     $myTaskLink
     $initialTaBasCoBaseline
     $cspecDelimiter
+    $taskNamePrefix
+    $configurationNamePrefix
 
     @allHlTypes
     @allLbTypes
@@ -51,6 +53,8 @@ use vars qw/
 
 
 BEGIN {
+    $taskNamePrefix = 'tsk_';
+    $configurationNamePrefix = 'cfg_';
     my $tabascoPrefix = 'tabasco_';
     $initialTaBasCoBaseline = $tabascoPrefix . 'InitialBaseline';
     $baselineLink = $tabascoPrefix . 'TaskBaseline';
@@ -69,7 +73,7 @@ BEGIN {
     $base = File::Basename::dirname (File::Basename::dirname ( Cwd::abs_path( File::Basename::dirname $0 ) ) );
     $configFilePath = $base . $OS::Common::Config::slash . $configFile;
 
-    $myVob = ClearCase::Vob->new( -tag => File::Basename::dirname ( $base ) );
+    $myVob = $ClearCase::Common::Config::myHost->getRegion()->getVob( File::Basename::dirname ( $base ) );
 
     @allHlTypes = ( $baselineLink, $taskLink, $nextReleaseLink, $floatingReleaseLink, $myTaskLink, $pathLink );
     
