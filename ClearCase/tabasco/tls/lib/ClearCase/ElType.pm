@@ -132,11 +132,13 @@ RETURN VALUE
 sub create {
    my $self = shift;
 
-   # still needs to be changed to use $self->getVob()->ensureElementType( -name => $self->getName() )
+
+   my $adminMode = 0;
+   $adminMode = 1 if( $self->getVob()->getVobsAdminClients or $self->getVob()->getMyAdminVob() );
    ClearCase::mkeltype(
        -name    => $self->getName(),
-       -global  => $self->getGlobalAndAcquire(),
-       -acquire => $self->getGlobalAndAcquire(),
+       -global  => $adminMode,
+       -acquire => $adminMode,
        -vob     => $self->getVob()->getTag()
       );
 

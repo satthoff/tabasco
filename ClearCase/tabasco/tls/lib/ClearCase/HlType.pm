@@ -137,10 +137,13 @@ sub create {
         [ 'COMMENT' ],
         @_ );
 
+
+   my $adminMode = 0;
+   $adminMode = 1 if( $self->getVob()->getVobsAdminClients or $self->getVob()->getMyAdminVob() );
    ClearCase::mkhltype(
        -name    => $self->getName(),
-       -global  => $self->getGlobalAndAcquire(),
-       -acquire => $self->getGlobalAndAcquire(),
+       -global  => $adminMode,
+       -acquire => $adminMode,
        -vob     => $self->getVob()->getTag(),
        -comment => $comment
        );

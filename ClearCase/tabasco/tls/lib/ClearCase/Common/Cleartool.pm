@@ -215,122 +215,61 @@ sub registerRemoteHost
 
 sub cleartool {
 
-   # initialize ClearTool object
-   if ( not defined $CT ) {
-      $CT = ClearCase::CtCmd->new();
-      $CT->{ 'CT_ERROUT' } = 1;
-   }
+    # initialize ClearTool object
+    if ( not defined $CT ) {
+	$CT = ClearCase::CtCmd->new();
+	$CT->{ 'CT_ERROUT' } = 1;
+    }
 
-  @CT_ERRORS = ();
-  @CT_WARNINGS = ();
-  @CT_OUTPUT = ();
-  $CT_RC = undef;
+    @CT_ERRORS = ();
+    @CT_WARNINGS = ();
+    @CT_OUTPUT = ();
+    $CT_RC = undef;
 
-   # store error and warnings internal in cleartool subprocess
-   #$CT->store;
+    # store error and warnings internal in cleartool subprocess
+    #$CT->store;
 
+    Exec( [ 'ct ' . join( ' ', @_ )] );
+    my @erg = ();
+    @erg = $CT->exec( join( ' ', @_ ) );
+    $CT_RC = $erg[0];
 
-   if( $_[1] =~ m/^REMOTEHOST:(\S+)/ )
-     {
-       my @cmd = ();
-       push @cmd, "ssh $1";
-       my $ct = join('/', $ENV{ATRIAHOME} || '/usr/atria', 'bin/cleartool');
-       $ct = 'cleartool' unless -x $ct;
-       push @cmd, $ct;
-       push @cmd, shift @_;
-       shift @_;
-       push @cmd, @_;
-       my $tmpout = POSIX::tmpnam();
-       my $tmperr = POSIX::tmpnam();
+    my @erg_out = split /\n/, $erg[1];
+    my @erg_err = split /\n/, $erg[2];
+    grep s/$/\n/, @erg_out;
+    grep s/$/\n/, @erg_err;
 
-       Exec( [ join( ' ', @cmd )] );
-       $CT_RC = system( "@cmd 2>$tmperr 1>$tmpout" );
+    foreach( @erg_out ) {
+	s/cleartool: *//;
+	if( /Error: *(.*)/ ) {
+	    push @CT_ERRORS, $1;
+	} elsif( /Warning: *(.*)/ ) {
+	    push @CT_WARNINGS, $1;
+	} else {
+	    push @CT_OUTPUT, $_;
+	}
+    }
 
-       open FD, "$tmpout" or Die( [ 'can not read temp file ' . $tmpout ] );
-       my @tmp = <FD>;
-       close FD;
-       unlink $tmpout;
-       foreach( @tmp )
-	 {
-	   if( /Warning/i )
-	     {
-	       push @CT_WARNINGS, $_;
-	     }
-	   else
-	     {
-	       push @CT_OUTPUT, $_;
-	     }
-	 }
+    foreach( @erg_err ) {
+	s/cleartool: *//;
+	if( /Error: *(.*)/ ) {
+	    push @CT_ERRORS, $1;
+	} elsif( /Warning: *(.*)/ ) {
+	    push @CT_WARNINGS, $1;
+	}
+    }
+    
+    @CT_WARNINGS = grep (!m/which is different from set view/, @CT_WARNINGS);
 
-       open FD, "$tmperr" or Die( [ 'can not read temp file ' . $tmperr ] );
-       @tmp = <FD>;
-       close FD;
-       unlink $tmperr;
-       foreach( @tmp )
-	 {
-	   if( /Warning/i )
-	     {
-	       push @CT_WARNINGS, $_;
-	     }
-	   else
-	     {
-	       push @CT_ERRORS, $_;
-	     }
-	 }
+    Debug( [ "Cleartool RC ". $CT_RC ] );
+    Debug( [ "Cleartool Output", @CT_OUTPUT ] )
+	if @CT_OUTPUT;
+    Warn( [ "Cleartool Warning", @CT_WARNINGS ] )
+	if ( @CT_WARNINGS and $CT->{ 'CT_ERROUT' } );
+    Error( [ "Cleartool Errors", @CT_ERRORS ] )
+	if ( @CT_ERRORS and $CT->{ 'CT_ERROUT' } );
 
-       $CT_RC =  ( $#CT_ERRORS > -1 );
-     }
-   else
-     {
-       Exec( [ 'ct ' . join( ' ', @_ )] );
-       my @erg = ();
-       @erg = $CT->exec( join( ' ', @_ ) );
-       $CT_RC = $erg[0];
-
-       my @erg_out = split /\n/, $erg[1];
-       my @erg_err = split /\n/, $erg[2];
-       grep s/$/\n/, @erg_out;
-       grep s/$/\n/, @erg_err;
-
-       foreach( @erg_out )
-	 {
-	   s/cleartool: *//;
-
-	   if( /Error: *(.*)/ ) {
-	     push @CT_ERRORS, $1;
-
-	   } elsif( /Warning: *(.*)/ ) {
-	     push @CT_WARNINGS, $1;
-
-	   } else {
-	     push @CT_OUTPUT, $_;
-	   }
-	 }
-
-       foreach( @erg_err )
-	 {
-	   s/cleartool: *//;
-
-	   if( /Error: *(.*)/ ) {
-	     push @CT_ERRORS, $1;
-
-	   } elsif( /Warning: *(.*)/ ) {
-	     push @CT_WARNINGS, $1;
-
-	   }
-	 }
-     }
-  @CT_WARNINGS = grep (!m/which is different from set view/, @CT_WARNINGS);
-
-  Debug( [ "Cleartool RC ". $CT_RC ] );
-  Debug( [ "Cleartool Output", @CT_OUTPUT ] )
-    if @CT_OUTPUT;
-  Warn( [ "Cleartool Warning", @CT_WARNINGS ] )
-    if ( @CT_WARNINGS and $CT->{ 'CT_ERROUT' } );
-  Error( [ "Cleartool Errors", @CT_ERRORS ] )
-    if ( @CT_ERRORS and $CT->{ 'CT_ERROUT' } );
-
-  return $CT_RC;
+    return $CT_RC;
 } # cleartool
 
 sub getRC {

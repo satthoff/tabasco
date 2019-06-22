@@ -193,24 +193,6 @@ sub create
       return undef;
   }
 
-sub typeCreationConfig {
-    my $self = shift;
-
-    # will return array @config
-    # $config[0] = 1|0, 1 = create global type, 0 = create ordinary type
-    # $config[1] = undef|ClearCase::Vob, the vob object is the root of a possibly existing administrative vob hierarchy
-    my @config = ();
-    my $GlobalAndAcquire = 0;
-    my $targetVob = $self;
-    $GlobalAndAcquire = 1 if( $self->getMyAdminVob() or $self->getVobsAdminClients() );
-    while( $targetVob->getMyAdminVob() ) {
-	$targetVob = $self->getMyAdminVob();
-    }
-    $config[0] = $GlobalAndAcquire;
-    $config[1] = $targetVob;
-    return @config;
-}
-
 sub loadFamilyID
   {
       my $self = shift;
@@ -247,51 +229,47 @@ sub loadUUID
   }
 
 
-sub load
-  {
-   my $proto = shift;
-   my $class = ref ($proto) || $proto;
-   my $path  = shift;
+sub load {
+    my $proto = shift;
+    my $class = ref ($proto) || $proto;
+    my $path  = shift;
 
-   ClearCase::disableErrorOut();
-   ClearCase::disableDieOnErrors();
-   my $tag = '';
-   my $check = 0;
-   if ( $path =~ m/^vobuuid:(\S+)/ )
-     {
-	 ClearCase::lsvob(
-			  -family => $1,
-			  -short  => 1
-			 );
-	 $check = 1  if( ClearCase::getRC() == 0 );
-	 $tag = ClearCase::getOutputLine();
-	 chomp $tag;
-     }
-   else
-   {
-       $path =~ s/^vob://;
-	 ClearCase::describe(
-			     -short => 1,
-			     -argv => 'vob:' . $path
-			    );
-	 $check = 1 if( ClearCase::getRC() == 0 );
-	 $tag = ClearCase::getOutputLine();
-	 chomp $tag;
-     }
-   ClearCase::enableErrorOut();
-   ClearCase::enableDieOnErrors();
-   return $proto->new( -tag => $tag ) if( $check );
-   return undef;
-  }
+    ClearCase::disableErrorOut();
+    ClearCase::disableDieOnErrors();
+    my $tag = '';
+    my $check = 0;
+    if ( $path =~ m/^vobuuid:(\S+)/ ) {
+	ClearCase::lsvob(
+	    -family => $1,
+	    -short  => 1
+	    );
+	$check = 1 if( ClearCase::getRC() == 0 );
+	$tag = ClearCase::getOutputLine();
+	chomp $tag;
+    } else {
+	$path =~ s/^vob://;
+	ClearCase::describe(
+	    -short => 1,
+	    -argv => 'vob:' . $path
+	    );
+	$check = 1 if( ClearCase::getRC() == 0 );
+	$tag = ClearCase::getOutputLine();
+	chomp $tag;
+    }
+    ClearCase::enableErrorOut();
+    ClearCase::enableDieOnErrors();
+    return $proto->new( -tag => $tag ) if( $check );
+    return undef;
+}
 
 sub loadVobsAdminClients {
     my $self = shift;
 
-    my @results = $self->getToHyperlinkedObjects( ClearCase::HlType->new( -name => $ClearCase::Common::Config::adminVobLink ) );
+    my @results = $self->getToHyperlinkedObjects( ClearCase::HlType->new( -name => $ClearCase::Common::Config::adminVobLink, -vob => $self ) );
     my @adminClients = ();
     if( @results ) {
 	foreach my $r ( @results ) {
-	    push @adminClients, $ClearCase::Common::Config::myHost->getRegion()->getVob( $r ) );
+	    push @adminClients, $ClearCase::Common::Config::myHost->getRegion()->getVob( $r );
 	}
 	return $self->setVobsAdminClients( \@adminClients );
     }
@@ -301,7 +279,7 @@ sub loadVobsAdminClients {
 sub loadMyAdminVob {
     my $self = shift;
 
-    my @results = $self->getFromHyperlinkedObjects( ClearCase::HlType->new( -name => $ClearCase::Common::Config::adminVobLink ) );
+    my @results = $self->getFromHyperlinkedObjects( ClearCase::HlType->new( -name => $ClearCase::Common::Config::adminVobLink, -vob => $self ) );
     if( @results ) {
 	return $self->setMyAdminVob( $ClearCase::Common::Config::myHost->getRegion()->getVob( $results[0] ) );
     }

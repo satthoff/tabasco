@@ -70,12 +70,14 @@ sub create {
     unless( $pbranch ) {
 	$pbranch = 0;
     }
-    
+
+    my $adminMode = 0;
+    $adminMode = 1 if( $self->getVob()->getVobsAdminClients or $self->getVob()->getMyAdminVob() );
     ClearCase::mklbtype(
 	-name    => $self->getName(),
 	-pbranch => $pbranch,
-	-global  => $self->getGlobalAndAcquire(),
-	-acquire => $self->getGlobalAndAcquire(),
+	-global  => $adminMode,
+	-acquire => $adminMode,
 	-vob     => $self->getVob()->getTag(),
 	-comment => $comment
 	);
