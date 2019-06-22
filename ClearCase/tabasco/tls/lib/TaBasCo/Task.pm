@@ -71,10 +71,13 @@ sub create {
 	Error( [ __PACKAGE__ . '::create : Baseline ' . $baseline->getName() . ' does not exist.' ] );
 	return undef;
     }
-    unless( $comment ) {
-	$comment = __PACKAGE__ . '::create - no purpose specified.';
+
+    if( $self->getName() ne 'main' ) {
+	unless( $comment ) {
+	    $comment = __PACKAGE__ . '::create - no purpose specified.';
+	}
+	$self->SUPER::create( -comment => $comment );
     }
-    $self->SUPER::create( -comment => $comment );
 
     # register the new task as a known task
     $self->createHyperlinkFromObject(
@@ -112,34 +115,9 @@ sub initializeMainTask {
     if( $mainTask->getToHyperlinkedObjects( $taskLink ) )  {
 	Die( [ __PACKAGE__ . '::initializeMainTask', "The main task has already been initialized." ] );
     }
-    
-    unless( $baseline->SUPER::exists() ) {
-	Die( [ __PACKAGE__ . '::initializeMainTask', "Label Type $baselineName to be used as baseline for the main task does not exist." ] );
-    }
 
-    # register the main task as a known task
-    $mainTask->createHyperlinkFromObject(
-	-hltype => $taskLink,
-	-object => $mainTask->getVob()->getMyReplica()
-	);
-
-    # register the provided baseline as the task baseline
-    $mainTask->createHyperlinkToObject(
-	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::baselineLink, -vob => $mainTask->getVob() ),
-	-object => $baseline
-	);
-    
-    # create the main task's floating release
-    # and register it as the task's first release
-    my $floatingRelease = TaBasCo::Release->new( -name => uc( $mainTask->getName() . $TaBasCo::Common::Config::floatingReleaseExtension ) );
-    $floatingRelease->SUPER::create();
-    $mainTask->createHyperlinkToObject(
-	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::firstReleaseLink, -vob => $mainTask->getVob() ),
-	-object => $floatingRelease
-	);
-    $floatingRelease->_registerAsTaskMember( $mainTask );
-    $mainTask->setFloatingRelease( $floatingRelease );
-
+    $mainTask->create( -baseline => $baseline );
+        
     # attach the initial path hyperlinks
     # we expect that TABASCO has been installed in the root Vob of an adminstrative Vob hierarchy or in an ordinary Vob.
     my @elements = ();

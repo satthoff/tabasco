@@ -24,7 +24,6 @@ sub BEGIN {
 
    %DATA = (
        Task => { CALCULATE => \&loadTask },
-       Name => { CALCULATE => \&loadName },
        Previous => { CALCULATE => \&loadPrevious },
        ConfigSpec => { CALCULATE => \&loadConfigSpec }
        );
