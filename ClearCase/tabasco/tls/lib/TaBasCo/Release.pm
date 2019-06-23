@@ -112,17 +112,26 @@ sub loadPrevious {
     my $self = shift;
 
     my @result = $self->getToHyperlinkedObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::nextReleaseLink, -vob => $self->getVob() ) );
-    return undef unless( @result );
-    if( $#result != 0 ) {
-	Die( [ '', "incorrect number ($#result) of next release links $TaBasCo::Common::Config::nextReleaseLink at release " . $self->getFullName(), '' ] );
+    unless( @result ) {
+	# we have to check whether the baseline of the task is a release of another task or not.
+	# the very first task main has a baseline which is not a release of any other task
+	# in this case we have to deliver the baseline as the previous release
+	if( $self->getTask()->getName() eq 'main' and $self->getName() ne $TaBasCo::Common::Config::initialTaBasCoBaseline ) {
+	    return $self->setPrevious( $self->getTask()->getBaseline() );
+	}
+	return undef;
+    } else {
+	if( $#result != 0 ) {
+	    Die( [ '', "incorrect number ($#result) of next release links $TaBasCo::Common::Config::nextReleaseLink at release " . $self->getFullName(), '' ] );
+	}
+	# we expect the result to be a TaBasCo::Release
+	my $release = TaBasCo::Release->new( -name => $result[0] );
+	unless( $release->exists() ) {
+	    Die( [ '', "Hyperlink $TaBasCo::Common::Config::nextReleaseLink on release " . $self->getFullName() . " does not point from an existing TaBasCo::Release in Vob " . $self->getVob()->getTag(), '' ] );
+	}
+	return $self->setPrevious( $release );
     }
-    # we expect the result to be a TaBasCo::Release
-    my $release = TaBasCo::Release->new( -name => $result[0] );
-    unless( $release->exists() ) {
-	Die( [ '', "Hyperlink $TaBasCo::Common::Config::nextReleaseLink on release " . $self->getFullName() . " does not point from an existing TaBasCo::Release in Vob " . $self->getVob()->getTag(), '' ] );
-    }
-
-    return $self->setPrevious( $release );
+    return undef; # should never be reached
 }
 
 sub loadTask {
