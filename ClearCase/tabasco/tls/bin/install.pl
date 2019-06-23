@@ -38,7 +38,7 @@ sub allVobsInAdminHierarchy {
     my $vob = shift;
 
     my @allVobs = ( $vob );
-    my $clients = $vob->getVobsAdminClients();
+    my $clients = $vob->getClientVobs();
     if( $clients ) {
 	foreach my $cl ( @$clients ) {
 	    push @allVobs, &allVobsInAdminHierarchy( $cl );
@@ -88,18 +88,18 @@ $tabascoTask->getFloatingRelease()->ensureAsFullRelease();
 $tabascoTask->createNewRelease();
 
 # finaly create all trigger types in all Vobs
-foreach my $trgVob ( &allVobsInAdminHierarchy( $TaBasCo::Common::Config::myVob ) ) {
-    foreach my $trg ( keys %TaBasCo::Common::Config::allTrigger ) {
-	my $trt = ClearCase::TrType->new( -name => $trg, -vob => $trgVob );
-	$trt->create(
-	    -all     => $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'all' },
-	    -element => $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'element' },
-	    -execu   => '"' . $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'execu' } . '"',
-	    -execw   => '"' . $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'execw' } . '"',
-	    -command => $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'ops' }
-	    );
-    }
-}
+#foreach my $trgVob ( &allVobsInAdminHierarchy( $TaBasCo::Common::Config::myVob ) ) {
+#    foreach my $trg ( keys %TaBasCo::Common::Config::allTrigger ) {
+#	my $trt = ClearCase::TrType->new( -name => $trg, -vob => $trgVob );
+#	$trt->create(
+#	    -all     => $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'all' },
+#	    -element => $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'element' },
+#	    -execu   => '"' . $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'execu' } . '"',
+#	    -execw   => '"' . $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'execw' } . '"',
+#	    -command => $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'ops' }
+#	    );
+#    }
+#}
 
 Transaction::commit(); # TaBasCo installation
 
