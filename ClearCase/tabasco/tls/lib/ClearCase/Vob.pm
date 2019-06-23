@@ -269,7 +269,7 @@ sub loadClientVobs {
     my @adminClients = ();
     if( @results ) {
 	foreach my $r ( @results ) {
-	    push @adminClients, $ClearCase::Common::Config::myHost->getRegion()->getVob( $r );
+	    push @adminClients, ClearCase::Vob->new( -tag => $r );
 	}
 	return $self->setClientVobs( \@adminClients );
     }
@@ -281,7 +281,7 @@ sub loadMyAdminVob {
 
     my @results = $self->getFromHyperlinkedObjects( ClearCase::HlType->new( -name => $ClearCase::Common::Config::adminVobLink, -vob => $self ) );
     if( @results ) {
-	return $self->setMyAdminVob( $ClearCase::Common::Config::myHost->getRegion()->getVob( $results[0] ) );
+	return $self->setMyAdminVob( ClearCase::Vob->new( -tag => $results[0] ) );
     }
     return undef;
 }

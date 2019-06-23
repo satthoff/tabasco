@@ -56,7 +56,6 @@ sub _createFloatingRelease {
 	-task => $self,
 	-comment => $comment
 	);
-    $floatingRelease->_registerAsTaskMember( $self );
     return $self->setFloatingRelease( $floatingRelease );
 }
 
