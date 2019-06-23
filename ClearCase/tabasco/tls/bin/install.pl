@@ -29,9 +29,9 @@ BEGIN {
   unshift @INC, @INCL_LIB;
 }
 
+use OS;
 use ClearCase;
 use TaBasCo;
-use OS;
 use Log;
 
 sub allVobsInAdminHierarchy {
@@ -47,7 +47,7 @@ sub allVobsInAdminHierarchy {
     return @allVobs;
 }
 
-#Log::setVerbosity( "debug" );
+Log::setVerbosity( "debug" );
 Transaction::start( -comment => 'TaBasCo installation' );
 
 # Tabasco must be installed in an ordinay Vob or the root Vob of an administrative Vob hierarchy

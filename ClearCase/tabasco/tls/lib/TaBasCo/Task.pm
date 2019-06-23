@@ -321,7 +321,8 @@ sub loadConfigSpec  {
 	    push @config_spec, "element $cp /main/0";
 	}
 	push @config_spec, "end mkbranch " . $self->getName();
-	$baseline = $self->getParent()->getBaseline();
+
+	$baseline = $self->getBaseline();
 	while( $baseline ) {
 	    foreach my $cp ( @{ $baseline->getTask()->getCspecPaths() } ) {
 		push @config_spec, "element " . $cp . ' ' . $baseline->getName() . " -nocheckout";
