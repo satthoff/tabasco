@@ -167,12 +167,6 @@ sub main {
          CLI::Command::getInstance()->exitInstance(-1);
          };
 
-      # specific check only for TABASCO
-      unless( TaBasCo::Common::Config::getConfigElement() ) {
-	  Error( [ '', "Cannot load the configuration element in CLI::Command", '' ] );
-          $self->exitInstance( -1 );
-      }
-
       # initialize the Command.
       $self->initInstance();
 
