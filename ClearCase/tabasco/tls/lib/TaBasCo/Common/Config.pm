@@ -75,7 +75,7 @@ BEGIN {
 
     $myVob = $ClearCase::Common::Config::myHost->getRegion()->getVob( File::Basename::dirname ( $base ) );
 
-    @allHlTypes = ( $baselineLink, $taskLink, $nextReleaseLink, $floatingReleaseLink, $myTaskLink, $pathLink );
+    @allHlTypes = ( $baselineLink, $taskLink, $firstReleaseLink, $nextReleaseLink, $floatingReleaseLink, $myTaskLink, $pathLink );
     
     @allLbTypes = ( $initialTaBasCoBaseline );
 

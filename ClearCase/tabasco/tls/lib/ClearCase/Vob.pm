@@ -35,7 +35,7 @@ sub BEGIN {
        AllReplica    => { CALCULATE => \&loadAllReplica },
        CspecTag   => { CALCULATE => \&loadCspecTag },
        UUID           => { CALCULATE => \&loadUUID },
-       VobsAdminClients => { CALCULATE => \&loadVobsAdminClients }
+       ClientVobs => { CALCULATE => \&loadClientVobs }
       );
 
    Data::init(
@@ -262,7 +262,7 @@ sub load {
     return undef;
 }
 
-sub loadVobsAdminClients {
+sub loadClientVobs {
     my $self = shift;
 
     my @results = $self->getToHyperlinkedObjects( ClearCase::HlType->new( -name => $ClearCase::Common::Config::adminVobLink, -vob => $self ) );
@@ -271,7 +271,7 @@ sub loadVobsAdminClients {
 	foreach my $r ( @results ) {
 	    push @adminClients, $ClearCase::Common::Config::myHost->getRegion()->getVob( $r );
 	}
-	return $self->setVobsAdminClients( \@adminClients );
+	return $self->setClientVobs( \@adminClients );
     }
     return undef;
 }

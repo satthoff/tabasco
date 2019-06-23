@@ -121,19 +121,20 @@ sub initializeMainTask {
     # attach the initial path hyperlinks
     # we expect that TABASCO has been installed in the root Vob of an adminstrative Vob hierarchy or in an ordinary Vob.
     my @elements = ();
-    push @elements, &TaBasCo::Task::_allAdminClientsRootElements( $mainTask->getVob() );
+    push @elements, $mainTask->allAdminClientsRootElements( $mainTask->getVob() );
     $mainTask->mkPaths( \@elements );
     return $mainTask;
 }
 
-sub _allAdminClientsRootElements {
+sub allAdminClientsRootElements {
+    my $self = shift;
     my $vob = shift;
 
     my @allRootElements = ( $vob->getRootElement() );
-    my $clients = $vob->getVobsAdminClients();
+    my $clients = $vob->getClientVobs();
     if( $clients ) {
 	foreach my $cl ( @$clients ) {
-	    push @allRootElements, &TaBasCo::Task::_allAdminClientsRootElements( $cl );
+	    push @allRootElements, $self->allAdminClientsRootElements( $cl );
 	}
     }
     return @allRootElements;

@@ -65,7 +65,7 @@ sub _registerAsTaskMember  {
     my $task = shift;
 
     $self->createHyperlinkToObject(
-	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::myTaskLink ),
+	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::myTaskLink, -vob => $self->getVob() ),
 	-object => $task
 	);
     return $self;
@@ -76,7 +76,7 @@ sub registerAsNextReleaseOf {
     my $previous = shift;
 
     $self->createHyperlinkToObject(
-	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::nextReleaseLink ),
+	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::nextReleaseLink, -vob => $self->getVob() ),
 	-object => $previous
 	);
     return $self;
@@ -111,7 +111,7 @@ sub ensureAsFullRelease {
 sub loadPrevious {
     my $self = shift;
 
-    my @result = $self->getToHyperlinkedObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::nextReleaseLink ) );
+    my @result = $self->getToHyperlinkedObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::nextReleaseLink, -vob => $self->getVob() ) );
     return undef unless( @result );
     if( $#result != 0 ) {
 	Die( [ '', "incorrect number ($#result) of next release links $TaBasCo::Common::Config::nextReleaseLink at release " . $self->getFullName(), '' ] );
@@ -128,7 +128,7 @@ sub loadPrevious {
 sub loadTask {
     my $self = shift;
 
-    my @result = $self->getFromHyperlinkedObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::myTaskLink ) );
+    my @result = $self->getFromHyperlinkedObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::myTaskLink, -vob => $self->getVob() ) );
     if( $#result != 0 ) {
 	Die( [ '', "incorrect number ($#result) of task member links $TaBasCo::Common::Config::myTaskLink at release " . $self->getFullName(), '' ] );
     }

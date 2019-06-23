@@ -72,7 +72,7 @@ sub create {
     }
 
     my $adminMode = 0;
-    $adminMode = 1 if( $self->getVob()->getVobsAdminClients or $self->getVob()->getMyAdminVob() );
+    $adminMode = 1 if( $self->getVob()->getClientVobs() or $self->getVob()->getMyAdminVob() );
     ClearCase::mkbrtype(
 	-name    => $self->getName(),
 	-pbranch => $pbranch,
