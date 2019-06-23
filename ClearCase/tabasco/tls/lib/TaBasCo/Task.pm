@@ -72,10 +72,20 @@ sub create {
     }
 
     if( $self->getName() ne 'main' ) {
+	# branch type main is a predefined one and needs not to be created
 	unless( $comment ) {
 	    $comment = __PACKAGE__ . '::create - no purpose specified.';
 	}
 	$self->SUPER::create( -comment => $comment );
+    } else {
+	# we have to connect the initial baseline of the main
+	# task to its task - this happens normally during the creation
+	# of a task's floating release, but the initial baseline of task main
+	# was never a floating release
+	$self->createHyperlinkFromObject(
+	    -hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::myTaskLink, -vob => $self->getVob() ),
+	    -object => $baseline
+	    );
     }
 
     # register the new task as a known task
@@ -147,16 +157,11 @@ sub createNewRelease {
 	@_ );
 
     my $newRelease = $self->getFloatingRelease();
-    $newRelease->rename(
-	-name => $self->nextReleaseName()
-	);
+    $newRelease->rename( $self->nextReleaseName() );
     my $floatingRelease = $self->_createFloatingRelease();
 
     # register the new floating release as the next release of the task
     $floatingRelease->registerAsNextReleaseOf( $newRelease );
-
-    # lock the new release
-    $newRelease->lock();
     
     return $newRelease;
 }
@@ -246,7 +251,7 @@ sub mkPaths {
 sub loadPaths {
     my $self = shift;
 
-    my @paths = $self->getHyperlinkedFromObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::pathLink, -vob => $self->getVob() ) );
+    my @paths = $self->getFromHyperlinkedObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::pathLink, -vob => $self->getVob() ) );
     my $parent = undef;
     if( @paths ) {
 	# results must be element paths, so construct them
@@ -255,7 +260,7 @@ sub loadPaths {
 	@paths = ();
 	foreach my $p ( reverse sort @tmp ) {
 	    push @paths, ClearCase::Element->new(
-		-pathanme => $p
+		-pathname => $p
 		);
 	}
     }

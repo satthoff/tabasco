@@ -75,7 +75,7 @@ sub registerAsNextReleaseOf {
     my $self = shift;
     my $previous = shift;
 
-    $self->createHyperlinkToObject(
+    $self->createHyperlinkFromObject(
 	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::nextReleaseLink, -vob => $self->getVob() ),
 	-object => $previous
 	);
@@ -98,7 +98,7 @@ sub ensureAsFullRelease {
 	my $normalPath = $tP->getNormalizedPath();
 	ClearCase::mklabel(
 	    -label => $self->getName(),
-	    -raplace => 1,
+	    -replace => 1,
 	    -recurse => 1,
 	    -argv => $normalPath
 	    );
