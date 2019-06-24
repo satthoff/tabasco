@@ -192,7 +192,7 @@ sub exists {
 sub loadFloatingRelease {
     my $self = shift;
 
-    my $floatingRelease = TaBasCo::Release->new( -name -> uc( $self->getName() . $TaBasCo::Common::Config::floatingReleaseExtension ) );
+    my $floatingRelease = TaBasCo::Release->new( -name => uc( $self->getName() . $TaBasCo::Common::Config::floatingReleaseExtension ) );
     return $self->setFloatingRelease( $floatingRelease ) if( $floatingRelease->exists() );
     return undef;
 }
