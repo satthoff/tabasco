@@ -11,6 +11,7 @@ sub BEGIN {
    require TaBasCo::Common::Config;
    require TaBasCo::Task;
    require TaBasCo::Release;
+   require TaBasCo::Environment;
    require TaBasCo::UI;
 }
 

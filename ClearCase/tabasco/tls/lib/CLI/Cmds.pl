@@ -3,7 +3,7 @@
     help     => 'helpText',
     crta     => 'createTask',
     crre     => 'createRelease',
-    setcs   => 'setConfigSpec'
+    lsta     => 'listTasks'
     );
 
 %COMMAND = (
@@ -50,19 +50,19 @@
 
 "
     },
-    setConfigSpec  => {
-	short => 'setcs',
-	package => 'CLI::Command::setConfigSpec',
-	description => 'sets the config spec of the current or specified view from the specified task or release',
+    listTasks  => {
+	short => 'lsta',
+	package => 'CLI::Command::listTasks',
+	description => 'list existing tasks with their releases',
 	helptext    => "
 
 *** USAGE
 
-    setConfigSpec  -task <task name> | -release <release name>  [ -view <view tag> ]
+    listTasks  [ -long ] [ <task name> <task name> ... ]
 
 
-    This command sets the config spec of the current view or for the specified view
-    with the work config spec of the specified task or the read-only config spec of the specified release.
+    This command displays existing tasks with their releases.
+    With option -long the config specs of tasks and releases will be displayed as well.
 
 "
     }
