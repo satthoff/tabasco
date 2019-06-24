@@ -24,6 +24,10 @@ BEGIN {
       {
 	  push @INCL_LIB, ( "$base", "$base/lib" );
       }
+
+   # inserted for VDI Linux at ASML
+   push @INCL_LIB, '/home/usatthof/myPerl/lib/site_perl/5.8.4/x86_64-linux';
+
    unshift @INC, @INCL_LIB;
 
    $installPath = dirname( dirname $base );
