@@ -33,6 +33,10 @@ BEGIN {
 use Log;
 use CLI::Config;
 
+use OS;
+use ClearCase;
+use TaBasCo;
+
 
 # ensure umask with 002, to guarantee correct directory permissions
 umask( 002 );
