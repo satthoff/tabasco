@@ -134,7 +134,7 @@ sub clearprompt {
     if ($mode =~ /text|file|list/) {
 	my $outf = tempname($mode);
 	my @cmd = (ccpath('clearprompt'), $mode, '-out', $outf, @args);
-	print STDERR "+ @cmd\n" if $ClearCase::ClearPrompt::Verbose;
+	print STDERR "+ @cmd\n" if $ClearCase::Common::ClearPrompt::Verbose;
 	if (!system(@cmd)) {
 	    if (open(OUTFILE, $outf)) {
 		local $/ = undef;
@@ -152,7 +152,7 @@ sub clearprompt {
 	unlink $outf if -f $outf;
     } else {
 	my @cmd = (ccpath('clearprompt'), $mode, @args);
-	print STDERR "+ @cmd\n" if $ClearCase::ClearPrompt::Verbose;
+	print STDERR "+ @cmd\n" if $ClearCase::Common::ClearPrompt::Verbose;
 	if (defined wantarray) {
 	    system(@cmd);
 	    $? = 2 if $? == 0x400;  # see above
@@ -385,7 +385,7 @@ sub import {
 
     # Allow trigger series stashing to be turned on at import time,
     # but let the EV override.
-    $ClearCase::ClearPrompt::TriggerSeries = 1 if exists $cmds{TRIGGERSERIES}
+    $ClearCase::Common::ClearPrompt::TriggerSeries = 1 if exists $cmds{TRIGGERSERIES}
 			&& !exists $ENV{CLEARCASE_CLEARPROMPT_TRIGGERSERIES};
 
     # +CAPTURE grabs all forms of output while +ERRORS grabs only error
@@ -543,11 +543,11 @@ __END__
 
 =head1 NAME
 
-ClearCase::ClearPrompt - Handle clearprompt in a portable, convenient way
+ClearCase::Common::ClearPrompt - Handle clearprompt in a portable, convenient way
 
 =head1 SYNOPSIS
 
- use ClearCase::ClearPrompt qw(clearprompt);
+ use ClearCase::Common::ClearPrompt qw(clearprompt);
 
  # Boolean usage
  my $rc = clearprompt(qw(yes_no -mask y,n -type ok -prompt), 'Well?');
@@ -559,14 +559,14 @@ ClearCase::ClearPrompt - Handle clearprompt in a portable, convenient way
  clearprompt(qw(proceed -mask p -type ok -prompt), "You said: $txt");
 
  # Trigger series (record/replay responses for multiple elements)
- use ClearCase::ClearPrompt qw(clearprompt +TRIGGERSERIES);
+ use ClearCase::Common::ClearPrompt qw(clearprompt +TRIGGERSERIES);
  my $txt = clearprompt(qw(text -pref -pro), 'Response for all elems: ');
 
  # Automatically divert trigger error msgs to clearprompt dialogs
- use ClearCase::ClearPrompt qw(+ERRORS);
+ use ClearCase::Common::ClearPrompt qw(+ERRORS);
 
  # Prompt for a directory (not supported natively by clearprompt cmd)
- use ClearCase::ClearPrompt qw(clearprompt_dir);
+ use ClearCase::Common::ClearPrompt qw(clearprompt_dir);
  my $dir = clearprompt_dir('/tmp', "Please choose a directory");
 
 =head1 DESCRIPTION
@@ -606,7 +606,7 @@ this tool is awkward and error prone, especially in multi-platform
 environments.  Often you must create temp files, invoke clearprompt to
 write into them, open them and read the data, then unlink them. In many
 cases this code must run seamlessly on both Unix and Windows systems
-and is replicated throughout many scripts. ClearCase::ClearPrompt
+and is replicated throughout many scripts. ClearCase::Common::ClearPrompt
 abstracts this dirty work without changing the interface to
 B<clearprompt>.
 
@@ -632,10 +632,10 @@ returns the undefined value.
 =head2 TRIGGER SERIES
 
 Since clearprompt is often used in triggers, special support is
-provided in ClearCase::ClearPrompt for multiple trigger firings
+provided in ClearCase::Common::ClearPrompt for multiple trigger firings
 deriving from a single CC operation upon multiple obects.
 
-If the boolean $ClearCase::ClearPrompt::TriggerSeries has a true value,
+If the boolean $ClearCase::Common::ClearPrompt::TriggerSeries has a true value,
 clearprompt will 'stash' its responses through multiple trigger
 firings. For instance, assuming a checkin trigger which prompts the
 user for a bugfix number and a command "cleartool ci *.c", the
@@ -645,7 +645,7 @@ firings. The user gets prompted only once.
 
 Trigger series behavior can also be requested at import time via:
 
-    use ClearCase::ClearPrompt qw(+TRIGGERSERIES);
+    use ClearCase::Common::ClearPrompt qw(+TRIGGERSERIES);
 
 This feature is only available on CC versions which support the
 CLEARCASE_SERIES_ID environment variable (3.2.1 and up) but attempts to
@@ -663,7 +663,7 @@ I<clearprompt> manually to display error messages but this is laborious
 and will not catch unanticipated errors such as those emanating from
 included modules or child processes.
 
-ClearCase::ClearPrompt can be told to fix this problem by capturing all
+ClearCase::Common::ClearPrompt can be told to fix this problem by capturing all
 stderr/stdout and displaying it automatically using I<clearprompt>.
 There's also a facility for forwarding error messages to a specified
 list of users via email.
@@ -686,22 +686,22 @@ The 4 channels are known as WARN, DIE, STDOUT, and STDERR. To capture
 any of them to clearprompt just specify them with a leading C<+> at
 I<use> time:
 
-	use ClearCase::ClearPrompt qw(+STDERR +WARN +DIE);
+	use ClearCase::Common::ClearPrompt qw(+STDERR +WARN +DIE);
 
 These 3 "error channels" can also be requested via the meta-command
 
-	use ClearCase::ClearPrompt qw(+ERRORS);
+	use ClearCase::Common::ClearPrompt qw(+ERRORS);
 
 while all 4 can be captured with
 
-	use ClearCase::ClearPrompt qw(+CAPTURE);
+	use ClearCase::Common::ClearPrompt qw(+CAPTURE);
 
 Messages may be automatically mailed to a list of users by attaching
 the comma-separated list to the name of the channel using '=' in the
 import method, e.g.
 
-    use ClearCase::ClearPrompt '+ERRORS=vobadm';
-    use ClearCase::ClearPrompt qw(+STDOUT=vobadm +STDERR=tom,dick,harry);
+    use ClearCase::Common::ClearPrompt '+ERRORS=vobadm';
+    use ClearCase::Common::ClearPrompt qw(+STDOUT=vobadm +STDERR=tom,dick,harry);
 
 Note: the email feature requires the Net::SMTP module to be installed
 and correctly configured. You may find the supplied
@@ -714,7 +714,7 @@ script which generates a warning via C<warn()> and a hard error from a
 child process:
 
    BEGIN { $ENV{ATRIA_FORCE_GUI} = 1 }
-   use ClearCase::ClearPrompt qw(+CAPTURE);
+   use ClearCase::Common::ClearPrompt qw(+CAPTURE);
    warn qq(This is a warning\n);
    system q(perl nosuchscript);
 
@@ -733,7 +733,7 @@ module provides a separate C<clearprompt_dir()> function which
 implements it with "clearprompt list" and C<opendir/readdir/closedir>.
 Usage is
 
-    use ClearCase::ClearPrompt qw(clearprompt_dir);
+    use ClearCase::Common::ClearPrompt qw(clearprompt_dir);
     $dir = clearprompt_dir($starting_dir, $prompt_string);
 
 This is pretty awkward to use since it doesn't employ a standard

@@ -2,7 +2,7 @@ package CLI::UI;
 
 use strict;
 use Carp;
-use ClearCase::ClearPrompt('clearprompt');
+use ClearCase::Common::ClearPrompt('clearprompt');
 use IO::File;
 use POSIX;
 use Data;
