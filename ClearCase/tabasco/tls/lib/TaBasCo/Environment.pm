@@ -12,7 +12,7 @@ use CLI;
 use Transaction;
 
 sub BEGIN {
-   use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+   use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS %DATA);
    $VERSION = '0.01';
    require Exporter;
 
