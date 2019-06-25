@@ -2,21 +2,15 @@ package TaBasCo::Environment;
 
 use strict;
 use Carp;
-use Getopt::Long;
-
-
 use Log;
-use CLI::User;
-use CLI::Config;
-use CLI;
-use Transaction;
 
 sub BEGIN {
    use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS %DATA);
    $VERSION = '0.01';
    require Exporter;
+   require Data;
 
-   @ISA = qw(Exporter );
+   @ISA = qw(Exporter Data);
 
    @EXPORT = qw(
    );
@@ -26,15 +20,13 @@ sub BEGIN {
       # TAG1 => [...],
    );
 
-   require Data;
-
    %DATA = (
        AllTasks => { CALCULATE => \&loadAllTasks }
        );
 
    Data::init(
       PACKAGE  => __PACKAGE__,
-      SUPER    => undef
+      SUPER    => 'Data'
       );
 } # sub BEGIN()
 
@@ -58,7 +50,7 @@ sub loadAllTasks {
 
     my $db = $TaBasCo::Common::Config::myVob->getMyReplica();
     my @taskObjects = $db->getFromHyperlinkedObjects(
-	ClearCase::HlType( -name => $TaBasCo::Common::Config::taskLink, -vob => $TaBasCo::Common::Config::myVob )
+	ClearCase::HlType->new( -name => $TaBasCo::Common::Config::taskLink, -vob => $TaBasCo::Common::Config::myVob )
 	);
     my %tasks = ();
     foreach my $to ( @taskObjects ) {

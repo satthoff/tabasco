@@ -201,7 +201,9 @@ sub printMe {
 	print "\tReleases:\n";
 	my $rel = $self->getLastRelease();
 	while( $rel ) {
-	    print "\t\t" . $rel->getName() . "\n";
+	    foreach my $line ( @{ $rel->getConfigSpec() } ) {
+		print "\t\t$line\n";
+	    }
 	    $rel = $rel->getPrevious();
 	}
     }
@@ -220,7 +222,7 @@ sub loadLastRelease {
     my $self = shift;
 
     my $lastRelease = $self->getFloatingRelease()->getPrevious();
-    return $self->setLastRelease if( $lastRelease );
+    return $self->setLastRelease( $lastRelease ) if( $lastRelease );
     return undef;
 }
 

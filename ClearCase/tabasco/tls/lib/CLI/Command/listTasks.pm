@@ -51,7 +51,12 @@ sub run {
       return unless( @tasks );
       print "\n\n";
   } else {
-      push @tasks, $environment->getAllTask();
+      if( $environment->getAllTasks() ) {
+          my %tmp = %{ $environment->getAllTasks() };
+          foreach ( keys %tmp ) {
+              push @tasks, $tmp{ $_ };
+          }
+      }
   }
   foreach my $t ( @tasks ) {
       $t->printMe( $self->getOption( 'long' ) );
