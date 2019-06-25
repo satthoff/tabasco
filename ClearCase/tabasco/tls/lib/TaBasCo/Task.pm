@@ -319,6 +319,9 @@ sub loadConfigSpec  {
 	$pT = $self->getParent()->getName();
       }
     push @config_spec, '# Parent Task : ' . $pT;
+    foreach my $np ( @{ $self->getPaths() } ) {
+	push @config_spec, '# Path : ' . $np->getNormalizedPath();
+    }
     push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
 
     if( $self->getName() eq 'main' ) {

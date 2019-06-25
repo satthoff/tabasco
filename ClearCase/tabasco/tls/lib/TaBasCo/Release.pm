@@ -116,7 +116,8 @@ sub loadPrevious {
 	# we have to check whether the baseline of the task is a release of another task or not.
 	# the very first task main has a baseline which is not a release of any other task
 	# in this case we have to deliver the baseline as the previous release
-	if( $self->getTask()->getName() eq 'main' and $self->getName() ne $TaBasCo::Common::Config::initialTaBasCoBaseline ) {
+	my @firstRelease = $self->getToHyperlinkedObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::firstReleaseLink, -vob => $self->getVob() ) );
+	if( @firstRelease ) {
 	    return $self->setPrevious( $self->getTask()->getBaseline() );
 	}
 	return undef;
@@ -159,12 +160,14 @@ sub loadConfigSpec {
     push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
     push @config_spec, '# BEGIN Release : ' . $self->getName();
     push @config_spec, '# My Task       : ' . $self->getTask()->getName();
+    foreach my $np ( @{ $self->getTask()->getPaths() } ) {
+	push @config_spec, '# Path : ' . $np->getNormalizedPath();
+    }
     push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
     
-    my @taskCspecPaths = @{ $self->getTask()->getCspecPaths() };
     my $actRelease = $self;
     while( $actRelease ) {
-	foreach my $cp ( @taskCspecPaths ) {
+	foreach my $cp ( @{ $actRelease->getTask()->getCspecPaths() } ) {
 	    push @config_spec, "element " . $cp . ' ' . $actRelease->getName() . " -nocheckout";
 	}
 	$actRelease = $actRelease->getPrevious();
