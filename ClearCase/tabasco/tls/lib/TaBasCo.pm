@@ -12,6 +12,7 @@ sub BEGIN {
    require TaBasCo::Task;
    require TaBasCo::Release;
    require TaBasCo::Environment;
+   require TaBasCo::Configuration;
    require TaBasCo::UI;
 }
 

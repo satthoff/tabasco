@@ -35,7 +35,8 @@ use vars qw/
     $nextLabelExtension
     $pathLink
     $baselineLink
-    $taskLink
+    $taskLinK
+    $configLink
     $firstReleaseLink
     $nextReleaseLink
     $floatingReleaseExtension
@@ -59,6 +60,7 @@ BEGIN {
     $initialTaBasCoBaseline = $tabascoPrefix . 'InitialBaseline';
     $baselineLink = $tabascoPrefix . 'TaskBaseline';
     $taskLink = $tabascoPrefix . 'RegisteredTask';
+    $configLink = $tabascoPrefix . 'RegisteredConfiguration';
     $firstReleaseLink = $tabascoPrefix . 'TaskFirstRelease';
     $nextReleaseLink = $tabascoPrefix . 'TaskNextRelease';
     $floatingReleaseExtension = '_NEXT';
@@ -75,7 +77,7 @@ BEGIN {
 
     $myVob = $ClearCase::Common::Config::myHost->getRegion()->getVob( File::Basename::dirname ( $base ) );
 
-    @allHlTypes = ( $baselineLink, $taskLink, $firstReleaseLink, $nextReleaseLink, $floatingReleaseLink, $myTaskLink, $pathLink );
+    @allHlTypes = ( $baselineLink, $taskLink, $firstReleaseLink, $nextReleaseLink, $floatingReleaseLink, $myTaskLink, $pathLink, $configLink );
     
     @allLbTypes = ( $initialTaBasCoBaseline );
 
