@@ -3,7 +3,8 @@
     help     => 'helpText',
     crta     => 'createTask',
     crre     => 'createRelease',
-    lsta     => 'listTasks'
+    lsta     => 'listTasks',
+    crco     => 'createConfiguration'
     );
 
 %COMMAND = (
@@ -63,6 +64,27 @@
 
     This command displays existing tasks with their releases.
     With option -long the config specs of tasks and releases will be displayed as well.
+
+"
+    },
+    createConfiguration => {
+	short => 'crco',
+	package => 'CLI::Command::createConfiguration',
+	description => 'creates a new configuration based on tasks, releases or tasks and releases',
+	helptext    => "
+
+*** USAGE
+
+    createConfiguration  -name <name of new configuration>
+                         -tasks <task name>,<task name>, ... ,<task name>  [-releases <release name>,<release name>, ... ,<release name>] |
+                         [-tasks <task name>,<task name>, ... ,<task name>] -releases <release name>,<release name>, ... ,<release name>
+
+
+    This command creates a new configuration with the specified name based on the specified tasks and/or releases.
+    Mandatory is at least one task or one release, but the number of specified tasks and releases is not limited.
+
+    Existing configuration can be used with command useConfiguration, which requires a view as argument. The specified view
+    will get the configuration specification of the appropriate TaBasCo Configuration.
 
 "
     }

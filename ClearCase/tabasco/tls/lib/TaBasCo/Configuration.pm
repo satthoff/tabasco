@@ -48,9 +48,7 @@ sub create {
 	[ 'TASKS', 'RELEASES' ],
 	@_ );
 
-    # check tasks existence
-
-    # check releases existence
+    # we expect all specified tasks and releases to exist
 
     $self->SUPER::create();
 
@@ -61,9 +59,24 @@ sub create {
 	);
 
     # declare all tasks as member of the config
+    if( $tasks ) {
+	foreach my $t ( @{ $tasks } ) {
+	    $self->createHyperlinkToObject(
+		-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::configTask, -vob => $self->getVob() ),
+		-object => $t
+		);
+	}
+    }
 
     # declare all releases as member of the config
-
+    if( $releases ) {
+	foreach my $t ( @{ $releases } ) {
+	    $self->createHyperlinkToObject(
+		-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::configRelease, -vob => $self->getVob() ),
+		-object => $t
+		);
+	}
+    }
     return $self;
 }
 
@@ -71,9 +84,24 @@ sub exists {
     my $self = shift;
 
     if( $self->SUPER::exists() ) {
+	my @result = $self->getToHyperlinkedObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::configLink, -vob => $self->getVob() ) );
+	if( $#result > 0 ) {
+	    Die( [ __PACKAGE__ , "FATAL ERROR: Incorrect number ($#result) of configuration registration links $TaBasCo::Common::Config::configLink at configuration " . $self->getFullName(), '' ] );
+	} elsif( $#result == 0 ) {
+	    # we expect the result to be our own replica
+	    if( $self->getVob()->getMyReplica()->getFullName() eq $result[0] ) {
+		return 1;
+	    }
+	    Die( [ __PACKAGE__ , "FATAL ERROR: Configuration registration link $TaBasCo::Common::Config::configLink at configuration " . $self->getFullName(),
+		 ' is connected to wrong meta object (our own replica expected) ' . $result[0] ] );
+	} else {
+	    Debug( [ __PACKAGE__ , "A branch type named " . $self->getName() . ' exists, but it is no ' . __PACKAGE__ ] );
+	    return 0;
+	}
     }
     return 0;
 }
+
 
 sub loadConfigSpec  {
     my $self = shift;
@@ -87,7 +115,10 @@ sub loadTasks  {
     my $self = shift;
 
     my @tasks = ();
-
+    my @result = $self->getFromHyperlinkedObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::configTask, -vob => $self->getVob() ) );
+    foreach my $r ( @result ) {
+	push @tasks, TaBasCo::Task->new( -name => $r );
+    }
     return $self->setTasks( \@tasks );
 }
 
@@ -95,7 +126,10 @@ sub loadReleases  {
     my $self = shift;
 
     my @releases = ();
-
+    my @result = $self->getFromHyperlinkedObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::configRelease, -vob => $self->getVob() ) );
+    foreach my $t ( @result ) {
+	push @releases, TaBasCo::Release->new( -name => $t );
+    }
     return $self->setReleases( \@releases );
 }
 1;

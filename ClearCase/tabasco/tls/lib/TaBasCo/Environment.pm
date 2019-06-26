@@ -21,7 +21,9 @@ sub BEGIN {
    );
 
    %DATA = (
-       AllTasks => { CALCULATE => \&loadAllTasks }
+       Releases => undef,
+       AllTasks => { CALCULATE => \&loadAllTasks },
+       AllConfigurations => { CALCULATE => \&loadAllConfigurations }
        );
 
    Data::init(
@@ -66,6 +68,63 @@ sub getTask {
 
     my %tt = %{ $self->getAllTasks() };
     return $tt{ $name } if( defined $tt{ $name } );
+    return undef;
+}
+
+sub loadAllConfigurations {
+    my $self = shift;
+
+    my $db = $TaBasCo::Common::Config::myVob->getMyReplica();
+    my @confObjects = $db->getFromHyperlinkedObjects(
+	ClearCase::HlType->new( -name => $TaBasCo::Common::Config::configLink, -vob => $TaBasCo::Common::Config::myVob )
+	);
+    my %configs = ();
+    foreach my $co ( @confObjects ) {
+	my $c = TaBasCo::Configuration->new( -name => $co );
+	$configs{ $c->getName() } = $c;
+    }
+    return $self->setAllConfigurations( \%configs );
+}
+
+sub getConfiguration {
+    my $self = shift;
+    my $name = shift;
+
+    my %tt = %{ $self->getAllConfigurations() };
+    return $tt{ $name } if( defined $tt{ $name } );
+    return undef;
+}
+
+sub createConfiguration {
+    my $self = shift;
+
+    my ( $name, $tasks, $releases, @other ) = $self->rearrange(
+	[ 'NAME','TASKS', 'RELEASES' ],
+	@_ );
+
+    my $newConfig = TaBasCo::Configuration( -name => $name );
+    $newConfig->create(
+	-tasks => $tasks,
+	-releases => $releases
+	);
+    return $newConfig;
+}
+
+sub getRelease  {
+    my $self = shift;
+    my $name = shift;
+
+    my %releases =();
+    if( $self->getReleases() ) {
+	%releases = %{ $self->getReleases() };
+    }
+    return $releases{ $name } if( defined $releases{ $name } );
+    my $requestedRelease = TaBasCo::Release->new( -name => $name );
+    if( $requestedRelease->exists() ) {
+	$releases{ $name } = $requestedRelease;
+	$self->setReleases( \%releases );
+	return $requestedRelease;
+    }
     return undef;
 }
 
