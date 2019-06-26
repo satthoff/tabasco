@@ -4,7 +4,8 @@
     crta     => 'createTask',
     crre     => 'createRelease',
     lsta     => 'listTasks',
-    crco     => 'createConfiguration'
+    crco     => 'createConfiguration',
+    usco     => 'useConfiguration'
     );
 
 %COMMAND = (
@@ -85,6 +86,22 @@
 
     Existing configuration can be used with command useConfiguration, which requires a view as argument. The specified view
     will get the configuration specification of the appropriate TaBasCo Configuration.
+
+"
+    },
+    useConfiguration => {
+	short => 'usco',
+	package => 'CLI::Command::useConfiguration',
+	description => 'initialzes the view specified with the config spec of the specified TaBasCo configuration',
+	helptext    => "
+
+*** USAGE
+
+    useConfiguration  -configuration <name of new configuration> -view <ClearCase dynamic view name>
+
+
+    This command computes the config spec of the specified configuration
+    and sets this config spec in the specified view.
 
 "
     }
