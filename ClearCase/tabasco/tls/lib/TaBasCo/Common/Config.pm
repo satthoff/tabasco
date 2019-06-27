@@ -64,7 +64,7 @@ BEGIN {
     $taskLink = $tabascoPrefix . 'RegisteredTask';
     $configLink = $tabascoPrefix . 'RegisteredConfiguration';
     $configRelease = $tabascoPrefix . 'ConfigMemberRelease';
-    $configRelease = $tabascoPrefix . 'ConfigMemberTask';
+    $configTask = $tabascoPrefix . 'ConfigMemberTask';
     $firstReleaseLink = $tabascoPrefix . 'TaskFirstRelease';
     $nextReleaseLink = $tabascoPrefix . 'TaskNextRelease';
     $floatingReleaseExtension = '_NEXT';

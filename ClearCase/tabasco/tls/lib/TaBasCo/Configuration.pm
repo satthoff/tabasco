@@ -130,7 +130,7 @@ sub loadConfigSpec  {
 	foreach my $t ( @{ $self->getTasks() } ) {
 	    my @paths = @{ $t->getPaths() };
 	    foreach my $p ( @paths ) {
-		push @{ $allPaths{ $p->getNormalizedPath() }->{ 'tasks' } }, $t->getName();
+		push @{ $allPaths{ $p->getNormalizedPath() }->{ 'tasks' } }, $t;
 	    }
 	}
     }
@@ -138,7 +138,7 @@ sub loadConfigSpec  {
 	foreach my $r ( @{ $self->getReleases() } ) {
 	    my @paths = @{ $r->getTask()->getPaths() };
 	    foreach my $p ( @paths ) {
-		push @{ $allPaths{ $p->getNormalizedPath() }->{ 'releases' } }, $r->getName();
+		push @{ $allPaths{ $p->getNormalizedPath() }->{ 'releases' } }, $r;
 	    }
 	}
     }

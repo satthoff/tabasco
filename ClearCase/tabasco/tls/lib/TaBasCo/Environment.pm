@@ -102,7 +102,7 @@ sub createConfiguration {
 	[ 'NAME','TASKS', 'RELEASES' ],
 	@_ );
 
-    my $newConfig = TaBasCo::Configuration( -name => $name );
+    my $newConfig = TaBasCo::Configuration->new( -name => $name );
     $newConfig->create(
 	-tasks => $tasks,
 	-releases => $releases
