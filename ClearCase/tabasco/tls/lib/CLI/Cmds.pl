@@ -3,10 +3,7 @@
     help     => 'helpText',
     crta     => 'createTask',
     crre     => 'createRelease',
-    lsta     => 'listTasks',
-    lsco     => 'listConfigurations',
-    crco     => 'createConfiguration',
-    usco     => 'useConfiguration'
+    lsta     => 'listTasks'
     );
 
 %COMMAND = (
@@ -66,59 +63,6 @@
 
     This command displays existing tasks with their releases.
     With option -long the config specs of tasks and releases will be displayed as well.
-
-"
-    },
-    createConfiguration => {
-	short => 'crco',
-	package => 'CLI::Command::createConfiguration',
-	description => 'creates a new configuration based on tasks, releases or tasks and releases',
-	helptext    => "
-
-*** USAGE
-
-    createConfiguration  -name <name of new configuration>
-                         -tasks <task name>,<task name>, ... ,<task name>  [-releases <release name>,<release name>, ... ,<release name>] |
-                         [-tasks <task name>,<task name>, ... ,<task name>] -releases <release name>,<release name>, ... ,<release name>
-
-
-    This command creates a new configuration with the specified name based on the specified tasks and/or releases.
-    Mandatory is at least one task or one release, but the number of specified tasks and releases is not limited.
-
-    Existing configuration can be used with command useConfiguration, which requires a view as argument. The specified view
-    will get the configuration specification of the appropriate TaBasCo Configuration.
-
-"
-    },
-    useConfiguration => {
-	short => 'usco',
-	package => 'CLI::Command::useConfiguration',
-	description => 'initialzes the view specified with the config spec of the specified TaBasCo configuration',
-	helptext    => "
-
-*** USAGE
-
-    useConfiguration  -configuration <name of new configuration> -view <ClearCase dynamic view name>
-
-
-    This command computes the config spec of the specified configuration
-    and sets this config spec in the specified view.
-
-"
-    },
-    listConfigurations  => {
-	short => 'lsco',
-	package => 'CLI::Command::listConfigurations',
-	description => 'list existing configurations with their attached tasks and releases',
-	helptext    => "
-
-*** USAGE
-
-    listConfigurations  [ -long ] [ <config name> <config name> ... ]
-
-
-    This command displays existing configurations with their attached tasks and releases.
-    With option -long the config spec of the configuration will be displayed instead of task and release names.
 
 "
     }
