@@ -4,6 +4,7 @@
     crta     => 'createTask',
     crre     => 'createRelease',
     lsta     => 'listTasks',
+    lsco     => 'listConfigurations',
     crco     => 'createConfiguration',
     usco     => 'useConfiguration'
     );
@@ -102,6 +103,22 @@
 
     This command computes the config spec of the specified configuration
     and sets this config spec in the specified view.
+
+"
+    },
+    listConfigurations  => {
+	short => 'lsco',
+	package => 'CLI::Command::listConfigurations',
+	description => 'list existing configurations with their attached tasks and releases',
+	helptext    => "
+
+*** USAGE
+
+    listConfigurations  [ -long ] [ <config name> <config name> ... ]
+
+
+    This command displays existing configurations with their attached tasks and releases.
+    With option -long the config spec of the configuration will be displayed instead of task and release names.
 
 "
     }

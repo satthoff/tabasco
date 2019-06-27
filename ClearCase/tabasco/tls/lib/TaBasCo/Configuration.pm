@@ -102,6 +102,27 @@ sub exists {
     return 0;
 }
 
+sub printMe {
+    my $self = shift;
+    my $long = shift;
+
+    print $self->getName() . "\n";
+    if( $long ) {
+	foreach my $l ( @{ $self->getConfigSpec() } ) {
+	    print "\t$l\n";
+	}
+    } else {
+	print "\tTasks:\n";
+	foreach my $t ( @{ $self->getTasks() } ) {
+	    print "\t\t" . $t->getName() . "\n";
+	}
+	print "\tReleases:\n";
+	foreach my $r ( @{ $self->getReleases() } ) {
+	    print "\t\t" . $r->getName() . "\n";
+	}
+    }
+}
+
 sub cspecHeader {
     my $config_spec = shift;
 
