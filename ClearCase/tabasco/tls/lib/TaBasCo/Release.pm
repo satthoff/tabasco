@@ -156,6 +156,8 @@ sub loadConfigSpec {
 
     my @config_spec = ();
 
+    &TaBasCo::Common::Config::cspecHeader( \@config_spec );
+
     push @config_spec, '';
     push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
     push @config_spec, '# BEGIN Release : ' . $self->getName();
@@ -175,6 +177,7 @@ sub loadConfigSpec {
 
     push @config_spec, '# END Release   : ' . $self->getName();
     push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
+    push @config_spec, 'element * /main/0 -nocheckout';
     push @config_spec, '';
     
     return $self->setConfigSpec( \@config_spec );

@@ -309,10 +309,13 @@ sub loadConfigSpec  {
     my $self = shift;
 
     my @config_spec = ();
+
+    &TaBasCo::Common::Config::cspecHeader( \@config_spec );
     
     push @config_spec, '';
     push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
     push @config_spec, '# BEGIN  Task : ' . $self->getName();
+    push @config_spec, '# Baseline : ' . $self->getBaseline()->getName();
     my $pT = 'NONE';
     if( $self->getParent() )
       {
@@ -357,6 +360,7 @@ sub loadConfigSpec  {
 
     push @config_spec, '# END   Task : ' . $self->getName();
     push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
+    push @config_spec, 'element * /main/0 -nocheckout';
     push @config_spec, '';
     grep chomp, @config_spec;
 

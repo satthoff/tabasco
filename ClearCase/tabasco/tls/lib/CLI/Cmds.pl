@@ -3,7 +3,9 @@
     help     => 'helpText',
     crta     => 'createTask',
     crre     => 'createRelease',
-    lsta     => 'listTasks'
+    lsta     => 'listTasks',
+    usta     => 'useTask',
+    usre     => 'useRelease'
     );
 
 %COMMAND = (
@@ -63,6 +65,38 @@
 
     This command displays existing tasks with their releases.
     With option -long the config specs of tasks and releases will be displayed as well.
+
+"
+    },
+    useTask  => {
+	short => 'usta',
+	package => 'CLI::Command::useTask',
+	description => 'sets the config spec of a task in a view',
+	helptext    => "
+
+*** USAGE
+
+    useTask  -task <task name>  -view <view tag>
+
+
+    This command gets the config spec of the specified task
+    and applies it to the specified view.
+
+"
+    },
+    useRelease  => {
+	short => 'usre',
+	package => 'CLI::Command::useRelease',
+	description => 'sets the config spec of a release in a view',
+	helptext    => "
+
+*** USAGE
+
+    useRelease  -release <release name>  -view <view tag>
+
+
+    This command gets the config spec of the specified release
+    and applies it to the specified view.
 
 "
     }
