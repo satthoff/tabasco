@@ -58,7 +58,7 @@ sub run {
   my $environment = TaBasCo::Environment->new();
   ClearCase::View->new( $viewName )->setConfigSpec( $environment->getRelease( $releaseName )->getConfigSpec() );
   Transaction::commit();
-  Message( [ __PACKAGE__ , "Successfully set config spec of task $taskName in view $viewName"  ] );
+  Message( [ __PACKAGE__ , "Successfully set config spec of task $releaseName in view $viewName"  ] );
 } # run
 
 1;
