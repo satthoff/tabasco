@@ -79,37 +79,22 @@ BEGIN {
     
     @allLbTypes = ( $initialTaBasCoBaseline );
 
+    my $myVobTag = $myVob->getTag();
     %allTrigger = (
                     'remove_empty_branch' => {
                                                'element'  => 1,
                                                'all'      => 1,
-                                               'execu' => '/opt/rational/clearcase/bin/Perl /view/$CLEARCASE_VIEW_TAG$CLEARCASE_VOB_PN/' . "$toolRoot/tls/trg/remove_empty_branch.txt",
-                                               'execw' => "ccperl \\\\view\\\%CLEARCASE_VIEW_TAG\%\%CLEARCASE_VOB_PN\%\\$toolRoot\\tls\\trg\\remove_empty_branch.txt",
+                                               'execu' => '/opt/rational/clearcase/bin/Perl /view/$CLEARCASE_VIEW_TAG' . "$myVobTag/$toolRoot/tls/trg/remove_empty_branch.txt",
+                                               'execw' => "ccperl \\\\view\\\%CLEARCASE_VIEW_TAG\%$myVobTag\\$toolRoot\\tls\\trg\\remove_empty_branch.txt",
                                                'ops'   => '-pos uncheckout,rmbranch,rmver'
                                              },
                     'apply_config_label'  => {
                                                'element'  => 1,
                                                'all'      => 1,
-                                               'execu' => '/opt/rational/clearcase/bin/Perl /view/$CLEARCASE_VIEW_TAG$CLEARCASE_VOB_PN/' . "$toolRoot/tls/trg/applyConfigLabel.pl",
-                                               'execw' => "ccperl \\\\view\\\%CLEARCASE_VIEW_TAG\%\%CLEARCASE_VOB_PN\%\\$toolRoot\\tls\\trg\\applyConfigLabel.pl",
+                                               'execu' => '/opt/rational/clearcase/bin/Perl /view/$CLEARCASE_VIEW_TAG' . "$myVobTag/$toolRoot/tls/trg/applyConfigLabel.pl",
+                                               'execw' => "ccperl \\\\view\\\%CLEARCASE_VIEW_TAG\%$myVobTag\\$toolRoot\\tls\\trg\\applyConfigLabel.pl",
                                                'ops'   => '-pos checkin'
                                              }
-#                    'control_config'      => {
-#                                               'element'  => 1,
-#                                               'all'      => 0,
-#                                               'execu' => '/opt/rational/clearcase/bin/Perl /view/$CLEARCASE_VIEW_TAG$CLEARCASE_VOB_PN/' . "$toolRoot/tls/trg/Modify.pl",
-#                                               'execw' => "ccperl \\\\view\\\%CLEARCASE_VIEW_TAG\%\%CLEARCASE_VOB_PN\%\\$toolRoot\\tls\\trg\\Modify.pl",
-#                                               'ops'   => '-pre checkin,checkout',
-#                                               'att'   => 1
-#                                             },
-#                    'post_control_config'      => {
-#                                               'element'  => 1,
-#                                               'all'      => 0,
-#                                               'execu' => '/opt/rational/clearcase/bin/Perl /view/$CLEARCASE_VIEW_TAG$CLEARCASE_VOB_PN/' . "$toolRoot/tls/trg/Modify2.pl",
-#                                               'execw' => "ccperl \\\\view\\\%CLEARCASE_VIEW_TAG\%\%CLEARCASE_VOB_PN\%\\$toolRoot\\tls\\trg\\Modify2.pl",
-#                                               'ops'   => '-pos checkout',
-#                                               'att'   => 1
-#                                             }
                   );
   }
 
