@@ -77,7 +77,7 @@ $mainTask->getFloatingRelease()->ensureAsFullRelease();
 my $firstMainRelease = $mainTask->createNewRelease();
 
 # create the task tabasco to manage the installed tool within its own task
-my $tabascoTask = TaBasCo::Task->new( -name => $TaBasCo::Common::Config::taskNamePrefix . 'tabasco' );
+my $tabascoTask = TaBasCo::Task->new( -name => $TaBasCo::Common::Config::maintenanceTask );
 $tabascoTask->create( -baseline => $firstMainRelease );
 my $tabascoRootPathElement = ClearCase::Element->new(
     -pathname => $TaBasCo::Common::Config::myVob->getRootElement()->getNormalizedPath() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot
@@ -116,7 +116,7 @@ Installation finished.
 
 TaBasCo is installed in $notice.
 
-A task named $tabasName has been created to manage changes of the of TaBasCo implementation.
+A task named $tabasName has been created to manage changes of the TaBasCo implementation.
 The TaBasCo installation has been fully labeled with $label.
 
 A task named main exists as well and the initial configuration in all participating Vobs

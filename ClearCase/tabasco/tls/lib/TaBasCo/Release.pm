@@ -158,6 +158,21 @@ sub loadConfigSpec {
 
     &TaBasCo::Common::Config::cspecHeader( \@config_spec );
 
+    # insert rule to select the latest release of the tabasco implementation
+    # but only if self is NOT the TaBasCo maintenance task
+    my $tabasco = TaBasCo::Task->new( -name => $TaBasCo::Common::Config::maintenanceTask );
+    if( $self->getTask()->getName() ne $tabasco->getName() ) {
+	my $latestReleaseName = $tabasco->getLastRelease()->getName();
+	push @config_spec, '';
+	push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
+	push @config_spec, '# Tabasco Tool Last Release : ' . $latestReleaseName;
+	push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
+	foreach my $tp ( @{ $tabasco->getCspecPaths() } ) {
+	    push @config_spec, "element $tp $latestReleaseName -nocheckout";
+	}
+	push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
+    }
+
     push @config_spec, '';
     push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
     push @config_spec, '# BEGIN Release : ' . $self->getName();

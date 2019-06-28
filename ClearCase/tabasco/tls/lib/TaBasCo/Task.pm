@@ -201,9 +201,8 @@ sub printMe {
 	print "\tReleases:\n";
 	my $rel = $self->getLastRelease();
 	while( $rel ) {
-	    foreach my $line ( @{ $rel->getConfigSpec() } ) {
-		print "\t\t$line\n";
-	    }
+	    last if( $rel->getTask()->getName() ne $self->getName() );
+	    print "\t\t" . $rel->getName() . "\n";
 	    $rel = $rel->getPrevious();
 	}
     }
@@ -311,6 +310,21 @@ sub loadConfigSpec  {
     my @config_spec = ();
 
     &TaBasCo::Common::Config::cspecHeader( \@config_spec );
+
+    # insert rule to select the latest release of the tabasco implementation
+    # but only if self is NOT the TaBasCo maintenance task
+    my $tabasco = TaBasCo::Task->new( -name => $TaBasCo::Common::Config::maintenanceTask );
+    if( $self->getName() ne $tabasco->getName() ) {
+	my $latestReleaseName = $tabasco->getLastRelease()->getName();
+	push @config_spec, '';
+	push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
+	push @config_spec, '# Tabasco Tool Last Release : ' . $latestReleaseName;
+	push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
+	foreach my $tp ( @{ $tabasco->getCspecPaths() } ) {
+	    push @config_spec, "element $tp $latestReleaseName -nocheckout";
+	}
+	push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
+    }
     
     push @config_spec, '';
     push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;

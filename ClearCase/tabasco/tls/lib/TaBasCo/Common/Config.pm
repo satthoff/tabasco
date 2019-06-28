@@ -45,6 +45,7 @@ use vars qw/
     $cspecDelimiter
     $taskNamePrefix
     $configurationNamePrefix
+    $maintenanceTask
 
     @allHlTypes
     @allLbTypes
@@ -68,6 +69,7 @@ BEGIN {
     $pathLink = $tabascoPrefix . 'Path';
     $nextLabelExtension = '_NEXT';
     $toolRoot = 'tabasco';
+    $maintenanceTask = 'tabasco';
     $toolPath = 'tls';
     $configFile = 'config.txt';
     $base = File::Basename::dirname (File::Basename::dirname ( Cwd::abs_path( File::Basename::dirname $0 ) ) );
