@@ -194,7 +194,6 @@ sub printMe {
 
     print $self->getName() . "\n";
     if( $long ) {
-	print "\n";
 	foreach my $line ( @{ $self->getConfigSpec() } ) {
 	    print "\t$line\n";
 	}
@@ -207,7 +206,6 @@ sub printMe {
 	}
     }
 }
-
 
 sub loadFloatingRelease {
     my $self = shift;
@@ -313,17 +311,21 @@ sub loadConfigSpec  {
 
     # insert rule to select the latest release of the tabasco implementation
     # but only if self is NOT the TaBasCo maintenance task
+    # and only if the TaBasCo maintenance task already exists. During the TaBasCo installation
+    # the main task will be initialized when the task tabasco does not exist yet.
     my $tabasco = TaBasCo::Task->new( -name => $TaBasCo::Common::Config::maintenanceTask );
-    if( $self->getName() ne $tabasco->getName() ) {
-	my $latestReleaseName = $tabasco->getLastRelease()->getName();
-	push @config_spec, '';
-	push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
-	push @config_spec, '# Tabasco Tool Last Release : ' . $latestReleaseName;
-	push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
-	foreach my $tp ( @{ $tabasco->getCspecPaths() } ) {
-	    push @config_spec, "element $tp $latestReleaseName -nocheckout";
+    if( ($tabasco->exists() ) {
+	if( $self->getName() ne $tabasco->getName() ) {
+	    my $latestReleaseName = $tabasco->getLastRelease()->getName();
+	    push @config_spec, '';
+	    push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
+	    push @config_spec, '# Tabasco Tool Last Release : ' . $latestReleaseName;
+	    push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
+	    foreach my $tp ( @{ $tabasco->getCspecPaths() } ) {
+		push @config_spec, "element $tp $latestReleaseName -nocheckout";
+	    }
+	    push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
 	}
-	push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
     }
     
     push @config_spec, '';
