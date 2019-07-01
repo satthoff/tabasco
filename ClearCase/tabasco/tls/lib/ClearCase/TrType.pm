@@ -110,7 +110,7 @@ sub _init {
    my $self = shift;
 
    $self->SUPER::_init( -type => 'trtype', @_ );
-   return;
+   return $self;
 } # _init
 
 
@@ -119,7 +119,7 @@ sub create {
    my $self = shift;
 
    ClearCase::mktrtype( @_ );
-   return;
+   return $self;
 } # create
 
 sub attach {

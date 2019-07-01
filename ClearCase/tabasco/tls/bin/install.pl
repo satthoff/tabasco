@@ -47,7 +47,7 @@ sub allVobsInAdminHierarchy {
     return @allVobs;
 }
 
-Log::setVerbosity( "debug" );
+#Log::setVerbosity( "debug" );
 Transaction::start( -comment => 'TaBasCo installation' );
 
 # Tabasco must be installed in an ordinay Vob or the root Vob of an administrative Vob hierarchy
@@ -96,7 +96,8 @@ foreach my $trgVob ( &allVobsInAdminHierarchy( $TaBasCo::Common::Config::myVob )
 	    -element => $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'element' },
 	    -execu   => '"' . $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'execu' } . '"',
 	    -execw   => '"' . $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'execw' } . '"',
-	    -command => $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'ops' }
+	    -command => $TaBasCo::Common::Config::allTrigger{ $trg }->{ 'ops' },
+	    -name    => $trt->getFullName()
 	    );
     }
 }

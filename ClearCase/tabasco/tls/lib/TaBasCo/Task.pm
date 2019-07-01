@@ -314,7 +314,7 @@ sub loadConfigSpec  {
     # and only if the TaBasCo maintenance task already exists. During the TaBasCo installation
     # the main task will be initialized when the task tabasco does not exist yet.
     my $tabasco = TaBasCo::Task->new( -name => $TaBasCo::Common::Config::maintenanceTask );
-    if( ($tabasco->exists() ) {
+    if( $tabasco->exists() ) {
 	if( $self->getName() ne $tabasco->getName() ) {
 	    my $latestReleaseName = $tabasco->getLastRelease()->getName();
 	    push @config_spec, '';
