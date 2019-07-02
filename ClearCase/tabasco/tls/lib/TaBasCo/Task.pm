@@ -62,8 +62,8 @@ sub _createFloatingRelease {
 sub create {
     my $self = shift;
 
-    my ( $baseline, $comment, @other ) = $self->rearrange(
-	[ 'BASELINE', 'COMMENT' ],
+    my ( $baseline, $comment, $restrictpath, @other ) = $self->rearrange(
+	[ 'BASELINE', 'COMMENT', 'RESTRICTPATH' ],
 	@_ );
 
     unless( $baseline->exists() ) {
@@ -106,7 +106,52 @@ sub create {
 	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::firstReleaseLink, -vob => $self->getVob() ),
 	-object => $self->_createFloatingRelease()
 	);
-    
+
+    if( $restrictpath ) {
+	# load the user interface
+	my $ui = TaBasCo::UI->new();
+
+	$ui->okMessage( "Path restriction is requested. We will step through all paths of the parent task." );
+
+	# we have to set the config spec of the task's baseline
+	# otherwise the directory selection might not work
+	Transaction::start( -comment => "set correct config spec for directory selection" );
+	my $currentView = $ClearCase::Common::Config::myHost->getCurrentView();
+	$currentView->setConfigSpec( $self->getBaseline()->getConfigSpec() );
+
+	# start an inner transaction to be able to re-set the config spec by
+	# releasing the parent transaction
+	Transaction::start( -comment => "inner transaction for path restriction" );
+
+	# get my parent's paths
+	my $parentPaths = $self->getParent()->getPaths();
+	my @pathCollection = ();
+	if( $parentPaths ) {
+	    foreach my $parentPathElement ( @$parentPaths ) {
+		my $newPath = '';
+		my $parentPath = $parentPathElement->getNormalizedPath();
+		while( $newPath = $ui->selectDirectory( -question  => 'Select a directory to be used for your new task. Abort to finish.', -directory => $parentPath ) ) {
+		    $parentPath =~ s/\\/\//g;
+		    $newPath =~ s/\\/\//g;
+		    my $i = index( $newPath, $parentPath);
+		    if( ($i == 0) and (length( $newPath ) >= length( $parentPath )) ) {
+			push @pathCollection, ClearCase::Element->new( -pathname => $newPath );
+			$ui->okMessage( "Added path $newPath to new task." );
+		    } else {
+			$ui->okMessage( "The path must be a subpath of the parent path." );
+		    }
+		}
+	    }
+	    if( @pathCollection ) {
+		$self->mkPaths( \@pathCollection );
+	    }
+	    Transaction::commit();  # commit all path actions done
+	} else {
+	    Transaction::release(); # release the inner transaction
+	}
+	Transaction::rollback(); # reset the config spec
+    }
+
     return $self;
 }
 

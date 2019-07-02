@@ -30,9 +30,12 @@
 *** USAGE
 
     createTask  -name <new task name> -baseline <release of another task> [ -comment <free text line> ]
+                [-restrictpaths]
 
 
     This command creates a new task with the specified baseline.
+    If option -restrictpaths is specified a path selection dialog starts after successful task creation.
+    Within this dialog the new task can be restricted to work only on subpaths of its parent task.
 
 "
     },

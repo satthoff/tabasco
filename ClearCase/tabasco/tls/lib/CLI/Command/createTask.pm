@@ -30,7 +30,8 @@ sub initInstance {
    $self->SUPER::initInstance(
        '-name=s',
        '-baseline=s',
-       '-comment=s'
+       '-comment=s',
+       '-restrictpaths'
        );
    
    if ( $#ARGV >= 0 ) {
@@ -73,7 +74,11 @@ sub run {
       Error( [ __PACKAGE__ , "A task with name $taskName already exists." ] );
       $self->exitInstance( -1 );
   }
-  $newTask = $newTask->create( -baseline => $baseline, -comment => $comment );
+  $newTask = $newTask->create(
+      -baseline => $baseline,
+      -comment => $comment,
+      -restrictpath => $self->getOption( 'restrictpaths' )
+      );
   unless( $newTask ) {
       Error( [ __PACKAGE__ , "Creation of new task $taskName failed."  ] );
       $self->exitInstance( -1 );
