@@ -47,11 +47,14 @@
 
 *** USAGE
 
-    createRelease -task <task name>  [ -comment <free text line> ]
+    createRelease -task <task name>  [ -comment <free text line> ] [ -full ]
 
 
     This command creates a new release in the specified task.
-    The new release name is upper_count_of( <task name> . GMT . <actual GMT time> )
+    The new release name is upper case of( <task name> . GMT . <actual GMT time> )
+
+    With option -full the new release will become a full release.
+    Default is a delta release.
 
 "
     },

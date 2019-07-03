@@ -130,7 +130,7 @@ sub create {
 	    foreach my $parentPathElement ( @$parentPaths ) {
 		my $newPath = '';
 		my $parentPath = $parentPathElement->getNormalizedPath();
-		while( $newPath = $ui->selectDirectory( -question  => 'Select a directory to be used for your new task. Abort to finish.', -directory => $parentPath ) ) {
+		while( $newPath = $ui->selectDirectory( -question  => 'Select a directory to be used for your new task. Abort to finish. Select the "." to add this path:', -directory => $parentPath ) ) {
 		    $parentPath =~ s/\\/\//g;
 		    $newPath =~ s/\\/\//g;
 		    my $i = index( $newPath, $parentPath);
@@ -197,11 +197,14 @@ sub allAdminClientsRootElements {
 sub createNewRelease {
     my $self = shift;
     
-    my ( $comment, @other ) = $self->rearrange(
-	[ 'COMMENT' ],
+    my ( $comment, $fullrelease, @other ) = $self->rearrange(
+	[ 'COMMENT', 'FULLRELEASE' ],
 	@_ );
 
     my $newRelease = $self->getFloatingRelease();
+    if( $fullrelease ) {
+	$newRelease->ensureAsFullRelease();
+    }
     $newRelease->rename( $self->nextReleaseName() );
     my $floatingRelease = $self->_createFloatingRelease();
 
@@ -358,6 +361,7 @@ sub loadConfigSpec  {
     # but only if self is NOT the TaBasCo maintenance task
     # and only if the TaBasCo maintenance task already exists. During the TaBasCo installation
     # the main task will be initialized when the task tabasco does not exist yet.
+    # We expect the last release of the TaBasCo task to be a full release.
     my $tabasco = TaBasCo::Task->new( -name => $TaBasCo::Common::Config::maintenanceTask );
     if( $tabasco->exists() ) {
 	if( $self->getName() ne $tabasco->getName() ) {

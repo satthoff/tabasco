@@ -29,7 +29,8 @@ sub initInstance {
    # first initialize the base classes
    $self->SUPER::initInstance(
        '-task=s',
-       '-comment=s'
+       '-comment=s',
+       '-full'
        );
    
    if ( $#ARGV >= 0 ) {
@@ -65,7 +66,8 @@ sub run {
   Transaction::start( -comment => 'create new release ' );
 
   my $newRelease = $task->createNewRelease(
-      -comment => $comment
+      -comment => $comment,
+      -fullrelease => $self->getOption( 'full' )
       );
 
   unless( $newRelease ) {
