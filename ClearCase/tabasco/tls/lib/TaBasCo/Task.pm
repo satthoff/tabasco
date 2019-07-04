@@ -130,7 +130,7 @@ sub create {
 	    foreach my $parentPathElement ( @$parentPaths ) {
 		my $newPath = '';
 		my $parentPath = $parentPathElement->getNormalizedPath();
-		while( $newPath = $ui->selectDirectory( -question  => 'Select a directory to be used for your new task. Abort to finish. Select the "." to add this path:', -directory => $parentPath ) ) {
+		while( $newPath = $ui->selectDirectory( -question  => 'Select a directory to be used for your new task. Cancel to finish. Select the "." to add this path:', -directory => $parentPath ) ) {
 		    $parentPath =~ s/\\/\//g;
 		    $newPath =~ s/\\/\//g;
 		    my $i = index( $newPath, $parentPath);
