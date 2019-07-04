@@ -70,7 +70,7 @@
 
 
     This command displays existing tasks with their releases.
-    With option -long the config specs of tasks and releases will be displayed as well.
+    With option -long the config specs of tasks and a list of their releases will be displayed as well.
 
 "
     },
