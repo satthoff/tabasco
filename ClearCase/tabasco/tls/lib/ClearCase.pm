@@ -20,6 +20,7 @@ sub BEGIN {
    require ClearCase::TrType;
    require ClearCase::HyperLink;
    require ClearCase::Replica;
+   require ClearCase::Attribute;
 }
 
 use Log;

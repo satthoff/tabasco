@@ -25,6 +25,7 @@ sub BEGIN {
        Format   => undef,
       Long     => undef,
       Ahl      => undef,
+      Aat      => undef,
       Version  => undef,
       Argv => undef
    );
@@ -42,9 +43,9 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $transaction, $argv, $short, $fmt, $ahl, $long, $version, @other ) =
+   my ( $transaction, $argv, $short, $fmt, $ahl, $aat, $long, $version, @other ) =
       $class->rearrange(
-         [ qw( TRANSACTION ARGV SHORT FMT AHL LONG VERSION) ],
+         [ qw( TRANSACTION ARGV SHORT FMT AHL AAT LONG VERSION) ],
          @_ );
    confess join( ' ', @other ) if @other;
 
@@ -54,6 +55,7 @@ sub new {
    $self->setVersion($version);
    $self->setShort($short);
    $self->setAhl($ahl);
+   $self->setAat($aat);
    $self->setFormat($fmt);
    $self->setLong($long);
    $self->setArgv( $argv );
@@ -68,6 +70,7 @@ sub do_execute {
    push @options, '-s' if $self->getShort();
    push @options, '-l' if $self->getLong();
    push @options, '-ahl '. $self->getAhl() if $self->getAhl();
+   push @options, '-aat '. $self->getAat() if $self->getAat();
    push @options, '-fmt '. $self->getFormat() if $self->getFormat();
 
    my $pathname = $self->getArgv();

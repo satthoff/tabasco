@@ -46,9 +46,11 @@ use vars qw/
     $taskNamePrefix
     $configurationNamePrefix
     $maintenanceTask
+    $fullReleaseFlag
 
     @allHlTypes
     @allLbTypes
+    @allAtTypes
     %allTrigger
     /;
 
@@ -67,6 +69,7 @@ BEGIN {
     $myTaskLink = $tabascoPrefix . 'MemberOfTask';
     $cspecDelimiter = '#-------------------------------------------------------------------------------------';
     $pathLink = $tabascoPrefix . 'Path';
+    $fullReleaseFlag = $tabascoPrefix . 'FullRelease';
     $nextLabelExtension = '_NEXT';
     $toolRoot = 'tabasco';
     $maintenanceTask = 'tabasco';
@@ -80,6 +83,8 @@ BEGIN {
     @allHlTypes = ( $baselineLink, $taskLink, $firstReleaseLink, $nextReleaseLink, $floatingReleaseLink, $myTaskLink, $pathLink );
     
     @allLbTypes = ( $initialTaBasCoBaseline );
+
+    @allAtTypes = ( $fullReleaseFlag );
 
     my $myVobTag = $myVob->getTag();
     %allTrigger = (

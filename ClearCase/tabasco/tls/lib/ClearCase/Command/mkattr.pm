@@ -61,12 +61,21 @@ sub do_execute {
    my @options = ();
 
    push @options, '-replace'  if $self->getReplace();
-   ClearCase::Common::Cleartool::mkattr(
-      @options,
-      $self->getAttribut(),
-      "'" . $self->getValue()    . "'",
-      $self->getObject()
-      );
+   if( $self->getValue() ) {
+       ClearCase::Common::Cleartool::mkattr(
+	   @options,
+	   $self->getAttribut(),
+	   "'" . $self->getValue()    . "'",
+	   $self->getObject()
+	   );
+   } else {
+       push @options, '-default';
+       ClearCase::Common::Cleartool::mkattr(
+	   @options,
+	   $self->getAttribut(),
+	   $self->getObject()
+	   );
+   }
 }
 
 sub do_commit {

@@ -94,7 +94,7 @@ B<BrType.pm> [options]
 sub _init {
    my $self = shift;
 
-   $self->SUPER::_init( -type => 'brtype', @_ );
+   $self->SUPER::_init( -type => 'attype', @_ );
    return $self;
 } # _init
 
@@ -102,20 +102,18 @@ sub _init {
 sub create {
     my $self = shift;
 
-    my ( $pbranch, $comment, @other ) = $self->rearrange(
-	[ 'PBRANCH', 'COMMENT' ],
+    my ( $valueType, $defaultValue, $comment, @other ) = $self->rearrange(
+	[ 'VALUETYPE', 'DEFAULTVALUE', 'COMMENT' ],
 	@_ );
-    unless( $pbranch ) {
-	$pbranch = 0;
-    }
 
     my $adminMode = 0;
     $adminMode = 1 if( $self->getVob()->getClientVobs() or $self->getVob()->getMyAdminVob() );
     ClearCase::mkattype(
 	-name    => $self->getName(),
-	-pbranch => $pbranch,
 	-global  => $adminMode,
 	-acquire => $adminMode,
+	-vtype   => $valueType,
+	-default => $defaultValue,
 	-vob     => $self->getVob()->getTag(),
 	-comment => $comment
 	);

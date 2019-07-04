@@ -405,6 +405,7 @@ sub loadConfigSpec  {
 	foreach my $cp (  @{ $self->getCspecPaths() } ) {
 	    while( $baseline ) {
 		push @config_spec, "element $cp " . $baseline->getName();
+		last if( $baseline->getIsFullRelease() );
 		$baseline = $baseline->getPrevious();
 	    }
 	    $baseline = $self->getBaseline();
@@ -419,6 +420,7 @@ sub loadConfigSpec  {
 	    foreach my $cp ( @{ $baseline->getTask()->getCspecPaths() } ) {
 		push @config_spec, "element " . $cp . ' ' . $baseline->getName() . " -nocheckout";
 	    }
+	    last if( $baseline->getIsFullRelease() );
 	    $baseline = $baseline->getPrevious();
 	}
     }

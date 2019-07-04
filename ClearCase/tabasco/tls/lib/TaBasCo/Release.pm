@@ -23,6 +23,7 @@ sub BEGIN {
    require Data;
 
    %DATA = (
+       IsFullRelease => { CALCULATE => \&checkFullRelease },
        Task => { CALCULATE => \&loadTask },
        Previous => { CALCULATE => \&loadPrevious },
        ConfigSpec => { CALCULATE => \&loadConfigSpec }
@@ -103,9 +104,30 @@ sub ensureAsFullRelease {
 	    -argv => $normalPath
 	    );
     }
+    my $fullFlag = ClearCase::Attribute->new(
+	-attype => ClearCase::AtType->new( -name => $TaBasCo::Common::Config::fullReleaseFlag, -vob => $self->getVob() ),
+	-to     => $self
+	);
+    $fullFlag->create();
     Transaction::commit(); # commit all label operations
     
     Transaction::rollback(); # reset the config spec
+}
+
+sub checkFullRelease {
+    my $self = shift;
+
+    ClearCase::describe(
+	-short => 1,
+	-aat => $TaBasCo::Common::Config::fullReleaseFlag,
+	-argv => $self->getFullName()
+	);
+    my @results = ClearCase::getOutput();
+    grep chomp, @results;
+    if( @results ) {
+	return $self->setIsFullRelease( 1 );
+    }
+    return undef;
 }
 
 sub loadPrevious {
@@ -187,6 +209,7 @@ sub loadConfigSpec {
 	foreach my $cp ( @{ $actRelease->getTask()->getCspecPaths() } ) {
 	    push @config_spec, "element " . $cp . ' ' . $actRelease->getName() . " -nocheckout";
 	}
+	last if( $actRelease->getIsFullRelease() );
 	$actRelease = $actRelease->getPrevious();
     }
 

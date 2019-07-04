@@ -69,6 +69,13 @@ foreach my $lbtypeName ( @TaBasCo::Common::Config::allLbTypes ) {
     $newType->create() unless( $newType->exists() );
 }
 
+# declare all attribute types
+# we expect only integer attribute types with a default value
+foreach my $attributeName ( @TaBasCo::Common::Config::allAtTypes ) {
+    my $newType = ClearCase::AtType->new( -name => $attributeName, -vob => $TaBasCo::Common::Config::myVob );
+    $newType->create( -valuetype => 'integer', -defaultvalue => 1 ) unless( $newType->exists() );
+}
+
 # initialize the main task - based on the default ClearCase branch type 'main'
 # the main task gets attached the root path of the installation Vob and
 # of all admin client Vobs if the installation Vob is an admin Vob

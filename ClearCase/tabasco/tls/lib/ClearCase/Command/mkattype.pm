@@ -21,10 +21,14 @@ sub BEGIN {
    );
 
    %DATA = (
-      Name     => undef,
-      Vob      => undef,
-      Comment  => undef,
-      PBranch  => undef
+       Name     => undef,
+       Vob      => undef,
+       Comment  => undef,
+       PBranch  => undef,
+       Global   => undef,
+       Acquire  => undef,
+       ValueType => undef,
+       DefaultValue => undef
    );
 
    Data::init(
@@ -38,9 +42,9 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $transaction, $name, $vob, $comment, $pbranch, @other ) =
+   my ( $transaction, $name, $vob, $comment, $pbranch, $valueType, $defaultValue, $global, $acquire, @other ) =
       $class->rearrange(
-         [ qw( TRANSACTION NAME VOB COMMENT PBRANCH) ],
+         [ qw( TRANSACTION NAME VOB COMMENT PBRANCH VTYPE DEFAULT GLOBAL ACQUIRE) ],
          @_ );
    confess join( ' ', @other ) if @other;
 
@@ -51,6 +55,10 @@ sub new {
    $self->setPBranch( $pbranch );
    $self->setVob( $vob );
    $self->setComment( $comment );
+   $self->setValueType( $valueType );
+   $self->setDefaultValue( $defaultValue );
+   $self->setGlobal( $global );
+   $self->setAcquire( $acquire );
 
    return $self;
 }
@@ -69,6 +77,11 @@ sub do_execute {
    }
 
    push @options, '-pbranch'     if $self->getPBranch();
+   push @options, '-vtype ' . $self->getValueType() if( $self->getValueType() );
+   push @options, '-default ' . $self->getDefaultValue() if( $self->getDefaultValue() );
+   push @options, '-global' if $self->getGlobal();
+   push @options, '-acquire' if $self->getAcquire();
+
    push @options, '-shared'; #attribute types are alwasy shared
 
    ClearCase::Common::Cleartool::mkattype(
