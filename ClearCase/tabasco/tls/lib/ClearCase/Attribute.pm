@@ -66,7 +66,7 @@ sub create {
     } elsif( $self->getTo()->isa( 'ClearCase::Common::MetaObject' ) ) {
 	$toId = $self->getTo()->getFullName();
     } else {
-	Die( [ 'FATAL ERROR: wrong TO object type in ClearCase::HyperLink::create()' ] );
+	Die( [ 'FATAL ERROR: wrong TO object type in ClearCase::Attribute::create()' ] );
     }
 
     ClearCase::mkattr(
