@@ -249,7 +249,11 @@ sub printMe {
 	my $rel = $self->getLastRelease();
 	while( $rel ) {
 	    last if( $rel->getTask()->getName() ne $self->getName() );
-	    print "\t\t" . $rel->getName() . "\n";
+	    my $relKind = 'delta';
+	    if( $rel->getIsFullRelease() ) {
+		$relKind = 'full';
+	    }
+	    print "\t\t" . $rel->getName() . " ($relKind)\n";
 	    $rel = $rel->getPrevious();
 	}
     }
