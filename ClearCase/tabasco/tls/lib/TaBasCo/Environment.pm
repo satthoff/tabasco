@@ -48,6 +48,7 @@ sub new() {
 
 sub loadAllTasks {
     my $self = shift;
+    Debug( [ '', __PACKAGE__ .'::loadAllTasks' ] );
 
     my $db = $TaBasCo::Common::Config::myVob->getMyReplica();
     my @taskObjects = $db->getFromHyperlinkedObjects(
@@ -64,6 +65,7 @@ sub loadAllTasks {
 sub getTask {
     my $self = shift;
     my $name = shift;
+    Debug( [ '', __PACKAGE__ .'::getTask' ] );
 
     my %tt = %{ $self->getAllTasks() };
     return $tt{ $name } if( defined $tt{ $name } );
@@ -73,6 +75,7 @@ sub getTask {
 sub getRelease  {
     my $self = shift;
     my $name = shift;
+    Debug( [ '', __PACKAGE__ .'::getRelease' ] );
 
     my %releases =();
     if( $self->getReleases() ) {

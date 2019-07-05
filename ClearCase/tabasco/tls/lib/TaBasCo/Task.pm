@@ -50,6 +50,7 @@ sub _init {
 sub _createFloatingRelease {
     my $self = shift;
     my $comment = shift;
+    Debug( [ '', __PACKAGE__ .'::_createFloatingRelease' ] );
 
     my $floatingRelease = TaBasCo::Release->new( -name => uc( $self->getName() . $TaBasCo::Common::Config::floatingReleaseExtension ) );
     $floatingRelease->create(
@@ -61,6 +62,7 @@ sub _createFloatingRelease {
 
 sub create {
     my $self = shift;
+    Debug( [ '', __PACKAGE__ .'::create' ] );
 
     my ( $baseline, $comment, $restrictpath, @other ) = $self->rearrange(
 	[ 'BASELINE', 'COMMENT', 'RESTRICTPATH' ],
@@ -157,6 +159,7 @@ sub create {
 
 sub initializeMainTask {
     my $baselineName = shift;
+    Debug( [ '', __PACKAGE__ .'::initializeMainTask' ] );
 
     my $mainTask = TaBasCo::Task->new( -name => 'main' );
     my $baseline = TaBasCo::Release->new( -name => $baselineName );
@@ -183,6 +186,7 @@ sub initializeMainTask {
 sub allAdminClientsRootElements {
     my $self = shift;
     my $vob = shift;
+    Debug( [ '', __PACKAGE__ .'::allAdminClientsRootElements' ] );
 
     my @allRootElements = ( $vob->getRootElement() );
     my $clients = $vob->getClientVobs();
@@ -196,6 +200,7 @@ sub allAdminClientsRootElements {
 
 sub createNewRelease {
     my $self = shift;
+    Debug( [ '', __PACKAGE__ .'::createNewRelease' ] );
     
     my ( $comment, $fullrelease, @other ) = $self->rearrange(
 	[ 'COMMENT', 'FULLRELEASE' ],
@@ -216,6 +221,7 @@ sub createNewRelease {
 
 sub exists {
     my $self = shift;
+    Debug( [ '', __PACKAGE__ .'::exists' ] );
 
     if( $self->SUPER::exists() ) {
 	my @result = $self->getToHyperlinkedObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::taskLink, -vob => $self->getVob() ) );
@@ -239,6 +245,7 @@ sub exists {
 sub printMe {
     my $self = shift;
     my $long = shift;
+    Debug( [ '', __PACKAGE__ .'::printMe' ] );
 
     print $self->getName() . "\n";
     if( $long ) {
@@ -261,6 +268,7 @@ sub printMe {
 
 sub loadFloatingRelease {
     my $self = shift;
+    Debug( [ '', __PACKAGE__ .'::loadFloatingRelease' ] );
 
     my $floatingRelease = TaBasCo::Release->new( -name => uc( $self->getName() . $TaBasCo::Common::Config::floatingReleaseExtension ) );
     return $self->setFloatingRelease( $floatingRelease ) if( $floatingRelease->exists() );
@@ -269,6 +277,7 @@ sub loadFloatingRelease {
 
 sub loadLastRelease {
     my $self = shift;
+    Debug( [ '', __PACKAGE__ .'::loadLastRelease' ] );
 
     my $lastRelease = $self->getFloatingRelease()->getPrevious();
     return $self->setLastRelease( $lastRelease ) if( $lastRelease );
@@ -277,6 +286,7 @@ sub loadLastRelease {
 
 sub loadBaseline {
     my $self = shift;
+    Debug( [ '', __PACKAGE__ .'::loadBaseline' ] );
 
     my @result = $self->getFromHyperlinkedObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::baselineLink, -vob => $self->getVob() ) );
     if( $#result != 0 ) {
@@ -293,6 +303,7 @@ sub loadBaseline {
 
 sub loadParent {
     my $self = shift;
+    Debug( [ '', __PACKAGE__ .'::loadParent' ] );
 
     return undef if( $self->getName() eq 'main' ); # Task 'main' has no parent task, it is the root task of all ever existing tasks.
     my $baseline = $self->getBaseline();
@@ -302,12 +313,14 @@ sub loadParent {
 
 sub nextReleaseName {
     my $self = shift;
+    Debug( [ '', __PACKAGE__ .'::nextReleaseName' ] );
     return uc( $self->getName() ) . '_' . &TaBasCo::Common::Config::gmtTimeString();
 }
 
 sub mkPaths {
     my $self = shift;
     my $elements = shift; # we expect a reference to an array of ClearCase::Element objects
+    Debug( [ '', __PACKAGE__ .'::mkPaths' ] );
 
     foreach my $elem ( @$elements ) {
 	$self->createHyperlinkToObject(
@@ -320,6 +333,7 @@ sub mkPaths {
 
 sub loadPaths {
     my $self = shift;
+    Debug( [ '', __PACKAGE__ .'::loadPaths' ] );
 
     my @paths = $self->getFromHyperlinkedObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::pathLink, -vob => $self->getVob() ) );
     my $parent = undef;
@@ -345,6 +359,7 @@ sub loadPaths {
 
 sub loadCspecPaths {
     my $self = shift;
+    Debug( [ '', __PACKAGE__ .'::loadCspecPaths' ] );
 
     my @paths = @{ $self->getPaths() };
     my @cspecPaths = ();
@@ -356,6 +371,7 @@ sub loadCspecPaths {
 
 sub loadConfigSpec  {
     my $self = shift;
+    Debug( [ '', __PACKAGE__ .'::loadConfigSpec' ] );
 
     my @config_spec = ();
 

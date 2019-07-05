@@ -108,6 +108,7 @@ BEGIN {
 my $configElement = undef;
 
 sub getConfigElement {
+    Debug( [ '', __PACKAGE__ .'::getConfigElement' ] );
     
     return $configElement if( $configElement );
 
@@ -135,6 +136,7 @@ sub getConfigElement {
 }
 
 sub gmtTimeString {
+    Debug( [ '', __PACKAGE__ .'::gmtTimeString' ] );
     my @gmt = gmtime();
     my @month = qw( Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
     my $year = $gmt[5] + 1900;
@@ -144,6 +146,7 @@ sub gmtTimeString {
 
 sub cspecHeader {
     my $config_spec = shift;
+    Debug( [ '', __PACKAGE__ .'::cspecHeader' ] );
 
     push @$config_spec, 'element * CHECKEDOUT';
     push @$config_spec, '#';

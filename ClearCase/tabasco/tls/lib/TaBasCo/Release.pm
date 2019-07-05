@@ -44,6 +44,7 @@ sub _init {
 
 sub create {
     my $self = shift;
+    Debug( [ '', __PACKAGE__ .'::create' ] );
 
    my ( $task, $comment, @other ) = $self->rearrange(
       [ 'TASK', 'COMMENT' ],
@@ -61,9 +62,10 @@ sub create {
     return $self;
 }
 
-sub _registerAsTaskMember  {
+sub _registerAsTaskMember {
     my $self = shift;
     my $task = shift;
+    Debug( [ '', __PACKAGE__ .'::_registerAsTaskMember' ] );
 
     $self->createHyperlinkToObject(
 	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::myTaskLink, -vob => $self->getVob() ),
@@ -75,6 +77,7 @@ sub _registerAsTaskMember  {
 sub registerAsNextReleaseOf {
     my $self = shift;
     my $previous = shift;
+    Debug( [ '', __PACKAGE__ .'::registerAsNextReleaseOf' ] );
 
     $self->createHyperlinkFromObject(
 	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::nextReleaseLink, -vob => $self->getVob() ),
@@ -85,6 +88,7 @@ sub registerAsNextReleaseOf {
 
 sub ensureAsFullRelease {
     my $self = shift;
+    Debug( [ '', __PACKAGE__ .'::ensureAsFullRelease' ] );
 
     my $view = $ClearCase::Common::Config::myHost->getCurrentView();
     unless( $view ) {
@@ -116,6 +120,7 @@ sub ensureAsFullRelease {
 
 sub checkFullRelease {
     my $self = shift;
+    Debug( [ '', __PACKAGE__ .'::checkFullRelease' ] );
 
     ClearCase::describe(
 	-short => 1,
@@ -132,6 +137,7 @@ sub checkFullRelease {
 
 sub loadPrevious {
     my $self = shift;
+    Debug( [ '', __PACKAGE__ .'::loadPrevious' ] );
 
     my @result = $self->getToHyperlinkedObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::nextReleaseLink, -vob => $self->getVob() ) );
     unless( @result ) {
@@ -159,6 +165,7 @@ sub loadPrevious {
 
 sub loadTask {
     my $self = shift;
+    Debug( [ '', __PACKAGE__ .'::loadTask' ] );
 
     my @result = $self->getFromHyperlinkedObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::myTaskLink, -vob => $self->getVob() ) );
     if( $#result != 0 ) {
@@ -175,6 +182,7 @@ sub loadTask {
 
 sub loadConfigSpec {
     my $self = shift;
+    Debug( [ '', __PACKAGE__ .'::loadConfigSpec' ] );
 
     my @config_spec = ();
 
