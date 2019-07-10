@@ -178,7 +178,7 @@ __END__
 
 =head1 AUTHOR INFORMATION
 
- Copyright (C) 2007  Uwe Satthoff
+ Copyright (C) 2001  Uwe Satthoff
 
 =head1 CREDITS
 
