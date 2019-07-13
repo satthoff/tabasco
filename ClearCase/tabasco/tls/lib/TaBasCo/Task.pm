@@ -422,13 +422,12 @@ sub loadConfigSpec  {
 	}
 	my $baseline = $self->getBaseline();
 	push @config_spec, "mkbranch " . $self->getName();
-	foreach my $cp (  @{ $self->getCspecPaths() } ) {
-	    while( $baseline ) {
+	while( $baseline ) {
+	    foreach my $cp (  @{ $self->getCspecPaths() } ) {
 		push @config_spec, "element $cp " . $baseline->getName();
-		last if( $baseline->getIsFullRelease() );
-		$baseline = $baseline->getPrevious();
 	    }
-	    $baseline = $self->getBaseline();
+	    last if( $baseline->getIsFullRelease() );
+	    $baseline = $baseline->getPrevious();
 	}
 	foreach my $cp ( @{ $self->getCspecPaths() } ) {
 	    push @config_spec, "element $cp /main/0";
