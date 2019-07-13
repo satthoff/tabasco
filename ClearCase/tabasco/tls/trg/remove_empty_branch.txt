@@ -20,12 +20,6 @@ $error
    exit 1;
 }
 
-my $vobPattern = quotemeta( $ENV{CLEARCASE_VOB_PN} );
-my @path = split /$vobPattern/, $ENV{CLEARCASE_PN};
-$path[$#path] =~ s/\\/\//g;
-my $toolPattern = quotemeta( '/.cfg/' );
-exit 0 if( $path[$#path] =~ m/^$toolPattern/ );
-
 $ENV{CLEARCASE_ID_STR} =~ s%\\%/%g;             # be compatible on Unix and Windows
 exit 0 if ( $ENV{CLEARCASE_OP_KIND} eq 'uncheckout' and $ENV{CLEARCASE_ID_STR} !~ m%/0$% );
 $BRANCH_DIR = $ENV{'CLEARCASE_XPN'};
