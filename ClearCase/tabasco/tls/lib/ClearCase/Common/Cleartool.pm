@@ -6,9 +6,8 @@ use Log;
 use IO::Handle;
 use POSIX;
 
-# according to ASML environment we replace IPC::ChildSafe by ClearCase::CtCmd
+# use CtCmd of CC distribution
 #use IPC::ClearTool;
-use lib '/sdev/user/lib/site_perl';
 use ClearCase::CtCmd;
 
 sub BEGIN {
