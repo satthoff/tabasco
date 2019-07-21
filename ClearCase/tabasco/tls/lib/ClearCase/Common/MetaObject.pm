@@ -25,7 +25,8 @@ sub BEGIN {
        Type => undef,
        Vob => undef,
        FullName => undef,
-       Exists => undef
+       Exists => undef,
+       AdminVob => { CALCULATE => \&loadAdminVob }
       );
 
    require Data;
@@ -112,6 +113,16 @@ sub exists {
     return $ex;
 }
 
+sub loadAdminVob {
+    my $self = shift;
+
+    my $adminVob = $self->getVob();
+    while( $adminVob->getMyAdminVob() ) {
+	$adminVob->getMyAdminVob();
+    }
+    return $self->setAdminVob( $adminVob );
+}
+    
 
 sub lock {
     my $self = shift;

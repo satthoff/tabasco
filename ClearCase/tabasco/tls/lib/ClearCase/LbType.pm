@@ -78,7 +78,7 @@ sub create {
 	-pbranch => $pbranch,
 	-global  => $adminMode,
 	-acquire => $adminMode,
-	-vob     => $self->getVob()->getTag(),
+	-vob     => $self->getAdminVob()->getTag(),
 	-comment => $comment
 	);
 

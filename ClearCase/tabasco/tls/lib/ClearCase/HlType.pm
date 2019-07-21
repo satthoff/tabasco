@@ -144,7 +144,7 @@ sub create {
        -name    => $self->getName(),
        -global  => $adminMode,
        -acquire => $adminMode,
-       -vob     => $self->getVob()->getTag(),
+       -vob     => $self->getAdminVob()->getTag(),
        -comment => $comment
        );
 
