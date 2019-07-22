@@ -22,9 +22,6 @@ BEGIN {
   else
     {
       push @INCL_LIB, ( "$base", "$base/lib" );
-
-      # inserted for VDI Linux at ASML
-      push @INCL_LIB, '/home/usatthof/myPerl/lib/site_perl/5.8.4/x86_64-linux';
     }
   unshift @INC, @INCL_LIB;
 }
@@ -49,13 +46,6 @@ sub allVobsInAdminHierarchy {
 
 #Log::setVerbosity( "debug" );
 Transaction::start( -comment => 'TaBasCo installation' );
-
-# Tabasco must be installed in an ordinay Vob or the root Vob of an administrative Vob hierarchy
-my $myAdminVob = $TaBasCo::Common::Config::myVob->getMyAdminVob();
-if( $myAdminVob ) {
-    Die( [ '', 'Tabasco must NOT be installed in a Vob which is the client of an admin Vob.',
-	   'Admin Vob is ' . $myAdminVob->getTag() ] );
-}
   
 # declare all hyperlink types
 foreach my $hltypeName ( @TaBasCo::Common::Config::allHlTypes ) {
