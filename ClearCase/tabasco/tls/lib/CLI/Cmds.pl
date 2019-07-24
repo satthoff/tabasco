@@ -24,30 +24,42 @@
     createTask  => {
 	short => 'crta',
 	package => 'CLI::Command::createTask',
-	description => 'creates a new task with baseline = release provided with option -baseline',
+	description => 'creates a new task',
 	helptext    => "
 
 *** USAGE
 
-    createTask  -name <new task name> -baseline <release of another task> [ -comment <free text line> ]
-                [-restrictpaths]
+    createTask  -name <new task name>  [ -comment <free text> ]
+                        { -baseline <release of another task>  [-restrictpaths]      |
+                          -paths <filename of a file with Vob paths, one per line> }
 
 
-    This command creates a new task with the specified baseline.
+    This command creates a new task.
+
+    With option -baseline, the baseline of the new task will be a release of another task.
+    The other task becomes the parent task of the new task.
     If option -restrictpaths is specified a path selection dialog starts after successful task creation.
     Within this dialog the new task can be restricted to work only on subpaths of its parent task.
+    Default is, that the new task inherits all paths of its parent task.
+
+    With option -paths a new initial task will be created which does not have a parent task.
+    The current view's config spec determines which versions of the specified paths forms together
+    the baseline of the new task.
+    The baseline of the new task will be created as a initial release and all selected Vob paths will
+    be recursively fully labeled with the name of the newly created release.
+    The baseline of the new task is named upper case of( <task name> _BASELINE).
 
 "
     },
     createRelease  => {
 	short => 'crre',
 	package => 'CLI::Command::createRelease',
-	description => 'creates a new release in the task specified with option -task',
+	description => 'creates a new release',
 	helptext    => "
 
 *** USAGE
 
-    createRelease -task <task name>  [ -comment <free text line> ] [ -full ]
+    createRelease -task <task name>  [ -comment <free text> ] [ -full ]
 
 
     This command creates a new release in the specified task.
@@ -69,7 +81,7 @@
     listTasks  [ -long ] [ <task name> <task name> ... ]
 
 
-    This command displays existing tasks with their releases.
+    This command displays existing tasks.
     With option -long the config specs of tasks and a list of their releases will be displayed as well.
 
 "
