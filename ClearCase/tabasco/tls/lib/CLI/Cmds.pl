@@ -31,7 +31,7 @@
 
     createTask  -name <new task name>  [ -comment <free text> ]
                         { -baseline <release of another task>  [-restrictpaths]      |
-                          -paths <filename of a file with Vob paths, one per line> }
+                          -paths <filename of a file with absolute Vob paths, one per line> }
 
 
     This command creates a new task.

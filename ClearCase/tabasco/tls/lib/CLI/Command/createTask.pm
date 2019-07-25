@@ -31,6 +31,7 @@ sub initInstance {
        '-name=s',
        '-baseline=s',
        '-comment=s',
+       '-paths=s',
        '-restrictpaths'
        );
    
@@ -51,22 +52,14 @@ sub run {
   unless( $taskName ) {
       Error( [ 'No task name has been specified.' ] );
       $self->exitInstance( -1 );
-  }
-  
-  my $baselineName = $self->getOption( 'baseline' );
-  unless( $baselineName ) {
-      Error( [ 'No baseline name has been specified.' ] );
-      $self->exitInstance( -1 );
-  }
-  
+  }  
   my $comment = '';
   $comment = $self->getOption( 'comment' ) if( $self->getOption( 'comment' ) );
 
-  
-  Transaction::start( -comment => 'create new task' . $self->getOption( 'name' ) );
-  
-  my $baseline = TaBasCo::Release->new( -name => $baselineName );
-  # existence of the release will be checked during task creation
+  if( $self->getOption( 'baseline' ) and $self->getOption( 'paths' ) ) {
+      Error( [ 'Options -baseline and -paths are mutually exclusive.' ] );
+      $self->exitInstance( -1 );
+  }
   
   my $newTask = TaBasCo::Task->new( -name => $taskName );
   $taskName = $newTask->getFullName();
@@ -74,19 +67,63 @@ sub run {
       Error( [ __PACKAGE__ , "A task with name $taskName already exists." ] );
       $self->exitInstance( -1 );
   }
-  $newTask = $newTask->create(
-      -baseline => $baseline,
-      -comment => $comment,
-      -restrictpath => $self->getOption( 'restrictpaths' )
-      );
-  unless( $newTask ) {
-      Error( [ __PACKAGE__ , "Creation of new task $taskName failed."  ] );
-      $self->exitInstance( -1 );
+
+  if( $self->getOption( 'baseline' ) ) {
+      my $baselineName = $self->getOption( 'baseline' );
+      unless( $baselineName ) {
+	  Error( [ 'No baseline name has been specified.' ] );
+	  $self->exitInstance( -1 );
+      }
+      Transaction::start( -comment => 'create new task with specified baseline' );
+  
+      my $baseline = TaBasCo::Release->new( -name => $baselineName );
+      # existence of the release will be checked during task creation
+  
+      $newTask = $newTask->create(
+	  -baseline => $baseline,
+	  -comment => $comment,
+	  -restrictpath => $self->getOption( 'restrictpaths' )
+	  );
+      unless( $newTask ) {
+	  Error( [ __PACKAGE__ , "Creation of new task $taskName failed."  ] );
+	  $self->exitInstance( -1 );
+      }
+  
+      Transaction::commit();
+      Message( [ __PACKAGE__ , "Successfully created new task  $taskName"  ] );
+  } else {
+      open FD, '"' . $self->getOption( 'paths' ) . '"' || {
+	  Error( [ 'File ' . $self->getOption( 'paths' ) . ' specified with option -paths does not exist or is not readable.' ] );
+	  $self->exitInstance( -1 );
+      }
+      Transaction::start( -comment => 'create new task with specified paths' );
+
+      my @pathSpecs = <FD>;
+      grep chomp, @pathSpecs;
+      close FD;
+      my $i = 0;
+      my @pathElements = ();
+      foreach my $p ( @pathSpecs ) {
+	  $i++;
+	  if( not -e "$p" ) {
+	      Error( [ "Path $p specified in line $i is not accessible." ] );
+	      $self->exitInstance( -1 );
+	  }
+	  push @pathElements, ClearCase::Element->new(
+		-pathname => $p
+		);
+      }
+      $newTask = $newTask->create(
+	  -elements => \@pathElements,
+	  -comment => $comment
+	  );
+      unless( $newTask ) {
+	  Error( [ __PACKAGE__ , "Creation of new task $taskName failed."  ] );
+	  $self->exitInstance( -1 );
+      }
+      Transaction::commit();
+      Message( [ __PACKAGE__ , "Successfully created new task  $taskName"  ] );
   }
-  
-  Transaction::commit();
-  Message( [ __PACKAGE__ , "Successfully created new task  $taskName"  ] );
-  
 } # run
 
 1;
