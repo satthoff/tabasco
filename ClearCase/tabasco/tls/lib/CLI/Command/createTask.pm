@@ -50,14 +50,14 @@ sub run {
 
   my $taskName = $self->getOption( 'name' );
   unless( $taskName ) {
-      Error( [ 'No task name has been specified.' ] );
+      Error( [ __PACKAGE__ , 'No task name has been specified.' ] );
       $self->exitInstance( -1 );
   }  
   my $comment = '';
   $comment = $self->getOption( 'comment' ) if( $self->getOption( 'comment' ) );
 
   if( $self->getOption( 'baseline' ) and $self->getOption( 'paths' ) ) {
-      Error( [ 'Options -baseline and -paths are mutually exclusive.' ] );
+      Error( [ __PACKAGE__ , 'Options -baseline and -paths are mutually exclusive.' ] );
       $self->exitInstance( -1 );
   }
   
@@ -70,10 +70,6 @@ sub run {
 
   if( $self->getOption( 'baseline' ) ) {
       my $baselineName = $self->getOption( 'baseline' );
-      unless( $baselineName ) {
-	  Error( [ 'No baseline name has been specified.' ] );
-	  $self->exitInstance( -1 );
-      }
       Transaction::start( -comment => 'create new task with specified baseline' );
   
       my $baseline = TaBasCo::Release->new( -name => $baselineName );
@@ -93,7 +89,7 @@ sub run {
       Message( [ __PACKAGE__ , "Successfully created new task  $taskName"  ] );
   } else {
       open FD, '"' . $self->getOption( 'paths' ) . '"' || {
-	  Error( [ 'File ' . $self->getOption( 'paths' ) . ' specified with option -paths does not exist or is not readable.' ] );
+	  Error( [ __PACKAGE__ , 'File ' . $self->getOption( 'paths' ) . ' specified with option -paths does not exist or is not readable.' ] );
 	  $self->exitInstance( -1 );
       }
       Transaction::start( -comment => 'create new task with specified paths' );
@@ -106,7 +102,7 @@ sub run {
       foreach my $p ( @pathSpecs ) {
 	  $i++;
 	  if( not -e "$p" ) {
-	      Error( [ "Path $p specified in line $i is not accessible." ] );
+	      Error( [ __PACKAGE__ , "Path $p specified in line $i is not accessible." ] );
 	      $self->exitInstance( -1 );
 	  }
 	  push @pathElements, ClearCase::Element->new(
