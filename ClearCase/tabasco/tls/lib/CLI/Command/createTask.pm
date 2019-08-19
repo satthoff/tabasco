@@ -99,15 +99,23 @@ sub run {
       close FD;
       my $i = 0;
       my @pathElements = ();
+      my @errors = ();
       foreach my $p ( @pathSpecs ) {
 	  $i++;
 	  if( not -e "$p" ) {
-	      Error( [ __PACKAGE__ , "Path $p specified in line $i is not accessible." ] );
-	      $self->exitInstance( -1 );
+	      push @errors, "Path $p specified in line $i is not accessible.";
+	  } else {
+	      push @pathElements, ClearCase::Element->new(
+		  -pathname => $p
+		  );
 	  }
-	  push @pathElements, ClearCase::Element->new(
-		-pathname => $p
-		);
+      }
+      if( @errors ) {
+	  Error( [ __PACKAGE__ , 'Errors in file ' . $self->getOption( 'paths' ) . ' :' ] );
+	  foreach my $l ( @errors ) {
+	      Error( [ __PACKAGE__ , $l ] );
+	  }
+	  $self->exitInstance( -1 );
       }
       $newTask = $newTask->create(
 	  -elements => \@pathElements,
