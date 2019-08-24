@@ -41,7 +41,6 @@ use vars qw/
     $floatingReleaseExtension
     $floatingReleaseLink
     $myTaskLink
-    $initialTaBasCoBaseline
     $cspecDelimiter
     $taskNamePrefix
     $configurationNamePrefix
@@ -59,7 +58,6 @@ BEGIN {
     $taskNamePrefix = 'tsk_';
     $configurationNamePrefix = 'cfg_';
     my $tabascoPrefix = 'tabasco_';
-    $initialTaBasCoBaseline = $tabascoPrefix . 'InitialBaseline';
     $baselineLink = $tabascoPrefix . 'TaskBaseline';
     $taskLink = $tabascoPrefix . 'RegisteredTask';
     $firstReleaseLink = $tabascoPrefix . 'TaskFirstRelease';

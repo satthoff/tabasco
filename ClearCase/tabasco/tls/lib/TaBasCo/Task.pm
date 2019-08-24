@@ -64,14 +64,9 @@ sub create {
     my $self = shift;
     Debug( [ '', __PACKAGE__ .'::create' ] );
 
-    my ( $baseline, $comment, $restrictpath, @other ) = $self->rearrange(
-	[ 'BASELINE', 'COMMENT', 'RESTRICTPATH' ],
+    my ( $baseline, $comment, $restrictpath, $elements, @other ) = $self->rearrange(
+	[ 'BASELINE', 'COMMENT', 'RESTRICTPATH', 'ELEMENTS' ],
 	@_ );
-
-    unless( $baseline->exists() ) {
-	Error( [ __PACKAGE__ . '::create : Baseline ' . $baseline->getName() . ' does not exist.' ] );
-	return undef;
-    }
 
     if( $self->getName() ne 'main' ) {
 	# branch type main is a predefined one and needs not to be created
@@ -80,28 +75,60 @@ sub create {
 	}
 	$self->SUPER::create( -comment => $comment );
     } else {
-	# we have to connect the initial baseline of the main
-	# task to its task - this happens normally during the creation
-	# of a task's floating release, but the initial baseline of task main
-	# was never a floating release
-	$self->createHyperlinkFromObject(
-	    -hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::myTaskLink, -vob => $self->getVob() ),
-	    -object => $baseline
-	    );
+	Error( [ __PACKAGE__ . '::create : The predefined branch type "main" cannot become a task.' ] );
+	return undef;
     }
 
+    if( $baseline ) {
+	unless( $baseline->exists() ) {
+	    Error( [ __PACKAGE__ . '::create : Baseline ' . $baseline->getName() . ' does not exist.' ] );
+	    return undef;
+	}
+    } elsif( @$elements ) {
+	# the new task is NOT based on an already existing baseline.
+	# we create the new baseline as a release of the new task
+	$baseline = TaBasCo::Release->new( -name => uc( $self->getName() . '_baseline' ) );
+	$baseline->create(
+	    -task => $self,
+	    -comment => $comment
+	    );
+
+	# label all specified elements recursively with the new baseline label
+	# and mark it as a full release
+	foreach my $tP ( @$elements ) {
+	    my $normalPath = $tP->getNormalizedPath();
+	    ClearCase::mklabel(
+		-label => $baseline->getName(),
+		-replace => 1,
+		-recurse => 1,
+		-argv => $normalPath
+		);
+	}
+	my $fullFlag = ClearCase::Attribute->new(
+	    -attype => ClearCase::AtType->new( -name => $TaBasCo::Common::Config::fullReleaseFlag, -vob => $self->getVob() ),
+	    -to     => $baseline
+	    );
+	$fullFlag->create();
+
+	# finally attach all elements as paths of the new task
+	$self->mkPaths( $elements );
+    } else {
+	Error( [ __PACKAGE__ . '::create : No list of elements nor a baseline have been specified.' ] );
+	return undef;
+    }
+    
     # register the new task as a known task
     $self->createHyperlinkFromObject(
 	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::taskLink, -vob => $self->getVob() ),
 	-object => $self->getVob()->getMyReplica()
 	);
     
-    # register the provided baseline as the task baseline
+    # register the provided or newly created baseline as the task baseline
     $self->createHyperlinkToObject(
 	-hltype => ClearCase::HlType->new( -name => $TaBasCo::Common::Config::baselineLink, -vob => $self->getVob() ),
 	-object => $baseline
 	);
-
+    
     # create the task's floating release
     # and register it as the task's first release
     $self->createHyperlinkToObject(
@@ -109,7 +136,7 @@ sub create {
 	-object => $self->_createFloatingRelease()
 	);
 
-    if( $restrictpath ) {
+    if( $restrictpath and not @$elements ) {
 	# load the user interface
 	my $ui = TaBasCo::UI->new();
 
@@ -157,32 +184,6 @@ sub create {
     return $self;
 }
 
-sub initializeMainTask {
-    my $baselineName = shift;
-    Debug( [ '', __PACKAGE__ .'::initializeMainTask' ] );
-
-    my $mainTask = TaBasCo::Task->new( -name => 'main' );
-    my $baseline = TaBasCo::Release->new( -name => $baselineName );
-    
-    # check whether the initialization has already been performed, never execute this subroutine twice!!!!
-    my $taskLink = ClearCase::HlType->new(
-	-name => $TaBasCo::Common::Config::taskLink,
-	-vob => $mainTask->getVob()
-	);
-    if( $mainTask->getToHyperlinkedObjects( $taskLink ) )  {
-	Die( [ __PACKAGE__ . '::initializeMainTask', "The main task has already been initialized." ] );
-    }
-
-    $mainTask->create( -baseline => $baseline );
-        
-    # attach the initial path hyperlinks
-    # we expect that TABASCO has been installed in the root Vob of an adminstrative Vob hierarchy or in an ordinary Vob.
-    my @elements = ();
-    push @elements, $mainTask->allAdminClientsRootElements( $mainTask->getVob() );
-    $mainTask->mkPaths( \@elements );
-    return $mainTask;
-}
-
 sub allAdminClientsRootElements {
     my $self = shift;
     my $vob = shift;
@@ -217,29 +218,6 @@ sub createNewRelease {
     $floatingRelease->registerAsNextReleaseOf( $newRelease );
     
     return $newRelease;
-}
-
-sub exists {
-    my $self = shift;
-    Debug( [ '', __PACKAGE__ .'::exists' ] );
-
-    if( $self->SUPER::exists() ) {
-	my @result = $self->getToHyperlinkedObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::taskLink, -vob => $self->getVob() ) );
-	if( $#result > 0 ) {
-	    Die( [ __PACKAGE__ , "FATAL ERROR: Incorrect number ($#result) of task registration links $TaBasCo::Common::Config::taskLink at task " . $self->getFullName(), '' ] );
-	} elsif( $#result == 0 ) {
-	    # we expect the result to be our own replica
-	    if( $self->getVob()->getMyReplica()->getFullName() eq $result[0] ) {
-		return 1;
-	    }
-	    Die( [ __PACKAGE__ , "FATAL ERROR: Task registration link $TaBasCo::Common::Config::taskLink at task " . $self->getFullName(),
-		 ' is connected to wrong meta object (our own replica expected) ' . $result[0] ] );
-	} else {
-	    Debug( [ __PACKAGE__ , "A branch type named " . $self->getName() . ' exists, but it is no ' . __PACKAGE__ ] );
-	    return 0;
-	}
-    }
-    return 0;
 }
 
 sub printMe {
@@ -308,6 +286,7 @@ sub loadParent {
     return undef if( $self->getName() eq 'main' ); # Task 'main' has no parent task, it is the root task of all ever existing tasks.
     my $baseline = $self->getBaseline();
     return undef unless( $baseline );
+    return undef if( $baseline->getTask()->getName() eq $self->getName() );
     return $self->setParent( $baseline->getTask() );
 }
 
@@ -412,29 +391,25 @@ sub loadConfigSpec  {
     }
     push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
 
-    if( $self->getName() eq 'main' ) {
-	foreach my $p ( @{ $self->getCspecPaths() } ) {
-	    push @config_spec, "element $p /" . $self->getName() . "/LATEST";
+    foreach my $cp ( @{ $self->getCspecPaths() } ) {
+	push @config_spec, "element $cp .../" . $self->getName() . "/LATEST";
+    }
+    my $baseline = $self->getBaseline();
+    push @config_spec, "mkbranch " . $self->getName();
+    while( $baseline ) {
+	foreach my $cp (  @{ $self->getCspecPaths() } ) {
+	    push @config_spec, "element $cp " . $baseline->getName();
 	}
-    } else {
-	foreach my $cp ( @{ $self->getCspecPaths() } ) {
-	    push @config_spec, "element $cp .../" . $self->getName() . "/LATEST";
-	}
-	my $baseline = $self->getBaseline();
-	push @config_spec, "mkbranch " . $self->getName();
-	while( $baseline ) {
-	    foreach my $cp (  @{ $self->getCspecPaths() } ) {
-		push @config_spec, "element $cp " . $baseline->getName();
-	    }
-	    last if( $baseline->getIsFullRelease() );
-	    $baseline = $baseline->getPrevious();
-	}
-	foreach my $cp ( @{ $self->getCspecPaths() } ) {
-	    push @config_spec, "element $cp /main/0";
-	}
-	push @config_spec, "end mkbranch " . $self->getName();
+	last if( $baseline->getIsFullRelease() );
+	$baseline = $baseline->getPrevious();
+    }
+    foreach my $cp ( @{ $self->getCspecPaths() } ) {
+	push @config_spec, "element $cp /main/0";
+    }
+    push @config_spec, "end mkbranch " . $self->getName();
 
-	$baseline = $self->getBaseline();
+    $baseline = $self->getBaseline();
+    if( $baseline->getTask()->getName() ne $self->getName() ) {
 	while( $baseline ) {
 	    foreach my $cp ( @{ $baseline->getTask()->getCspecPaths() } ) {
 		push @config_spec, "element " . $cp . ' ' . $baseline->getName() . " -nocheckout";

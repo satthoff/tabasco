@@ -66,23 +66,16 @@ foreach my $attributeName ( @TaBasCo::Common::Config::allAtTypes ) {
     $newType->create( -valuetype => 'integer', -defaultvalue => 1 ) unless( $newType->exists() );
 }
 
-# initialize the main task - based on the default ClearCase branch type 'main'
-# the main task gets attached the root path of the installation Vob and
-# of all admin client Vobs if the installation Vob is an admin Vob
-my $mainTask = TaBasCo::Task::initializeMainTask( $TaBasCo::Common::Config::initialTaBasCoBaseline );
-$mainTask->getFloatingRelease()->ensureAsFullRelease();
-my $firstMainRelease = $mainTask->createNewRelease();
-
 # create the task tabasco to manage the installed tool within its own task
 my $tabascoTask = TaBasCo::Task->new( -name => $TaBasCo::Common::Config::maintenanceTask );
-$tabascoTask->create( -baseline => $firstMainRelease );
 my $tabascoRootPathElement = ClearCase::Element->new(
     -pathname => $TaBasCo::Common::Config::myVob->getRootElement()->getNormalizedPath() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot
     );
 my @tmp = (); push @tmp, $tabascoRootPathElement;
-$tabascoTask->mkPaths( \@tmp );
-$tabascoTask->getFloatingRelease()->ensureAsFullRelease();
-$tabascoTask->createNewRelease();
+$tabascoTask->create(
+    -elements => \@tmp,
+    -comment => 'TABASCO Maintenance Task'
+    );
 
 # finaly create all trigger types in all Vobs
 foreach my $trgVob ( &allVobsInAdminHierarchy( $TaBasCo::Common::Config::myVob ) ) {
@@ -105,9 +98,8 @@ Transaction::commit(); # TaBasCo installation
 my $ui = TaBasCo::UI->new();
 
 my $notice = $TaBasCo::Common::Config::myVob->getRootElement()->getNormalizedPath() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot;
-my $label = $tabascoTask->getLastRelease()->getName();
+my $label = $tabascoTask->getBaseline()->getName();
 my $tabasName = $tabascoTask->getName();
-my $mainLabel = $mainTask->getLastRelease()->getName();
 $ui->okMessage( "
 
 Installation finished.
@@ -116,8 +108,5 @@ TaBasCo is installed in $notice.
 
 A task named $tabasName has been created to manage changes of the TaBasCo implementation.
 The TaBasCo installation has been fully labeled with $label.
-
-A task named main exists as well and the initial configuration in all participating Vobs
-has been fully labeled with $mainLabel.
 
 " );
