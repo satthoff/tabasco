@@ -85,7 +85,7 @@ sub create {
 	    return undef;
 	}
     } elsif( @$elements ) {
-	# the new task is NOT based on an already existing baseline.
+	# the new task is NOT based on an already existing task release.
 	# we create the new baseline as a release of the new task
 	$baseline = TaBasCo::Release->new( -name => uc( $self->getName() . '_baseline' ) );
 	$baseline->create(
@@ -136,7 +136,7 @@ sub create {
 	-object => $self->_createFloatingRelease()
 	);
 
-    if( $restrictpath and not @$elements ) {
+    if( $restrictpath and not @$elements and $self->getParent() ) {
 	# load the user interface
 	my $ui = TaBasCo::UI->new();
 

@@ -77,6 +77,13 @@ $tabascoTask->create(
     -comment => 'TABASCO Maintenance Task'
     );
 
+# label the Vob root to make the Tabasco installation accessible
+ClearCase::mklabel(
+    -label => $tabascoTask->getBaseline()->getName(),
+    -replace => 1,
+    -argv => $TaBasCo::Common::Config::myVob->getRootElement()->getNormalizedPath()
+    );
+
 # finaly create all trigger types in all Vobs
 foreach my $trgVob ( &allVobsInAdminHierarchy( $TaBasCo::Common::Config::myVob ) ) {
     foreach my $trg ( keys %TaBasCo::Common::Config::allTrigger ) {

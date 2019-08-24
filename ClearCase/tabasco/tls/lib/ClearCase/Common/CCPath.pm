@@ -149,7 +149,7 @@ sub _init {
     my $self = shift;
 
     # exists here only to ensure that a subroutine _init exists in the class hierachy,
-    # because sibling classes might not declare a _init subroutine.
+    # because child classes might not declare a _init subroutine.
     return $self;
 }
 

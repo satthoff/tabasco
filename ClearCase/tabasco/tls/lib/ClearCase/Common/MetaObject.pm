@@ -88,6 +88,10 @@ sub _init {
 
        Die( [ __PACKAGE__ , "Wrong object initialization. Unknown object type = $typeName." ] ) unless( grep m/^${typeName}$/, @knownTypes );
 
+       # ensure the correct Vob element
+       $vob = $ClearCase::Common::Config::myHost->getRegion()->getVob( $vobTag );
+
+       # set MetaObject attributes
        $self->setType( $typeName );
        $self->setName( $name );
        $self->setVob( $vob );
