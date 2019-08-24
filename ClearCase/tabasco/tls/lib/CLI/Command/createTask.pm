@@ -104,6 +104,8 @@ sub run {
 	  $i++;
 	  if( not -e "$p" ) {
 	      push @errors, "Path $p specified in line $i is not accessible.";
+	  } elsif( not -d "$p" ) {
+	      push @errors, "Path $p specified in line $i is not a directory.";
 	  } else {
 	      push @pathElements, ClearCase::Element->new(
 		  -pathname => $p
