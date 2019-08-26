@@ -80,7 +80,7 @@ BEGIN {
 
     @allHlTypes = ( $baselineLink, $taskLink, $firstReleaseLink, $nextReleaseLink, $floatingReleaseLink, $myTaskLink, $pathLink );
     
-    @allLbTypes = ( $initialTaBasCoBaseline );
+    @allLbTypes = ();
 
     @allAtTypes = ( $fullReleaseFlag );
 
