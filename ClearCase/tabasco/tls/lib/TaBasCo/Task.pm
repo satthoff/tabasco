@@ -2,6 +2,7 @@ package TaBasCo::Task;
 
 use strict;
 use Carp;
+use File::Basename;
 
 use Log;
 
@@ -103,6 +104,14 @@ sub create {
 		-recurse => 1,
 		-argv => $normalPath
 		);
+	    unless( $normalPath eq $tP->getVob()->getTag() ) {
+		$normalPath = File::Basename::dirname $normalPath;
+		ClearCase::mklabel(
+		    -label => $baseline->getName(),
+		    -replace => 1,
+		    -argv => $normalPath
+		    );
+	    }
 	}
 	my $fullFlag = ClearCase::Attribute->new(
 	    -attype => ClearCase::AtType->new( -name => $TaBasCo::Common::Config::fullReleaseFlag, -vob => $self->getVob() ),
@@ -416,6 +425,23 @@ sub loadConfigSpec  {
 	    }
 	    last if( $baseline->getIsFullRelease() );
 	    $baseline = $baseline->getPrevious();
+	}
+    } else {
+	my %rootPaths = ();
+	foreach my $np ( @{ $self->getPaths() } ) {
+	    my $normPath = $np->getNormalizedPath();
+	    unless( $normPath eq $np->getVob()->getTag() ) {
+		$normPath = File::Basename::dirname $normPath;
+		$rootPaths{ "$normPath" } = 1;
+	    }
+	}
+	foreach my $rp ( reverse sort keys %rootPaths ) {
+	    my $elem = ClearCase::Element->new(
+		-pathname => $rp
+		);
+	    my $cp = $elem->getCspecPath();
+	    $cp =~ s/\/\.\.\.//;
+	    push @config_spec, "element -directory $cp  " . $self->getBaseline()->getName() . ' -nocheckout';
 	}
     }
 

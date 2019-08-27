@@ -88,10 +88,11 @@ sub run {
       Transaction::commit();
       Message( [ __PACKAGE__ , "Successfully created new task  $taskName"  ] );
   } else {
-      open FD, '"' . $self->getOption( 'paths' ) . '"' || {
-	  Error( [ __PACKAGE__ , 'File ' . $self->getOption( 'paths' ) . ' specified with option -paths does not exist or is not readable.' ] );
+      my $fn = $self->getOption( 'paths' );
+      unless( open FD, "$fn" ) {
+	  Error( [ __PACKAGE__ , "Cannot read file $fn." ] );
 	  $self->exitInstance( -1 );
-      }
+      };
       Transaction::start( -comment => 'create new task with specified paths' );
 
       my @pathSpecs = <FD>;
