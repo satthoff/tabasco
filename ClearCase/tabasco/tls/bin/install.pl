@@ -72,17 +72,13 @@ my $tabascoRootPathElement = ClearCase::Element->new(
     -pathname => $TaBasCo::Common::Config::myVob->getRootElement()->getNormalizedPath() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot
     );
 my @tmp = (); push @tmp, $tabascoRootPathElement;
+
+# the Vob root path will be labeled as well by TaBasCo::create
 $tabascoTask->create(
     -elements => \@tmp,
     -comment => 'TABASCO Maintenance Task'
     );
 
-# label the Vob root to make the Tabasco installation accessible
-ClearCase::mklabel(
-    -label => $tabascoTask->getBaseline()->getName(),
-    -replace => 1,
-    -argv => $TaBasCo::Common::Config::myVob->getRootElement()->getNormalizedPath()
-    );
 
 # finaly create all trigger types in all Vobs
 foreach my $trgVob ( &allVobsInAdminHierarchy( $TaBasCo::Common::Config::myVob ) ) {
