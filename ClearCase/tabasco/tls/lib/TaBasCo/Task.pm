@@ -69,16 +69,15 @@ sub create {
 	[ 'BASELINE', 'COMMENT', 'RESTRICTPATH', 'ELEMENTS' ],
 	@_ );
 
-    if( $self->getName() ne 'main' ) {
-	# branch type main is a predefined one and needs not to be created
-	unless( $comment ) {
-	    $comment = __PACKAGE__ . '::create - no purpose specified.';
-	}
-	$self->SUPER::create( -comment => $comment );
-    } else {
+    if( $self->getName() eq 'main' ) {
 	Error( [ __PACKAGE__ . '::create : The predefined branch type "main" cannot become a task.' ] );
 	return undef;
     }
+    
+    unless( $comment ) {
+	$comment = __PACKAGE__ . '::create - no purpose specified.';
+    }
+    $self->SUPER::create( -comment => $comment );
 
     if( $baseline ) {
 	unless( $baseline->exists() ) {
