@@ -81,7 +81,8 @@ $tabascoTask->create(
 
 
 # finaly create all trigger types in all Vobs
-foreach my $trgVob ( &allVobsInAdminHierarchy( $TaBasCo::Common::Config::myVob ) ) {
+# we expect that all Vobs are owned by the calling user
+foreach my $trgVob ( &allVobsInAdminHierarchy( $TaBasCo::Common::Config::myVob->getAdminVobHierarchyRoot() ) ) {
     foreach my $trg ( keys %TaBasCo::Common::Config::allTrigger ) {
 	my $trt = ClearCase::TrType->new( -name => $trg, -vob => $trgVob );
 	$trt->create(
