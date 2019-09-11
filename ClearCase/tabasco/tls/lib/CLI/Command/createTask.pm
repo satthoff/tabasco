@@ -59,6 +59,9 @@ sub run {
   if( $self->getOption( 'baseline' ) and $self->getOption( 'paths' ) ) {
       Error( [ __PACKAGE__ , 'Options -baseline and -paths are mutually exclusive.' ] );
       $self->exitInstance( -1 );
+  } elsif( not $self->getOption( 'baseline' ) and not $self->getOption( 'paths' ) ) {
+      Error( [ __PACKAGE__ , 'One of the options -baseline | -paths must be specified.' ] );
+      $self->exitInstance( -1 );
   }
   
   my $newTask = TaBasCo::Task->new( -name => $taskName );
@@ -86,7 +89,7 @@ sub run {
       }
   
       Transaction::commit();
-      Message( [ __PACKAGE__ , "Successfully created new task  $taskName"  ] );
+      Message( [ __PACKAGE__ , "Successfully created new task $taskName"  ] );
   } else {
       my $fn = $self->getOption( 'paths' );
       unless( open FD, "$fn" ) {
@@ -98,19 +101,18 @@ sub run {
       my @pathSpecs = <FD>;
       grep chomp, @pathSpecs;
       close FD;
+      grep s/^\s+//, @pathSpecs;
+      grep s/\s+$//, @pathSpecs;
       my $i = 0;
       my @pathElements = ();
       my @errors = ();
+      my @minimizedPaths = ();
       foreach my $p ( @pathSpecs ) {
 	  $i++;
 	  if( not -e "$p" ) {
 	      push @errors, "Path $p specified in line $i is not accessible.";
 	  } elsif( not -d "$p" ) {
 	      push @errors, "Path $p specified in line $i is not a directory.";
-	  } else {
-	      push @pathElements, ClearCase::Element->new(
-		  -pathname => $p
-		  );
 	  }
       }
       if( @errors ) {
@@ -119,6 +121,28 @@ sub run {
 	      Error( [ __PACKAGE__ , $l ] );
 	  }
 	  $self->exitInstance( -1 );
+      }
+      
+      # minimze paths
+      my @sortedPaths = sort @pathSpecs;
+      my @minimizedPaths = @sortedPaths;
+      my @tmp = ();
+      while( my $checkPath = shift @sortedPaths ) {
+	  my $pattern = quotemeta( $checkPath );
+	  foreach my $p ( sort @minimizedPaths ) {
+	      if( "$p" eq "$checkPath" or $p !~ m/^$pattern/ ) {
+		  push @tmp, $p;
+	      }
+	  }
+	  @minimizedPaths = @tmp;
+	  @tmp = ();
+      }
+
+      # generate path elements
+      foreach my $p ( @minimizedPaths ) {
+	  push @pathElements, ClearCase::Element->new(
+	      -pathname => $p
+	      );
       }
       $newTask = $newTask->create(
 	  -elements => \@pathElements,
