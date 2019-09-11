@@ -35,7 +35,8 @@ sub BEGIN {
        AllReplica    => { CALCULATE => \&loadAllReplica },
        CspecTag   => { CALCULATE => \&loadCspecTag },
        UUID           => { CALCULATE => \&loadUUID },
-       ClientVobs => { CALCULATE => \&loadClientVobs }
+       ClientVobs => { CALCULATE => \&loadClientVobs },
+       AdminVobHierarchyRoot => { CALCULATE => \&loadAdminVobHierarchyRoot }
       );
 
    Data::init(
@@ -284,6 +285,16 @@ sub loadMyAdminVob {
 	return $self->setMyAdminVob( ClearCase::Vob->new( -tag => $results[0] ) );
     }
     return undef;
+}
+
+sub loadAdminVobHierarchyRoot {
+    my $self = shift;
+
+    my $adminVob = $self;
+    while( $adminVob->getMyAdminVob() ) {
+	$adminVob->getMyAdminVob();
+    }
+    return $self->setAdminVobHierarchyRoot( $adminVob );
 }
 1;
 

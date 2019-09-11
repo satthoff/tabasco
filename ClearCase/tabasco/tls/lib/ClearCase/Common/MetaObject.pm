@@ -120,11 +120,7 @@ sub exists {
 sub loadAdminVob {
     my $self = shift;
 
-    my $adminVob = $self->getVob();
-    while( $adminVob->getMyAdminVob() ) {
-	$adminVob->getMyAdminVob();
-    }
-    return $self->setAdminVob( $adminVob );
+    return $self->setAdminVob( $self->getVob()->getAdminVobHierarchyRoot() );
 }
     
 
