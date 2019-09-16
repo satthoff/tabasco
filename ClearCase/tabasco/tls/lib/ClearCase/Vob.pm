@@ -292,7 +292,7 @@ sub loadAdminVobHierarchyRoot {
 
     my $adminVob = $self;
     while( $adminVob->getMyAdminVob() ) {
-	$adminVob->getMyAdminVob();
+	$adminVob = $adminVob->getMyAdminVob();
     }
     return $self->setAdminVobHierarchyRoot( $adminVob );
 }
