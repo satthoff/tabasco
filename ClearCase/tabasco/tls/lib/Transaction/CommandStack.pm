@@ -24,11 +24,10 @@ sub BEGIN {
 
 
 sub END {
-
-   while ( Transaction::getTransaction() )
-   {
-      Transaction::rollback();
-   }
+    Log::setVerbosity( "debug" );
+    while ( Transaction::getTransaction() ) {
+	Transaction::rollback();
+    }
 }
 
 sub new()
