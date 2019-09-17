@@ -95,6 +95,7 @@ sub _init {
        $self->setType( $typeName );
        $self->setName( $name );
        $self->setVob( $vob );
+       $self->setVob( $self->getAdminVob() );
        $self->setFullName( $self->getType() . ':' . $self->getName() . '@' . $self->getVob()->getTag() );
    }
    return $self;
