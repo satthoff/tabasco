@@ -23,11 +23,12 @@ sub BEGIN {
    %DATA = (
        Short    => undef,
        Format   => undef,
-      Long     => undef,
-      Ahl      => undef,
-      Aat      => undef,
-      Version  => undef,
-      Argv => undef
+       Long     => undef,
+       Ahl      => undef,
+       Aat      => undef,
+       Version  => undef,
+       Local    => undef,
+       Argv     => undef
    );
 
    Data::init(
@@ -43,9 +44,9 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $transaction, $argv, $short, $fmt, $ahl, $aat, $long, $version, @other ) =
+   my ( $transaction, $argv, $short, $fmt, $ahl, $aat, $long, $version, $localquery, @other ) =
       $class->rearrange(
-         [ qw( TRANSACTION ARGV SHORT FMT AHL AAT LONG VERSION) ],
+         [ qw( TRANSACTION ARGV SHORT FMT AHL AAT LONG VERSION LOCALQUERY) ],
          @_ );
    confess join( ' ', @other ) if @other;
 
@@ -59,6 +60,7 @@ sub new {
    $self->setFormat($fmt);
    $self->setLong($long);
    $self->setArgv( $argv );
+   $self->setLocal( $localquery );
 
    return $self;
 }
@@ -67,6 +69,7 @@ sub do_execute {
    my $self = shift;
    my @options = ();
 
+   push @options, '-local' if $self->getLocal();
    push @options, '-s' if $self->getShort();
    push @options, '-l' if $self->getLong();
    push @options, '-ahl '. $self->getAhl() if $self->getAhl();

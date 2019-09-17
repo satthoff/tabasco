@@ -106,8 +106,15 @@ sub exists {
     return 1 if( $self->getExists() );
     ClearCase::disableErrorOut();
     ClearCase::disableDieOnErrors();
+    my $myName = $self->getFullName();
+    if( $myName !~ m/^vob:/ and $self->getVob()->getTag() ne $self->getAdminVob()->getTag() ) {
+	# in case of an Admin Vob exists for my Vob then we have to question
+	# for the existence in the Admin Vob, because the local copy of the global meta object
+	# may not already exist.
+	$myName = $self->getType() . ':' . $self->getName() . '@' . $self->getAdminVob()->getTag();
+    }
     ClearCase::describe(
-	-argv => $self->getFullName(),
+	-argv => $myName,
 	-short    => 1
 	);
     my $ex = ( ClearCase::getRC() == 0 );
@@ -149,7 +156,9 @@ sub getFromHyperlinkedObjects {
 
     Die( [ __PACKAGE__ . '::getFromHyperlinkedObjects', 'FATAL ERROR: subroutine parameter is not a ClearCase::HlType' ] ) unless( $hltype->isa( 'ClearCase::HlType' ) );
 
+    # use always option -local, because we do not expect hyperlinks between global type in an parent Admin Vob
     ClearCase::describe(
+	-localquery => 1,
 	-short => 1,
 	-ahl => $hltype->getName(),
 	-argv => $self->getFullName()
@@ -177,7 +186,9 @@ sub getToHyperlinkedObjects {
 
     Die( [ __PACKAGE__ . '::getToHyperlinkedObjects', 'FATAL ERROR: subroutine parameter is not a ClearCase::HlType' ] ) unless( $hltype->isa( 'ClearCase::HlType' ) );
 
+    # use always option -local, because we do not expect hyperlinks between global type in an parent Admin Vob
     ClearCase::describe(
+	-localquery => 1,
 	-short => 1,
 	-ahl => $hltype->getName(),
 	-argv => $self->getFullName()
