@@ -123,6 +123,7 @@ sub checkFullRelease {
     Debug( [ '', __PACKAGE__ .'::checkFullRelease' ] );
 
     ClearCase::describe(
+	-localquery => 1,
 	-short => 1,
 	-aat => $TaBasCo::Common::Config::fullReleaseFlag,
 	-argv => $self->getFullName()
