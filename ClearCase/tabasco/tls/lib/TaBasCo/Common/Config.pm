@@ -46,6 +46,7 @@ use vars qw/
     $configurationNamePrefix
     $maintenanceTask
     $fullReleaseFlag
+    $installRoot
 
     @allHlTypes
     @allLbTypes
@@ -77,6 +78,8 @@ BEGIN {
     $configFilePath = $base . $OS::Common::Config::slash . $configFile;
 
     $myVob = $ClearCase::Common::Config::myHost->getRegion()->getVob( File::Basename::dirname ( $base ) );
+
+    $installRoot = $myVob->getRootElement()->getNormalizedPath() . $OS::Common::Config::slash . $toolRoot
 
     @allHlTypes = ( $baselineLink, $taskLink, $firstReleaseLink, $nextReleaseLink, $floatingReleaseLink, $myTaskLink, $pathLink );
     

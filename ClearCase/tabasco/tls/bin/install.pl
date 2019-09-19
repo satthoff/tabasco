@@ -69,7 +69,7 @@ foreach my $attributeName ( @TaBasCo::Common::Config::allAtTypes ) {
 # create the task tabasco to manage the installed tool within its own task
 my $tabascoTask = TaBasCo::Task->new( -name => $TaBasCo::Common::Config::maintenanceTask );
 my $tabascoRootPathElement = ClearCase::Element->new(
-    -pathname => $TaBasCo::Common::Config::myVob->getRootElement()->getNormalizedPath() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot
+    -pathname => $TaBasCo::Common::Config::$installRoot
     );
 my @tmp = (); push @tmp, $tabascoRootPathElement;
 

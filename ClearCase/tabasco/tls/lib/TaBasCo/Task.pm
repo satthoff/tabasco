@@ -364,26 +364,6 @@ sub loadConfigSpec  {
 
     &TaBasCo::Common::Config::cspecHeader( \@config_spec );
 
-    # insert rule to select the latest release of the tabasco implementation
-    # but only if self is NOT the TaBasCo maintenance task
-    # and only if the TaBasCo maintenance task already exists. During the TaBasCo installation
-    # the main task will be initialized when the task tabasco does not exist yet.
-    # We expect the last release of the TaBasCo task to be a full release.
-    my $tabasco = TaBasCo::Task->new( -name => $TaBasCo::Common::Config::maintenanceTask );
-    if( $tabasco->exists() ) {
-	if( $self->getName() ne $tabasco->getName() ) {
-	    my $latestReleaseName = $tabasco->getLastRelease()->getName();
-	    push @config_spec, '';
-	    push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
-	    push @config_spec, '# Tabasco Tool Last Release : ' . $latestReleaseName;
-	    push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
-	    foreach my $tp ( @{ $tabasco->getCspecPaths() } ) {
-		push @config_spec, "element $tp $latestReleaseName -nocheckout";
-	    }
-	    push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
-	}
-    }
-    
     push @config_spec, '';
     push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
     push @config_spec, '# BEGIN  Task : ' . $self->getName();
@@ -466,7 +446,7 @@ __END__
 
 =head1 AUTHOR INFORMATION
 
- Copyright (C) 2006, 2010, 2014  by Uwe Satthoff
+ Copyright (C) 2006, 2010, 2014, 2019  by Uwe Satthoff
 
 =head1 CREDITS
 
