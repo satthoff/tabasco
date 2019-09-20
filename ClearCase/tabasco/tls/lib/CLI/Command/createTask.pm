@@ -103,6 +103,7 @@ sub run {
       close FD;
       grep s/^\s+//, @pathSpecs;
       grep s/\s+$//, @pathSpecs;
+      grep s/\/+$//, @pathSpecs;
       my $i = 0;
       my @pathElements = ();
       my @errors = ();
@@ -139,7 +140,7 @@ sub run {
       while( my $checkPath = shift @sortedPaths ) {
 	  my $pattern = quotemeta( $checkPath );
 	  foreach my $p ( sort @minimizedPaths ) {
-	      if( "$p" eq "$checkPath" or $p !~ m/^$pattern/ ) {
+	      if( "$p" eq "$checkPath" or $p !~ m/^$pattern\// ) {
 		  push @tmp, $p;
 	      }
 	  }
