@@ -79,7 +79,7 @@ BEGIN {
 
     $myVob = $ClearCase::Common::Config::myHost->getRegion()->getVob( File::Basename::dirname ( $base ) );
 
-    $installRoot = $myVob->getRootElement()->getNormalizedPath() . $OS::Common::Config::slash . $toolRoot
+    $installRoot = $myVob->getRootElement()->getNormalizedPath() . $OS::Common::Config::slash . $toolRoot;
 
     @allHlTypes = ( $baselineLink, $taskLink, $firstReleaseLink, $nextReleaseLink, $floatingReleaseLink, $myTaskLink, $pathLink );
     
