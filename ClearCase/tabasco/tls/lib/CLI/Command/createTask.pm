@@ -111,9 +111,9 @@ sub run {
       # always add the TaBasCo installation root path
       # to ensure that the TaBasCo tool is included in config specs
       # of tasks and releases
-      my $pattern = quotemeta( $TaBasCo::Common::Config::$installRoot );
+      my $pattern = quotemeta( $TaBasCo::Common::Config::installRoot );
       unless( grep m/^${pattern}$/, @pathSpecs ) {
-	  push @pathSpecs, $TaBasCo::Common::Config::$installRoot;
+	  push @pathSpecs, $TaBasCo::Common::Config::installRoot;
       }
 
       foreach my $p ( @pathSpecs ) {
