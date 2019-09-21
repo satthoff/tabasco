@@ -141,27 +141,14 @@ sub loadPrevious {
     Debug( [ '', __PACKAGE__ .'::loadPrevious' ] );
 
     my @result = $self->getToHyperlinkedObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::nextReleaseLink, -vob => $self->getVob() ) );
-    unless( @result ) {
-	# we have to check whether the baseline of the task is a release of another task or not.
-	# the very first task main has a baseline which is not a release of any other task
-	# in this case we have to deliver the baseline as the previous release
-	my @firstRelease = $self->getToHyperlinkedObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::firstReleaseLink, -vob => $self->getVob() ) );
-	if( @firstRelease ) {
-	    return $self->setPrevious( $self->getTask()->getBaseline() );
-	}
-	return undef;
-    } else {
+    if( @result ) {
 	if( $#result != 0 ) {
 	    Die( [ '', "incorrect number ($#result) of next release links $TaBasCo::Common::Config::nextReleaseLink at release " . $self->getFullName(), '' ] );
 	}
 	# we expect the result to be a TaBasCo::Release
-	my $release = TaBasCo::Release->new( -name => $result[0] );
-	unless( $release->exists() ) {
-	    Die( [ '', "Hyperlink $TaBasCo::Common::Config::nextReleaseLink on release " . $self->getFullName() . " does not point from an existing TaBasCo::Release in Vob " . $self->getVob()->getTag(), '' ] );
-	}
-	return $self->setPrevious( $release );
+	return $self->setPrevious( TaBasCo::Release->new( -name => $result[0] ) );
     }
-    return undef; # should never be reached
+    return undef;
 }
 
 sub loadTask {
@@ -189,21 +176,6 @@ sub loadConfigSpec {
 
     &TaBasCo::Common::Config::cspecHeader( \@config_spec );
 
-    # insert rule to select the latest release of the tabasco implementation
-    # but only if self is NOT the TaBasCo maintenance task
-    my $tabasco = TaBasCo::Task->new( -name => $TaBasCo::Common::Config::maintenanceTask );
-    if( $self->getTask()->getName() ne $tabasco->getName() ) {
-	my $latestReleaseName = $tabasco->getLastRelease()->getName();
-	push @config_spec, '';
-	push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
-	push @config_spec, '# Tabasco Tool Last Release : ' . $latestReleaseName;
-	push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
-	foreach my $tp ( @{ $tabasco->getCspecPaths() } ) {
-	    push @config_spec, "element $tp $latestReleaseName -nocheckout";
-	}
-	push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
-    }
-
     push @config_spec, '';
     push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
     push @config_spec, '# BEGIN Release : ' . $self->getName();
@@ -212,16 +184,35 @@ sub loadConfigSpec {
 	push @config_spec, '# Path : ' . $np->getNormalizedPath();
     }
     push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
-    
-    my $actRelease = $self;
-    while( $actRelease ) {
-	foreach my $cp ( @{ $actRelease->getTask()->getCspecPaths() } ) {
-	    push @config_spec, "element " . $cp . ' ' . $actRelease->getName() . " -nocheckout";
-	}
-	last if( $actRelease->getIsFullRelease() );
-	$actRelease = $actRelease->getPrevious();
-    }
 
+    $selectedRelease = $self;
+    while( $selectedRelease ) {
+	foreach my $cp ( @{ $selectedRelease->getTask()->getCspecPaths() } ) {
+	    push @config_spec, "element " . $cp . ' ' . $selectedRelease->getName() . " -nocheckout";
+	}
+	unless( $selectedRelease->getPrevious() ) {
+	    # we are at the root task of a task hierarchy
+	    my %rootPaths = ();
+	    foreach my $np ( @{ $selectedRelease->getTask()->getPaths() } ) {
+		my $normPath = $np->getNormalizedPath();
+		unless( $normPath eq $np->getVob()->getTag() ) {
+		    $normPath = File::Basename::dirname $normPath;
+		    $rootPaths{ "$normPath" } = 1;
+		}
+	    }
+	    foreach my $rp ( reverse sort keys %rootPaths ) {
+		my $elem = ClearCase::Element->new(
+		    -pathname => $rp
+		    );
+		my $cp = $elem->getCspecPath();
+		$cp =~ s/\/\.\.\.//;
+		push @config_spec, "element -directory $cp  " . $selectedRelease->getName() . ' -nocheckout';
+	    }
+	}
+	last if( $selectedRelease->getIsFullRelease() );
+	$selectedRelease = $selectedRelease->getPrevious();
+    }
+ 
     push @config_spec, '# END Release   : ' . $self->getName();
     push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
     push @config_spec, 'element * /main/0 -nocheckout';

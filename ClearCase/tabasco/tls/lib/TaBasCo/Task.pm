@@ -291,7 +291,6 @@ sub loadParent {
     my $self = shift;
     Debug( [ '', __PACKAGE__ .'::loadParent' ] );
 
-    return undef if( $self->getName() eq 'main' ); # Task 'main' has no parent task, it is the root task of all ever existing tasks.
     my $baseline = $self->getBaseline();
     return undef unless( $baseline );
     return undef if( $baseline->getTask()->getName() eq $self->getName() );
@@ -362,6 +361,7 @@ sub loadConfigSpec  {
 
     my @config_spec = ();
 
+    push @$config_spec, 'element * CHECKEDOUT';
     &TaBasCo::Common::Config::cspecHeader( \@config_spec );
 
     push @config_spec, '';
@@ -382,51 +382,26 @@ sub loadConfigSpec  {
     foreach my $cp ( @{ $self->getCspecPaths() } ) {
 	push @config_spec, "element $cp .../" . $self->getName() . "/LATEST";
     }
-    my $baseline = $self->getBaseline();
+    my $selectedRelease = $self->getBaseline();
     push @config_spec, "mkbranch " . $self->getName();
-    while( $baseline ) {
+    while( $selectedRelease ) {
 	foreach my $cp (  @{ $self->getCspecPaths() } ) {
-	    push @config_spec, "element $cp " . $baseline->getName();
+	    push @config_spec, "element $cp " . $selectedRelease->getName();
 	}
-	last if( $baseline->getIsFullRelease() );
-	$baseline = $baseline->getPrevious();
+	last if( $selectedRelease->getIsFullRelease() );
+	$selectedRelease = $selectedRelease->getPrevious();
     }
     foreach my $cp ( @{ $self->getCspecPaths() } ) {
 	push @config_spec, "element $cp /main/0";
     }
     push @config_spec, "end mkbranch " . $self->getName();
 
-    $baseline = $self->getBaseline();
-    if( $baseline->getTask()->getName() ne $self->getName() ) {
-	while( $baseline ) {
-	    foreach my $cp ( @{ $baseline->getTask()->getCspecPaths() } ) {
-		push @config_spec, "element " . $cp . ' ' . $baseline->getName() . " -nocheckout";
-	    }
-	    last if( $baseline->getIsFullRelease() );
-	    $baseline = $baseline->getPrevious();
-	}
-    } else {
-	my %rootPaths = ();
-	foreach my $np ( @{ $self->getPaths() } ) {
-	    my $normPath = $np->getNormalizedPath();
-	    unless( $normPath eq $np->getVob()->getTag() ) {
-		$normPath = File::Basename::dirname $normPath;
-		$rootPaths{ "$normPath" } = 1;
-	    }
-	}
-	foreach my $rp ( reverse sort keys %rootPaths ) {
-	    my $elem = ClearCase::Element->new(
-		-pathname => $rp
-		);
-	    my $cp = $elem->getCspecPath();
-	    $cp =~ s/\/\.\.\.//;
-	    push @config_spec, "element -directory $cp  " . $self->getBaseline()->getName() . ' -nocheckout';
-	}
-    }
-
+    push @config_spec, grep( !m/^#/, @{ $self->getBaseline()->getConfigSpec() } );
+    
+ 
+    push @config_spec, '';
     push @config_spec, '# END   Task : ' . $self->getName();
     push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
-    push @config_spec, 'element * /main/0 -nocheckout';
     push @config_spec, '';
     grep chomp, @config_spec;
 
