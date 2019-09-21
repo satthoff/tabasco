@@ -87,9 +87,6 @@ sub run {
 	  Error( [ __PACKAGE__ , "Creation of new task $taskName failed."  ] );
 	  $self->exitInstance( -1 );
       }
-  
-      Transaction::commit();
-      Message( [ __PACKAGE__ , "Successfully created new task $taskName"  ] );
   } else {
       my $fn = $self->getOption( 'paths' );
       unless( open FD, "$fn" ) {
@@ -162,9 +159,9 @@ sub run {
 	  Error( [ __PACKAGE__ , "Creation of new task $taskName failed."  ] );
 	  $self->exitInstance( -1 );
       }
-      Transaction::commit();
-      Message( [ __PACKAGE__ , "Successfully created new task  $taskName"  ] );
   }
+  Transaction::commit();
+  Message( [ __PACKAGE__ , "Successfully created new task  $taskName"  ] );
 } # run
 
 1;

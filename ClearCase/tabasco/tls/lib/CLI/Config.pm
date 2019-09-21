@@ -9,7 +9,7 @@ use OS::Common::Config;
 
 sub BEGIN {
    use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $COPYRIGHT );
-   $VERSION   = '666';
+   $VERSION   = '201909-1';
    $COPYRIGHT = '(C) 2000 - 2019 Uwe Satthoff';
    require Exporter;
 

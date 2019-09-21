@@ -101,7 +101,7 @@ Transaction::commit(); # TaBasCo installation
 # load the user interface
 my $ui = TaBasCo::UI->new();
 
-my $notice = $TaBasCo::Common::Config::myVob->getRootElement()->getNormalizedPath() . $OS::Common::Config::slash . $TaBasCo::Common::Config::toolRoot;
+my $notice = $TaBasCo::Common::Config::$installRoot;
 my $label = $tabascoTask->getBaseline()->getName();
 my $tabasName = $tabascoTask->getName();
 $ui->okMessage( "

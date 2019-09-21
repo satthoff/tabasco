@@ -26,7 +26,8 @@ sub BEGIN {
        Vob => undef,
        FullName => undef,
        Exists => undef,
-       AdminVob => { CALCULATE => \&loadAdminVob }
+       AdminVob => { CALCULATE => \&loadAdminVob },
+       AdminMode => 
       );
 
    require Data;
@@ -129,7 +130,14 @@ sub loadAdminVob {
 
     return $self->setAdminVob( $self->getVob()->getAdminVobHierarchyRoot() );
 }
-    
+
+sub loadAdminMode {
+    my $self = shift;
+
+    my $adminMode = 0;
+    $adminMode = 1 if( $self->getVob()->getClientVobs() or $self->getVob()->getMyAdminVob() );
+    return $self->setAdminMode( $adminMode );
+}
 
 sub lock {
     my $self = shift;
