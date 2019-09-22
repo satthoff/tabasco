@@ -88,10 +88,11 @@ sub rename {
     my $self = shift;
     my $newName = shift;
 
-    my $tmpLbType = $self->new( -name => $newName, -vob => $self->getVob() );
+    my $tmpLbType = ClearCase::LbType->new( -name => $newName, -vob => $self->getAdminVob() );
     ClearCase::rename(
 	-oldname => $self->getFullName(),
-	-newname => $tmpLbType->getFullName()
+	-newname => $tmpLbType->getFullName(),
+	-acquire => $self->getAdminMode()
 	);
 
     # in ClearCase the label type has been renamed,

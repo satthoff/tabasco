@@ -21,8 +21,9 @@ sub BEGIN {
    );
 
    %DATA = (
-      NewName  => undef,
-      OldName  => undef
+       NewName  => undef,
+       OldName  => undef,
+       Acquire  => undef
    );
 
    Data::init(
@@ -36,9 +37,9 @@ sub new {
    my $proto = shift;
    my $class = ref $proto || $proto;
 
-   my ( $transaction, $newName, $oldName, @other ) =
+   my ( $transaction, $newName, $oldName, $acquire, @other ) =
       $class->rearrange(
-         [ qw( TRANSACTION NEWNAME OLDNAME ) ],
+         [ qw( TRANSACTION NEWNAME OLDNAME ACQUIRE ) ],
          @_ );
    confess join( ' ', @other ) if @other;
 
@@ -47,13 +48,16 @@ sub new {
 
    $self->setNewName( $newName );
    $self->setOldName( $oldName );
+   $self->setAcquire( $acquire );
 
    return $self;
 }
 
 sub do_execute {
-   my $self = shift;
-   ClearCase::Common::Cleartool::rename( $self->getOldName(), $self->getNewName() );
+    my $self = shift;
+    my @options = ();
+    push @options, '-acquire' if $self->getAcquire();
+    clearcase::Common::Cleartool::rename( @options, $self->getOldName(), $self->getNewName() );
 }
 
 sub do_commit {
@@ -61,8 +65,10 @@ sub do_commit {
 }
 
 sub do_rollback {
-   my $self = shift;
-   ClearCase::Common::Cleartool::rename( $self->getNewName(), $self->getOldName() );
+    my $self = shift;
+    my @options = ();
+    push @options, '-acquire' if $self->getAcquire();
+    ClearCase::Common::Cleartool::rename( @options, $self->getNewName(), $self->getOldName() );
 }
 
 1;
