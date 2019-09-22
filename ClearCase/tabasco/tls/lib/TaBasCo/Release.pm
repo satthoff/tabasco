@@ -185,7 +185,7 @@ sub loadConfigSpec {
     }
     push @config_spec, $TaBasCo::Common::Config::cspecDelimiter;
 
-    $selectedRelease = $self;
+    my $selectedRelease = $self;
     while( $selectedRelease ) {
 	foreach my $cp ( @{ $selectedRelease->getTask()->getCspecPaths() } ) {
 	    push @config_spec, "element " . $cp . ' ' . $selectedRelease->getName() . " -nocheckout";
