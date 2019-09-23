@@ -88,7 +88,7 @@ sub rename {
     my $self = shift;
     my $newName = shift;
 
-    my $tmpLbType = ClearCase::LbType->new( -name => $newName, -vob => $self->getAdminVob() );
+    my $tmpLbType = TaBasCo::Release->new( -name => $newName );
     ClearCase::rename(
 	-oldname => $self->getFullName(),
 	-newname => $tmpLbType->getFullName(),

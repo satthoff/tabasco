@@ -57,7 +57,7 @@ sub do_execute {
     my $self = shift;
     my @options = ();
     push @options, '-acquire' if $self->getAcquire();
-    Clearcase::Common::Cleartool::rename( @options, $self->getOldName(), $self->getNewName() );
+    ClearCase::Common::Cleartool::rename( @options, $self->getOldName(), $self->getNewName() );
 }
 
 sub do_commit {

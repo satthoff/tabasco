@@ -27,7 +27,7 @@ sub BEGIN {
        FullName => undef,
        Exists => undef,
        AdminVob => { CALCULATE => \&loadAdminVob },
-       AdminMode => 
+       AdminMode => { CALCULATE => \&loadAdminMode }
       );
 
    require Data;
