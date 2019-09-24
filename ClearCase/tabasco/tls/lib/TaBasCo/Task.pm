@@ -84,7 +84,7 @@ sub create {
 	    Error( [ __PACKAGE__ . '::create : Baseline ' . $baseline->getName() . ' does not exist.' ] );
 	    return undef;
 	}
-    } elsif( @$elements ) {
+    } elsif( $elements ) {
 	# the new task is NOT based on an already existing task release.
 	# we create the new baseline as a release of the new task
 	$baseline = TaBasCo::Release->new( -name => uc( $self->getName() . '_baseline' ) );
@@ -144,7 +144,7 @@ sub create {
 	-object => $self->_createFloatingRelease()
 	);
 
-    if( $restrictpath and not @$elements and $self->getParent() ) {
+    if( $restrictpath and not $elements and $self->getParent() ) {
 	# load the user interface
 	my $ui = TaBasCo::UI->new();
 
@@ -162,7 +162,7 @@ sub create {
 
 	# get my parent's paths
 	my $parentPaths = $self->getParent()->getPaths();
-	my @pathCollection = ();
+	my %pathCollection = ();
 	if( $parentPaths ) {
 	    foreach my $parentPathElement ( @$parentPaths ) {
 		my $newPath = '';
@@ -172,15 +172,24 @@ sub create {
 		    $newPath =~ s/\\/\//g;
 		    my $i = index( $newPath, $parentPath);
 		    if( ($i == 0) and (length( $newPath ) >= length( $parentPath )) ) {
-			push @pathCollection, ClearCase::Element->new( -pathname => $newPath );
+			$pathCollection{ $newPath } = ClearCase::Element->new( -pathname => $newPath );
 			$ui->okMessage( "Added path $newPath to new task." );
 		    } else {
 			$ui->okMessage( "The path must be a subpath of the parent path." );
 		    }
 		}
 	    }
-	    if( @pathCollection ) {
-		$self->mkPaths( \@pathCollection );
+	    my @allPaths = keys %pathCollection;
+	    if( @allPaths ) {
+		# always add the TaBasCo installation root path
+		# to ensure that the TaBasCo tool is included in config specs
+		# of tasks and releases
+		my $pattern = quotemeta( $TaBasCo::Common::Config::installRoot );
+		unless( grep m/^${pattern}$/, @allPaths ) {
+		    $pathCollection{ $TaBasCo::Common::Config::installRoot } = ClearCase::Element->new( -pathname => $TaBasCo::Common::Config::installRoot );
+		}
+		my @values = values %pathCollection;
+		$self->mkPaths( \@values );
 	    }
 	    Transaction::commit();  # commit all path actions done
 	} else {
