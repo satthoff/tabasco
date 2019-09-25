@@ -172,7 +172,8 @@ sub create {
 		    $newPath =~ s/\\/\//g;
 		    my $i = index( $newPath, $parentPath);
 		    if( ($i == 0) and (length( $newPath ) >= length( $parentPath )) ) {
-			$pathCollection{ $newPath } = ClearCase::Element->new( -pathname => $newPath );
+			my $ccElem = ClearCase::Element->new( -pathname => $newPath );
+			$pathCollection{ $newPath } = $ccElem if( $ccElem ); # add the path only if it is a CC element
 			$ui->okMessage( "Added path $newPath to new task." );
 		    } else {
 			$ui->okMessage( "The path must be a subpath of the parent path." );
@@ -184,11 +185,15 @@ sub create {
 		# always add the TaBasCo installation root path
 		# to ensure that the TaBasCo tool is included in config specs
 		# of tasks and releases
-		my $pattern = quotemeta( $TaBasCo::Common::Config::installRoot );
+		my $pattern = quotemeta( "$TaBasCo::Common::Config::installRoot" );
 		unless( grep m/^${pattern}$/, @allPaths ) {
-		    $pathCollection{ $TaBasCo::Common::Config::installRoot } = ClearCase::Element->new( -pathname => $TaBasCo::Common::Config::installRoot );
+		    $pathCollection{ "$TaBasCo::Common::Config::installRoot" } = ClearCase::Element->new( -pathname => $TaBasCo::Common::Config::installRoot );
 		}
 		my @values = values %pathCollection;
+		Debug( [ 'CHECK PATHS' ] );
+		for my $p ( keys %pathCollection ) {
+		    Debug( [ ">$p<" ] );
+		}
 		$self->mkPaths( \@values );
 	    }
 	    Transaction::commit();  # commit all path actions done

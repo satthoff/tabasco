@@ -24,7 +24,6 @@ sub BEGIN {
 
 
 sub END {
-    Log::setVerbosity( "debug" );
     while ( Transaction::getTransaction() ) {
 	Transaction::rollback();
     }
