@@ -147,9 +147,7 @@ sub loadPrevious {
 	}
 	# we expect the result to be a TaBasCo::Release
 	return $self->setPrevious( TaBasCo::Release->new( -name => $result[0] ) );
-    } elsif( $self->getTask()->getParent() ) {
-	# we have a parent task, so our previous release is our task's baseline,
-	# which is a release of our parent task
+    } elsif( $self->getTask()->getBaseline()->getName() ne $self->getName() ) {
 	return $self->setPrevious( $self->getTask()->getBaseline() );
     }
     # here we are at the top of a task hierarchy.
