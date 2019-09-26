@@ -157,7 +157,7 @@ sub cspecHeader {
     push @$config_spec, "# TABASCO Version: $CLI::Config::VERSION";
     push @$config_spec, '# Copyright (C) 2004 - 2019  by Uwe Satthoff (satthoff@icloud.com)';
     push @$config_spec, '#';
-    push @$config_spec, '# Date : ' . &TaBasCo::Common::Config::gmtTimeString();
+    push @$config_spec, '# Cspec created : ' . &TaBasCo::Common::Config::gmtTimeString();
     push @$config_spec, $TaBasCo::Common::Config::cspecDelimiter;
     
     return;
