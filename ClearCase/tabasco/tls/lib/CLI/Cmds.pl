@@ -6,6 +6,8 @@
     lsta     => 'listTasks',
     usta     => 'useTask',
     usre     => 'useRelease'
+    reta     => 'rebaseWithParentTask',
+    mere     => 'mergeChildReleases'
     );
 
 %COMMAND = (
@@ -18,6 +20,37 @@
 *** USAGE
 
     helpText (help) [command]
+
+"
+    },
+        rebaseWithParentTask  => {
+	short => 'reta',
+	package     => 'CLI::Command::notImplemented',
+	description => 'not yet implemented',
+	helptext    => "
+
+*** USAGE
+
+    rebaseWithParentTask - not yet implemented.
+
+    Replace current baseline by recommended release of parent task,
+    and afterwards perform a cspec/view merge for the paths of the
+    current task.
+
+"
+    },
+        mergeChildReleases  => {
+	short => 'mere',
+	package     => 'CLI::Command::notImplemented',
+	description => 'not yet implemented',
+	helptext    => "
+
+*** USAGE
+
+    mergeChildReleases - not yet implemented.
+
+    Perform a cspec/view merge from the recommended release
+    of the child task specified with option -from <task>.
 
 "
     },
