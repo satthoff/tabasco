@@ -402,7 +402,6 @@ sub loadConfigSpec  {
 	foreach my $cp (  @{ $self->getCspecPaths() } ) {
 	    push @config_spec, "element $cp " . $selectedRelease->getName();
 	}
-	last if( $selectedRelease->getIsFullRelease() );
 	$selectedRelease = $selectedRelease->getPrevious();
     }
     foreach my $cp ( @{ $self->getCspecPaths() } ) {
