@@ -5,7 +5,7 @@
     crre     => 'createRelease',
     lsta     => 'listTasks',
     usta     => 'useTask',
-    usre     => 'useRelease'
+    usre     => 'useRelease',
     reta     => 'rebaseWithParentTask',
     mere     => 'mergeChildReleases'
     );
