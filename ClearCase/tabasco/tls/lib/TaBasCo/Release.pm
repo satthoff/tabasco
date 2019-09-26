@@ -213,7 +213,6 @@ sub loadConfigSpec {
 		push @config_spec, "element -directory $cp  " . $selectedRelease->getName() . ' -nocheckout';
 	    }
 	}
-	last if( $selectedRelease->getIsFullRelease() );
 	$selectedRelease = $selectedRelease->getPrevious();
     }
  
