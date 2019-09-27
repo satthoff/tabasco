@@ -8,7 +8,7 @@
     usre     => 'useRelease',
     reta     => 'rebaseWithParentTask',
     adre     => 'adoptReleaseFromChildTask',
-    rere     => 'recommedRelease'
+    rere     => 'recommendRelease'
     );
 
 %COMMAND = (
@@ -24,15 +24,15 @@
 
 "
     },
-        recommedRelease  => {
+        recommendRelease  => {
 	short => 'rere',
-	package     => 'CLI::Command::recommedRelease',
+	package     => 'CLI::Command::recommendRelease',
 	description => 'not yet implemented',
 	helptext    => "
 
 *** USAGE
 
-    recommedRelease - not yet implemented.
+    recommendRelease - not yet implemented.
 
     Recommend release for usage with commands
     rebaseWithParentTask or adoptReleaseFromChildTask
