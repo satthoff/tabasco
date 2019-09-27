@@ -7,7 +7,8 @@
     usta     => 'useTask',
     usre     => 'useRelease',
     reta     => 'rebaseWithParentTask',
-    mere     => 'mergeChildReleases'
+    adre     => 'adoptReleaseFromChildTask',
+    rere     => 'recommedRelease'
     );
 
 %COMMAND = (
@@ -23,9 +24,24 @@
 
 "
     },
+        recommedRelease  => {
+	short => 'rere',
+	package     => 'CLI::Command::recommedRelease',
+	description => 'not yet implemented',
+	helptext    => "
+
+*** USAGE
+
+    recommedRelease - not yet implemented.
+
+    Recommend release for usage with commands
+    rebaseWithParentTask or adoptReleaseFromChildTask
+
+"
+    },
         rebaseWithParentTask  => {
 	short => 'reta',
-	package     => 'CLI::Command::notImplemented',
+	package     => 'CLI::Command::rebaseWithParentTask',
 	description => 'not yet implemented',
 	helptext    => "
 
@@ -39,15 +55,15 @@
 
 "
     },
-        mergeChildReleases  => {
-	short => 'mere',
-	package     => 'CLI::Command::notImplemented',
+        adoptReleaseFromChildTask  => {
+	short => 'adre',
+	package     => 'CLI::Command::adoptReleaseFromChildTask',
 	description => 'not yet implemented',
 	helptext    => "
 
 *** USAGE
 
-    mergeChildReleases - not yet implemented.
+    adoptReleaseFromChildTask - not yet implemented.
 
     Perform a cspec/view merge from the recommended release
     of the child task specified with option -from <task>.
