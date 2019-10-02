@@ -127,11 +127,12 @@
 
 *** USAGE
 
-    listTasks  [ -long ] [ <task name> <task name> ... ]
+    listTasks  [ -long ] [ <task name> <task name> ... ] | -struct
 
 
     This command displays existing tasks.
     With option -long the config specs of tasks and a list of their releases will be displayed as well.
+    With option -struct the task tree structure of all root tasks will be displayed.
 
 "
     },

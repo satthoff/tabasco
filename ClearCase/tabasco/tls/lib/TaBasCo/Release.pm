@@ -26,7 +26,8 @@ sub BEGIN {
        IsFullRelease => { CALCULATE => \&checkFullRelease },
        Task => { CALCULATE => \&loadTask },
        Previous => { CALCULATE => \&loadPrevious },
-       ConfigSpec => { CALCULATE => \&loadConfigSpec }
+       ConfigSpec => { CALCULATE => \&loadConfigSpec },
+       BaselinedTasks => { CACULATE => \&loadBaselinedTasks }
        );
 
    Data::init(
@@ -134,6 +135,17 @@ sub checkFullRelease {
 	return $self->setIsFullRelease( 1 );
     }
     return undef;
+}
+
+sub loadBaselinedTasks {
+    my $self = shift;
+
+    my @result = $self->getToHyperlinkedObjects( ClearCase::HlType->new( -name => $TaBasCo::Common::Config::baselineLink, -vob => $self->getVob() ) );
+    my @tasks = ();
+    foreach my $t ( @result ) {
+	push @tasks, TaBasCo::Task->new( -name => $t );
+    }
+    return $self->setBaselinedTasks( \@tasks );
 }
 
 sub loadPrevious {

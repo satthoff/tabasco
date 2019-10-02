@@ -242,6 +242,35 @@ sub createNewRelease {
     return $newRelease;
 }
 
+sub printStruct {
+    my $self = shift;
+    my $indent = shift;
+
+    unless( $indent ) {
+	$indent = '';
+    }
+
+    print $indent . 'Task : ' . $self->getName() . "\n";
+    foreach my $np ( @{ $self->getPaths() } ) {
+	print $indent . 'Path : ' . $np->getNormalizedPath() . "\n";
+    }
+    print $indent . "Releases:\n";
+    my $rel = $self->getLastRelease();
+    while( $rel ) {
+	last if( $rel->getTask()->getName() ne $self->getName() );
+	my $relKind = 'delta';
+	if( $rel->getIsFullRelease() ) {
+	    $relKind = 'full';
+	}
+	print $indent . '   ' . $rel->getName() . " ($relKind)\n";
+	my @tasks = $rel->getBaselinedTasks();
+	foreach my $t( @tasks ) {
+	    $t->printStruct( $indent . '     ' );
+	}
+	$rel = $rel->getPrevious();
+    }
+}
+
 sub printMe {
     my $self = shift;
     my $long = shift;

@@ -28,7 +28,8 @@ sub initInstance {
 
    # first initialize the base classes
    $self->SUPER::initInstance(
-       '-long'
+       '-long',
+       '-struct'
        );
    
    return;
@@ -40,29 +41,40 @@ sub run {
 
   my @tasks = ();
   my $environment = TaBasCo::Environment->new();
-  if( @ARGV ) {
-      foreach my $taskName ( @ARGV ) {
-	  if( $environment->getTask( $taskName ) ) {
-	      push @tasks, $environment->getTask( $taskName );
-	  } else {
-	      Error( [ __PACKAGE__, "A task with name $taskName does not exist." ] );
+  if( $self->getOption( 'struct' ) ) {
+      my %tmp = %{ $environment->getAllTasks() };
+      my @tasks = values %tmp;
+      my @rootTasks = ();
+      foreach my $t ( @tasks ) {
+	  push @rootTasks, $t unless( $t->getParent() );
+      }
+      foreach my $rt ( @rootTasks ) {
+	  $rt->printStruct( ' ' );
+      }
+  } else {
+      if( @ARGV ) {
+	  foreach my $taskName ( @ARGV ) {
+	      if( $environment->getTask( $taskName ) ) {
+		  push @tasks, $environment->getTask( $taskName );
+	      } else {
+		  Error( [ __PACKAGE__, "A task with name $taskName does not exist." ] );
+	      }
+	  }
+	  return unless( @tasks );
+	  print "\n\n";
+      } else {
+	  if( $environment->getAllTasks() ) {
+	      my %tmp = %{ $environment->getAllTasks() };
+	      foreach ( keys %tmp ) {
+		  push @tasks, $tmp{ $_ };
+	      }
 	  }
       }
-      return unless( @tasks );
-      print "\n\n";
-  } else {
-      if( $environment->getAllTasks() ) {
-          my %tmp = %{ $environment->getAllTasks() };
-          foreach ( keys %tmp ) {
-              push @tasks, $tmp{ $_ };
-          }
+      foreach my $t ( @tasks ) {
+	  $t->printMe( $self->getOption( 'long' ) );
+	  print "\n\n";
       }
   }
-  foreach my $t ( @tasks ) {
-      $t->printMe( $self->getOption( 'long' ) );
-      print "\n\n";
-  }
-
 } # run
 
 1;
