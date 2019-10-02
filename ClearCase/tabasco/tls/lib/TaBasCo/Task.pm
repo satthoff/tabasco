@@ -250,11 +250,11 @@ sub printStruct {
 	$indent = '';
     }
 
-    print $indent . 'Task : ' . $self->getName() . "\n";
+    print $indent . "===============================================\n";
+    print $indent . '|Task : ' . $self->getName() . "\n";
     foreach my $np ( @{ $self->getPaths() } ) {
-	print $indent . 'Path : ' . $np->getNormalizedPath() . "\n";
+	print $indent . '|Path : ' . $np->getNormalizedPath() . "\n";
     }
-    print $indent . "Releases:\n";
     my $rel = $self->getLastRelease();
     while( $rel ) {
 	last if( $rel->getTask()->getName() ne $self->getName() );
@@ -262,13 +262,15 @@ sub printStruct {
 	if( $rel->getIsFullRelease() ) {
 	    $relKind = 'full';
 	}
-	print $indent . '   ' . $rel->getName() . " ($relKind)\n";
-	my @tasks = $rel->getBaselinedTasks();
+	print $indent . '|Release : ' . $rel->getName() . " ($relKind)\n";
+	my @tasks = @{ $rel->getBaselinedTasks() };
 	foreach my $t( @tasks ) {
-	    $t->printStruct( $indent . '     ' );
+            next if( $self->getName() eq $t->getName() );
+	    $t->printStruct( $indent . '|---> ' );
 	}
 	$rel = $rel->getPrevious();
     }
+    print $indent . "===============================================\n";
 }
 
 sub printMe {

@@ -27,7 +27,7 @@ sub BEGIN {
        Task => { CALCULATE => \&loadTask },
        Previous => { CALCULATE => \&loadPrevious },
        ConfigSpec => { CALCULATE => \&loadConfigSpec },
-       BaselinedTasks => { CACULATE => \&loadBaselinedTasks }
+       BaselinedTasks => { CALCULATE => \&loadBaselinedTasks }
        );
 
    Data::init(
