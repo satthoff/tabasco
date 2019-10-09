@@ -1,4 +1,4 @@
-package CLI::Command::adoptReleaseFromChildTask;
+package CLI::Command::mergeInRelease;
 
 use strict;
 use Carp;

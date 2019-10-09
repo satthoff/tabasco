@@ -7,7 +7,7 @@
     usta     => 'useTask',
     usre     => 'useRelease',
     reta     => 'rebaseWithParentTask',
-    adre     => 'adoptReleaseFromChildTask',
+    mire     => 'mergeInRelease',
     rere     => 'recommendRelease'
     );
 
@@ -35,7 +35,7 @@
     recommendRelease - not yet implemented.
 
     Recommend release for usage with commands
-    rebaseWithParentTask or adoptReleaseFromChildTask
+    rebaseWithParentTask or mergeInRelease
 
 "
     },
@@ -48,25 +48,26 @@
 *** USAGE
 
     rebaseWithParentTask - not yet implemented.
+                   -latest | -recommended
 
-    Replace current baseline by recommended release of parent task,
+    Replace current baseline by selected release of parent task,
     and afterwards perform a cspec/view merge for the paths of the
     current task.
 
 "
     },
-        adoptReleaseFromChildTask  => {
+        mergeInRelease  => {
 	short => 'adre',
-	package     => 'CLI::Command::adoptReleaseFromChildTask',
+	package     => 'CLI::Command::mergeInRelease',
 	description => 'not yet implemented',
 	helptext    => "
 
 *** USAGE
 
-    adoptReleaseFromChildTask - not yet implemented.
+    mergeInRelease - not yet implemented.
+                   -latest | -recommended | <release name>
 
-    Perform a cspec/view merge from the recommended release
-    of the child task specified with option -from <task>.
+    Perform a cspec/view merge from the selected release
 
 "
     },
