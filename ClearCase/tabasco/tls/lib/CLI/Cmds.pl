@@ -6,7 +6,6 @@
     lsta     => 'listTasks',
     usta     => 'useTask',
     usre     => 'useRelease',
-    reta     => 'rebaseWithParentTask',
     mire     => 'mergeInRelease',
     rere     => 'recommendRelease'
     );
@@ -39,25 +38,8 @@
 
 "
     },
-        rebaseWithParentTask  => {
-	short => 'reta',
-	package     => 'CLI::Command::rebaseWithParentTask',
-	description => 'not yet implemented',
-	helptext    => "
-
-*** USAGE
-
-    rebaseWithParentTask - not yet implemented.
-                   -latest | -recommended
-
-    Replace current baseline by selected release of parent task,
-    and afterwards perform a cspec/view merge for the paths of the
-    current task.
-
-"
-    },
         mergeInRelease  => {
-	short => 'adre',
+	short => 'mire',
 	package     => 'CLI::Command::mergeInRelease',
 	description => 'not yet implemented',
 	helptext    => "
@@ -65,7 +47,9 @@
 *** USAGE
 
     mergeInRelease - not yet implemented.
-                   -latest | -recommended | <release name>
+                   -latest <task name> |
+                   -recommended <task name> |
+                   <release name>
 
     Perform a cspec/view merge from the selected release
 
