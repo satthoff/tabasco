@@ -46,12 +46,14 @@
 
 *** USAGE
 
-    mergeInRelease - not yet implemented.
+    mergeInRelease -target <task name>
                    -latest <task name> |
                    -recommended <task name> |
-                   <release name>
+                   -release <release name>
 
-    Perform a cspec/view merge from the selected release
+    Perform a cspec/view merge from the selected release into the target task,
+    but only for those paths of the release's task which are
+    visible and writable for the target task.
 
 "
     },

@@ -23,6 +23,26 @@ sub BEGIN {
 
 } # sub BEGIN()
 
+sub initInstance {
+   my ( $self ) = @_;
+
+   # first initialize the base classes
+   $self->SUPER::initInstance(
+       '-target=s',
+       '-latest=s',
+       '-recommended=s',
+       '-release=s'
+       );
+   
+   if ( $#ARGV >= 0 ) {
+      Error( [ '', "superfluous arguments \"@ARGV\"" ] );
+      $self->help();
+      $self->exitInstance(-1);
+   }
+
+   return;
+} # initInstance
+
 
 sub run {
   my $self = shift;
